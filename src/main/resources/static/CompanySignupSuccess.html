@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Welcome to LebVest</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f5f7fa;font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" role="presentation">
+    <tr>
+        <td align="center" style="padding: 40px 20px;">
+            <table width="600" cellpadding="0" cellspacing="0"
+                   style="background:white;border-radius:8px;padding:40px;box-shadow:0 4px 14px rgba(0,0,0,0.05);">
+
+                <!-- Header -->
+                <tr>
+                    <td style="text-align: center; padding-bottom: 24px;">
+                        <h1 style="margin:0;color:#0A3161;font-size:24px;">Welcome to LebVest</h1>
+                        <p style="color:#6b7280;font-size:14px;margin-top:8px;">Your company registration has been approved</p>
+                    </td>
+                </tr>
+
+                <!-- Message Body -->
+                <tr>
+                    <td style="padding: 24px 0; font-size: 16px; color: #1f2937; line-height: 1.6;">
+                        <p>Dear <strong>{{name}}</strong>,</p>
+
+                        <p>We're excited to inform you that your company <strong>{{companyName}}</strong> has been successfully reviewed and accepted into the LebVest platform.</p>
+
+                        <p>You can now access your company dashboard, upload documents, connect with investors, and start showcasing your business to the community.</p>
+
+                        <p><strong style="color:#0A3161;">Sector:</strong> {{sector}}</p>
+                        <p><strong style="color:#0A3161;">Registered Email:</strong> {{email}}</p>
+
+                        <p>We're thrilled to have you onboard and can't wait to see your growth journey!</p>
+                    </td>
+                </tr>
+
+                <!-- Button -->
+                <tr>
+                    <td align="center" style="padding: 16px 0;">
+                        <a href="{{loginUrl}}" style="background-color:#0A3161;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;">
+                            Login to your account
+                        </a>
+                    </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                    <td style="border-top: 1px solid #e5e7eb; padding-top: 20px; text-align: center;">
+                        <p style="color:#9ca3af;font-size:13px;margin:0;">
+                            This is an automated message from <strong style="color:#0A3161;">LebVest</strong>. If you did not initiate this registration, please contact support.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
