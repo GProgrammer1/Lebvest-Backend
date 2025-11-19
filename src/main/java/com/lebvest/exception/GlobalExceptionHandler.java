@@ -23,6 +23,21 @@ public class GlobalExceptionHandler{
         );
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorPayload> handleResourceNotFoundException(
+            ResourceNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("ResourceNotFound at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.status(404).body(
+                ErrorPayload.builder()
+                        .status(404)
+                        .path(request.getRequestURI())
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
+
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorPayload> handleIllegalArgumentException(
             IllegalArgumentException ex,
