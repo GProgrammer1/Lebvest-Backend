@@ -1,5 +1,6 @@
 package com.lebvest.model.entities.investor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import jakarta.persistence.*;
@@ -10,9 +11,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -45,6 +44,7 @@ public class Investor {
 
     private String imageUrl;
 
+    // OK — ManyToMany Set (this is fine)
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "investor_watchlist",
@@ -52,38 +52,38 @@ public class Investor {
             inverseJoinColumns = @JoinColumn(name = "investment_id", referencedColumnName = "id")
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private Set<Investment> watchlist = new HashSet<>();
 
+    // FIX: Use Set instead of List to avoid bag fetch exception
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<InvestorInvestment> investments = new ArrayList<>();
+    @JsonIgnore
+    private Set<InvestorInvestment> investments = new HashSet<>();
 
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<InvestorNotification> notifications = new ArrayList<>();
+    @JsonIgnore
+    private Set<InvestorNotification> notifications = new HashSet<>();
 
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<InvestorGoal> goals = new ArrayList<>();
+    @JsonIgnore
+    private Set<InvestorGoal> goals = new HashSet<>();
 
     @OneToOne(mappedBy = "investor",
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private InvestorPreference preferences;
 
     @PrePersist
     public void prePersist() {
-        if (portfolio_value == null) {
-            portfolio_value = BigDecimal.ZERO;
-        }
-        if (total_invested == null) {
-            total_invested = BigDecimal.ZERO;
-        }
-        if (total_returns == null) {
-            total_returns = BigDecimal.ZERO;
-        }
+        if (portfolio_value == null) portfolio_value = BigDecimal.ZERO;
+        if (total_invested == null) total_invested = BigDecimal.ZERO;
+        if (total_returns == null) total_returns = BigDecimal.ZERO;
     }
 }

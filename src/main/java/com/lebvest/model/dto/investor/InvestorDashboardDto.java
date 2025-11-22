@@ -87,7 +87,7 @@ public class InvestorDashboardDto {
     @Builder
     public static class InvestorGoalDto {
         private Long id;
-        private String title;
+        private String name;
         private BigDecimal targetAmount;
         private BigDecimal currentAmount;
         private LocalDate deadline;

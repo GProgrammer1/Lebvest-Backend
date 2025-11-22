@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,18 +20,35 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Getter
+@Setter
 public class InvestorGoal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NonNull
-    @ManyToOne(fetch=LAZY, optional=false)
-    @JoinColumn(name="investor_id", nullable=false)
+    @ManyToOne(fetch = LAZY, optional = false)
+    @JoinColumn(name = "investor_id", nullable = false)
     private Investor investor;
 
-    @NonNull private String title;
-    @NonNull @Column(name="target_amount", precision=15, scale=2) private BigDecimal targetAmount;
-    @NonNull @Column(name="current_amount", precision=15, scale=2) private BigDecimal currentAmount;
-    @NonNull private LocalDate deadline;
+    @NonNull
+    @Column(name = "title", nullable = false)
+    private String name;
+
+    @NonNull
+    @Column(name = "target_amount", precision = 15, scale = 2, nullable = false)
+    private BigDecimal targetAmount;
+
+    @Column(name = "current_amount", precision = 15, scale = 2, nullable = false)
+    private BigDecimal currentAmount = BigDecimal.ZERO;
+
+    @Column(nullable = true)
+    private LocalDate deadline;
+
+    @PrePersist
+    public void prePersist() {
+        if (currentAmount == null) {
+            currentAmount = BigDecimal.ZERO;
+        }
+    }
 }

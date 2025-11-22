@@ -4,9 +4,15 @@ import com.lebvest.model.dto.ErrorPayload;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
@@ -51,6 +57,45 @@ public class GlobalExceptionHandler{
                         .status(400)
                         .path(request.getRequestURI())
                         .message(ex.getMessage())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorPayload> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request
+    ) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        return ResponseEntity.badRequest().body(
+                ErrorPayload.builder()
+                        .status(400)
+                        .path(request.getRequestURI())
+                        .message("Validation failed")
+                        .errors(errors)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorPayload> handleConstraintViolationException(
+            ConstraintViolationException ex,
+            HttpServletRequest request
+    ) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        ex.getConstraintViolations()
+                .forEach(violation ->
+                        errors.put(violation.getPropertyPath().toString(), violation.getMessage()));
+
+        return ResponseEntity.badRequest().body(
+                ErrorPayload.builder()
+                        .status(400)
+                        .path(request.getRequestURI())
+                        .message("Validation failed")
+                        .errors(errors)
                         .build()
         );
     }

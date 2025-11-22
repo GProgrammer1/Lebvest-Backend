@@ -23,13 +23,13 @@ public class InvestorPreference implements Serializable {
      * PK is investor_id (same as investors.id)
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long investorId;
+private Long investorId;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId
-    @JoinColumn(name = "investor_id")
-    private Investor investor;
+@OneToOne(fetch = FetchType.LAZY, optional = false)
+@MapsId
+@JoinColumn(name = "investor_id")
+private Investor investor;
+
 
     /**
      * Categories preferences.

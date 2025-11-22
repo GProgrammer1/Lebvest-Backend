@@ -200,7 +200,7 @@ public class InvestorService {
     private InvestorDashboardDto.InvestorGoalDto toGoalDto(InvestorGoal goal) {
         return InvestorDashboardDto.InvestorGoalDto.builder()
                 .id(goal.getId())
-                .title(goal.getTitle())
+                .name(goal.getName())
                 .targetAmount(goal.getTargetAmount())
                 .currentAmount(goal.getCurrentAmount())
                 .deadline(goal.getDeadline())

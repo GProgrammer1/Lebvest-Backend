@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -14,6 +15,7 @@ public class ErrorPayload {
     private String message;
     private String path;
     private int status;
+    private Map<String, String> errors;
     @Builder.Default
     private LocalDateTime timestamp = LocalDateTime.now();
 }
