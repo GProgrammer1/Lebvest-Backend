@@ -32,7 +32,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 .requestMatchers("/auth/**").permitAll()
-
+                                .requestMatchers("/investments/featured").permitAll()
+                                .requestMatchers("/investments").permitAll()
+                                .requestMatchers("/investments/*/watchlist").authenticated()
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
