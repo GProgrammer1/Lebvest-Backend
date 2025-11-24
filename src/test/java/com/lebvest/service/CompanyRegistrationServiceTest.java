@@ -3,7 +3,6 @@ package com.lebvest.service;
 import com.lebvest.config.VarsConfig;
 import com.lebvest.controller.AdminNotificationSseController;
 import com.lebvest.exception.ConflictException;
-import com.lebvest.model.dto.Attachment;
 import com.lebvest.model.dto.CompanyRegistrationRequest;
 import com.lebvest.model.entities.company.CompanySignupRequest;
 import com.lebvest.repository.CompanyRepository;
@@ -16,42 +15,42 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class CompanyRegistrationServiceTest {
 
-    private MailService mailService;
     private VarsConfig varsConfig;
     private CompanySignupRequestRepository companySignupRequestRepository;
     private AdminNotificationSseController adminNotificationSseController;
-    private S3Service s3Service;
     private CompanyRegistrationService companyRegistrationService;
     private RabbitTemplate rabbitTemplate;
     @BeforeEach
     void setUp() {
-        mailService = mock(MailService.class);
         varsConfig = mock(VarsConfig.class);
         UserRepository userRepository = mock(UserRepository.class);
         CompanyRepository companyRepository = mock(CompanyRepository.class);
         companySignupRequestRepository = mock(CompanySignupRequestRepository.class);
         adminNotificationSseController = mock(AdminNotificationSseController.class);
-        s3Service = mock(S3Service.class);
         rabbitTemplate = mock(RabbitTemplate.class);
 
         companyRegistrationService = new CompanyRegistrationService(
-                mailService,
                 varsConfig,
                 userRepository,
                 companyRepository,
                 companySignupRequestRepository,
                 adminNotificationSseController,
-                s3Service,
                 rabbitTemplate
         );
     }
@@ -84,7 +83,7 @@ class CompanyRegistrationServiceTest {
     }
 
     @Test
-    void registerCompany_shouldUploadDocs_saveRequest_notifyAdmins_sendEmail() throws IOException {
+    void registerCompany_shouldSaveRequest_notifyAdmins_enqueueEvents() {
         CompanyRegistrationRequest request = getCompanyRegistrationRequest();//creates a mock registration request
 
         BindingResult bindingResult = mock(BindingResult.class);
@@ -93,21 +92,18 @@ class CompanyRegistrationServiceTest {
 
         UUID fakeRequestId = UUID.randomUUID();
         when(varsConfig.getPendingPrefix(any())).thenReturn("pending/" + fakeRequestId); //testing the pending prefix method
-        when(mailService.loadAndFormatEmailTemplate(anyMap(), eq("CompanyRegistrationEmail"))).thenReturn("<html></html>");//testing the email loading
-        when(varsConfig.getAdminEmail()).thenReturn("admin@example.com");
+        when(varsConfig.getSignupCompanyUploadQueueName()).thenReturn("uploadQueue");
+        when(varsConfig.getSignupCompanyEmailQueueName()).thenReturn("emailQueue");
 
-        doNothing().when(s3Service).uploadPendingDocs(any(), eq(request));
         doNothing().when(adminNotificationSseController).notifyAllAdmins(any());
-        doNothing().when(mailService).sendHtmlMail(anyString(), anyString(), anyString(),
-                any(Attachment[].class));
 
         String result = companyRegistrationService.registerCompany(request, bindingResult);
 
         assertEquals("Request submitted successfully", result);
-        verify(s3Service).uploadPendingDocs(any(), eq(request));
-        verify(companySignupRequestRepository).save(any());
+        verify(companySignupRequestRepository, times(2)).save(any());
         verify(adminNotificationSseController).notifyAllAdmins(any());
-        verify(mailService).sendHtmlMail(anyString(), anyString(), anyString(), any(Attachment[].class));
+        verify(rabbitTemplate).convertAndSend(eq("uploadQueue"), any(Object.class));
+        verify(rabbitTemplate).convertAndSend(eq("emailQueue"), any(Object.class));
     }
 
     private static CompanyRegistrationRequest getCompanyRegistrationRequest() {

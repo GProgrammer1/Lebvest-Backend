@@ -44,7 +44,6 @@ public interface InvestmentRepository extends JpaRepository<Investment, Long> {
 
     @Query("SELECT i FROM Investment i WHERE i.deadline >= CURRENT_DATE ORDER BY i.createdAt DESC")
     List<Investment> findRecentInvestments(Pageable pageable);
+
+    List<Investment> findTop5ByOrderByCreatedAtDesc();
 }
-
-
-
