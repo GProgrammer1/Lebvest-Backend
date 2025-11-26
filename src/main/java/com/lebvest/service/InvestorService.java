@@ -115,7 +115,17 @@ public class InvestorService {
 
     @Transactional(readOnly = true)
     public InvestorProfileDto getCurrentInvestorProfile() {
-        Investor investor = getCurrentInvestorWithRelations();
+        // For profile, we only need basic info, no need to load all relations
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new IllegalArgumentException("Unable to determine authenticated investor");
+        }
+        String email = authentication.getName();
+        
+        // Use a simpler query that only loads user (no collections)
+        Investor investor = investorRepository.findByUserEmailForProfile(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
+        
         return InvestorProfileDto.builder()
                 .id(investor.getId())
                 .name(investor.getUser().getName())
