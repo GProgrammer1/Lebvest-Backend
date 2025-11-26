@@ -38,12 +38,25 @@ public class CompanyRegistrationService {
 
     @Transactional
     public String registerCompany(CompanyRegistrationRequest req, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
+        log.info("CompanyRegistrationService - Starting company registration for: {}", req.getCompanyName());
+        log.info("CompanyRegistrationService - Email: {}, Name: {}", req.getEmail(), req.getName());
+        log.info("CompanyRegistrationService - Password present: {}, Password length: {}", 
+                req.getPassword() != null, req.getPassword() != null ? req.getPassword().length() : 0);
+        
+        // Validation is handled by @Valid annotation in the controller
+        // This check is only for backward compatibility with @ModelAttribute requests
+        if (bindingResult != null && bindingResult.hasErrors()) {
             StringBuilder errorMessages = new StringBuilder("Validation failed: <br>");
             bindingResult.getAllErrors().forEach(error ->
                     errorMessages.append(error.getDefaultMessage()).append("<br>")
             );
             throw new IllegalArgumentException(errorMessages.toString());
+        }
+
+        // Explicit password validation
+        if (req.getPassword() == null || req.getPassword().trim().isEmpty()) {
+            log.error("CompanyRegistrationService - Password is null or empty!");
+            throw new IllegalArgumentException("Password cannot be null or empty");
         }
 
         // Check if user already exists
