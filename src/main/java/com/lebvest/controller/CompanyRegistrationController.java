@@ -29,13 +29,13 @@ public class CompanyRegistrationController {
     public ResponseEntity<ResponsePayload> registerCompany(@ModelAttribute CompanyRegistrationRequest companyRegistrationRequest, BindingResult bindingResult) {
 
         log.info("Request to registerCompany is {}", companyRegistrationRequest.toString());
-        String successMessage = companyRegistrationService.registerCompany(companyRegistrationRequest, bindingResult);
+        String token = companyRegistrationService.registerCompany(companyRegistrationRequest, bindingResult);
         return ResponseEntity.ok(
                 ResponsePayload
                         .builder()
-                        .message(successMessage)
+                        .message("Company registered successfully!")
                         .status(201)
-                        .data(Map.of("message", successMessage))
+                        .data(Map.of("token", token))
                         .build()
         );
     }
