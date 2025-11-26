@@ -1,12 +1,17 @@
 package com.lebvest.controller;
 
 import com.lebvest.model.dto.ResponsePayload;
+import com.lebvest.model.dto.investor.InvestorNotificationDto;
+import com.lebvest.model.dto.investor.InvestorPreferenceDto;
+import com.lebvest.model.dto.investor.InvestorProfileDto;
+import com.lebvest.model.dto.investor.UpdateInvestorPreferenceRequest;
+import com.lebvest.model.dto.investor.UpdateInvestorProfileRequest;
 import com.lebvest.service.InvestorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -63,6 +68,78 @@ public class InvestorController {
                         .status(200)
                         .message("Investor goals fetched successfully")
                         .data(Map.of("goals", goals))
+                        .build()
+        );
+    }
+
+    @GetMapping("/profile")
+    public ResponseEntity<ResponsePayload> getProfile() {
+        InvestorProfileDto profile = investorService.getCurrentInvestorProfile();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor profile fetched successfully")
+                        .data(Map.of("profile", profile))
+                        .build()
+        );
+    }
+
+    @PutMapping("/profile")
+    public ResponseEntity<ResponsePayload> updateProfile(@RequestBody @Valid UpdateInvestorProfileRequest request) {
+        InvestorProfileDto profile = investorService.updateCurrentInvestorProfile(request);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor profile updated successfully")
+                        .data(Map.of("profile", profile))
+                        .build()
+        );
+    }
+
+    @GetMapping("/preferences")
+    public ResponseEntity<ResponsePayload> getPreferences() {
+        InvestorPreferenceDto preferences = investorService.getCurrentInvestorPreferences();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor preferences fetched successfully")
+                        .data(Map.of("preferences", preferences))
+                        .build()
+        );
+    }
+
+    @PutMapping("/preferences")
+    public ResponseEntity<ResponsePayload> updatePreferences(@RequestBody @Valid UpdateInvestorPreferenceRequest request) {
+        InvestorPreferenceDto preferences = investorService.updateCurrentInvestorPreferences(request);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor preferences updated successfully")
+                        .data(Map.of("preferences", preferences))
+                        .build()
+        );
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<ResponsePayload> getNotifications() {
+        List<InvestorNotificationDto> notifications = investorService.getCurrentInvestorNotifications();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor notifications fetched successfully")
+                        .data(Map.of("notifications", notifications))
+                        .build()
+        );
+    }
+
+    @PutMapping("/notifications/{id}/read")
+    public ResponseEntity<ResponsePayload> markNotificationAsRead(@PathVariable Long id) {
+        InvestorNotificationDto notification = investorService.markNotificationAsRead(id);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Notification marked as read successfully")
+                        .data(Map.of("notification", notification))
                         .build()
         );
     }

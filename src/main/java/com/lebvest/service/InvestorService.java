@@ -2,6 +2,11 @@ package com.lebvest.service;
 
 import com.lebvest.exception.ResourceNotFoundException;
 import com.lebvest.model.dto.investor.InvestorDashboardDto;
+import com.lebvest.model.dto.investor.InvestorNotificationDto;
+import com.lebvest.model.dto.investor.InvestorPreferenceDto;
+import com.lebvest.model.dto.investor.InvestorProfileDto;
+import com.lebvest.model.dto.investor.UpdateInvestorPreferenceRequest;
+import com.lebvest.model.dto.investor.UpdateInvestorProfileRequest;
 import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import com.lebvest.model.entities.investor.Investor;
@@ -13,6 +18,7 @@ import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestorNotificationRepository;
 import com.lebvest.repository.InvestorRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,11 +36,14 @@ public class InvestorService {
 
     private final InvestorRepository investorRepository;
     private final InvestmentRepository investmentRepository;
+    private final InvestorNotificationRepository investorNotificationRepository;
 
     public InvestorService(InvestorRepository investorRepository,
-                           InvestmentRepository investmentRepository) {
+                           InvestmentRepository investmentRepository,
+                           InvestorNotificationRepository investorNotificationRepository) {
         this.investorRepository = investorRepository;
         this.investmentRepository = investmentRepository;
+        this.investorNotificationRepository = investorNotificationRepository;
     }
 
     @Transactional(readOnly = true)
@@ -102,6 +111,139 @@ public class InvestorService {
                 .sorted(Comparator.comparing(InvestorGoal::getDeadline))
                 .map(this::toGoalDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestorProfileDto getCurrentInvestorProfile() {
+        Investor investor = getCurrentInvestorWithRelations();
+        return InvestorProfileDto.builder()
+                .id(investor.getId())
+                .name(investor.getUser().getName())
+                .email(investor.getUser().getEmail())
+                .bio(investor.getBio())
+                .imageUrl(investor.getImageUrl())
+                .portfolioValue(investor.getPortfolio_value())
+                .totalInvested(investor.getTotal_invested())
+                .totalReturns(investor.getTotal_returns())
+                .build();
+    }
+
+    @Transactional
+    public InvestorProfileDto updateCurrentInvestorProfile(UpdateInvestorProfileRequest request) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        if (request.getName() != null && !request.getName().isBlank()) {
+            investor.getUser().setName(request.getName());
+        }
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            investor.getUser().setEmail(request.getEmail());
+        }
+        if (request.getBio() != null) {
+            investor.setBio(request.getBio());
+        }
+        if (request.getImageUrl() != null) {
+            investor.setImageUrl(request.getImageUrl());
+        }
+        
+        investorRepository.save(investor);
+        
+        return InvestorProfileDto.builder()
+                .id(investor.getId())
+                .name(investor.getUser().getName())
+                .email(investor.getUser().getEmail())
+                .bio(investor.getBio())
+                .imageUrl(investor.getImageUrl())
+                .portfolioValue(investor.getPortfolio_value())
+                .totalInvested(investor.getTotal_invested())
+                .totalReturns(investor.getTotal_returns())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestorPreferenceDto getCurrentInvestorPreferences() {
+        Investor investor = getCurrentInvestorWithRelations();
+        InvestorPreference preferences = investor.getPreferences();
+        
+        if (preferences == null) {
+            return InvestorPreferenceDto.builder()
+                    .categories(Set.of())
+                    .riskLevels(Set.of())
+                    .locations(Set.of())
+                    .build();
+        }
+        
+        return InvestorPreferenceDto.builder()
+                .categories(toSlugSet(preferences.getCategories()))
+                .riskLevels(toSlugSet(preferences.getRiskLevels()))
+                .locations(toSlugSet(preferences.getLocations()))
+                .build();
+    }
+
+    @Transactional
+    public InvestorPreferenceDto updateCurrentInvestorPreferences(UpdateInvestorPreferenceRequest request) {
+        Investor investor = getCurrentInvestorWithRelations();
+        InvestorPreference preferences = investor.getPreferences();
+        
+        if (preferences == null) {
+            preferences = InvestorPreference.builder()
+                    .investor(investor)
+                    .categories(new HashSet<>(request.getCategories()))
+                    .riskLevels(new HashSet<>(request.getRiskLevels()))
+                    .locations(new HashSet<>(request.getLocations()))
+                    .build();
+            investor.setPreferences(preferences);
+        } else {
+            preferences.setCategories(new HashSet<>(request.getCategories()));
+            preferences.setRiskLevels(new HashSet<>(request.getRiskLevels()));
+            preferences.setLocations(new HashSet<>(request.getLocations()));
+        }
+        
+        investorRepository.save(investor);
+        
+        return InvestorPreferenceDto.builder()
+                .categories(toSlugSet(preferences.getCategories()))
+                .riskLevels(toSlugSet(preferences.getRiskLevels()))
+                .locations(toSlugSet(preferences.getLocations()))
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestorNotificationDto> getCurrentInvestorNotifications() {
+        Investor investor = getCurrentInvestorWithRelations();
+        return investorNotificationRepository.findByInvestorOrderByNotifiedAtDesc(investor)
+                .stream()
+                .map(this::toInvestorNotificationDto)
+                .toList();
+    }
+
+    @Transactional
+    public InvestorNotificationDto markNotificationAsRead(Long notificationId) {
+        Investor investor = getCurrentInvestorWithRelations();
+        InvestorNotification notification = investorNotificationRepository
+                .findByIdAndInvestor(notificationId, investor)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Notification not found or does not belong to current investor"));
+        
+        notification.setRead(true);
+        investorNotificationRepository.save(notification);
+        
+        return toInvestorNotificationDto(notification);
+    }
+
+    private InvestorNotificationDto toInvestorNotificationDto(InvestorNotification notification) {
+        return InvestorNotificationDto.builder()
+                .id(notification.getId())
+                .type(notification.getInvestorNotificationType() != null
+                        ? notification.getInvestorNotificationType().name().toLowerCase()
+                        : null)
+                .title(notification.getTitle())
+                .message(notification.getMessage())
+                .notifiedAt(notification.getNotifiedAt())
+                .read(notification.isRead())
+                .relatedInvestmentId(notification.getRelatedInvestment() != null
+                        ? notification.getRelatedInvestment().getId()
+                        : null)
+                .build();
     }
 
     private Investor getCurrentInvestorWithRelations() {
