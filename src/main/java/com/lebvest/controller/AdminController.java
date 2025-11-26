@@ -45,4 +45,10 @@ public class AdminController {
         ResponsePayload payload = adminService.readNotification(id);
         return ResponseEntity.ok(payload);
     }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<ResponsePayload> getStatistics() {
+        ResponsePayload payload = adminService.getStatistics();
+        return ResponseEntity.ok(payload);
+    }
 }

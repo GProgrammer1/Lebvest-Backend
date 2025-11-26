@@ -46,9 +46,7 @@ public class Company {
 
     private String location;
 
-    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<CompanyTeamMember> teamMembers = new ArrayList<>();
+
 
     @ElementCollection
     @CollectionTable(name = "company_documents",

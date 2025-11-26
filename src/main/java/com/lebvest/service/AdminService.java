@@ -234,4 +234,18 @@ public class AdminService {
                 .data(Map.of("notification", notificationDto))
                 .build();
     }
+
+    public ResponsePayload getStatistics() {
+        long totalUsers = userRepo.count();
+        long totalCompanies = companyRepo.count();
+        
+        return ResponsePayload.builder()
+                .message("Statistics retrieved successfully")
+                .status(200)
+                .data(Map.of(
+                        "totalUsers", totalUsers,
+                        "totalCompanies", totalCompanies
+                ))
+                .build();
+    }
 }
