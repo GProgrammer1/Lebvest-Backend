@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface CompanyRepository extends JpaRepository<Company, Long> {
     boolean existsByUser(User user);
     Optional<Company> findByName(String name);
+    Optional<Company> findByUser(User user);
 }

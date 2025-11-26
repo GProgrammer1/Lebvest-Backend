@@ -42,7 +42,7 @@ public class CompanyRegistrationRequest {
     @NotNull
     private CompanySector sector;
 
-    @NotEmpty
+    // Documents are optional - can be null or empty
     private MultipartFile[] documents;
 
     @NotBlank
