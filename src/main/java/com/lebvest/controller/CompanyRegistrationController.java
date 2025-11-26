@@ -2,9 +2,7 @@ package com.lebvest.controller;
 
 import com.lebvest.model.dto.CompanyRegistrationRequest;
 import com.lebvest.model.dto.ResponsePayload;
-import com.lebvest.model.entities.company.Company;
 import com.lebvest.service.CompanyRegistrationService;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,8 +25,8 @@ public class CompanyRegistrationController {
         this.companyRegistrationService = companyRegistrationService;
     }
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponsePayload> registerCompany( @ModelAttribute CompanyRegistrationRequest companyRegistrationRequest, BindingResult bindingResult) {
+    @PostMapping(value = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<ResponsePayload> registerCompany(@ModelAttribute CompanyRegistrationRequest companyRegistrationRequest, BindingResult bindingResult) {
 
         log.info("Request to registerCompany is {}", companyRegistrationRequest.toString());
         String successMessage = companyRegistrationService.registerCompany(companyRegistrationRequest, bindingResult);

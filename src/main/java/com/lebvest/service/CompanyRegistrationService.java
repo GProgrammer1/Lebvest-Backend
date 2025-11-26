@@ -61,6 +61,8 @@ public class CompanyRegistrationService {
         CompanySignupRequest signupRequest = buildSignupRequest(req);
         companySignupRequestRepository.save(signupRequest);
 
+        // TODO: Re-enable when AWS and email credentials are available
+        /*
         // Offload uploading to queue: map MultipartFile[] -> Attachment[]
         var uploadQueueName = varsConfig.getSignupCompanyUploadQueueName();
         var files = Arrays.stream(req.getDocuments()).map(file -> {
@@ -101,6 +103,7 @@ public class CompanyRegistrationService {
                 null     // null -> listener will send to admin email
         );
         rabbitTemplate.convertAndSend(emailQueueName, emailEvent);
+        */
 
         return "Request submitted successfully";
     }
