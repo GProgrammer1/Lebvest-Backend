@@ -20,6 +20,8 @@ import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.repository.InvestmentRepository;
 import com.lebvest.repository.InvestorNotificationRepository;
 import com.lebvest.repository.InvestorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class InvestorService {
+
+    private static final Logger log = LoggerFactory.getLogger(InvestorService.class);
 
     private final InvestorRepository investorRepository;
     private final InvestmentRepository investmentRepository;
@@ -248,12 +252,33 @@ public class InvestorService {
 
     private Investor getCurrentInvestorWithRelations() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        log.info("InvestorService - Getting current investor, authentication: {}", 
+                authentication != null ? "present" : "null");
+        
         if (authentication == null || authentication.getName() == null) {
+            log.error("InvestorService - Authentication is null or name is null. Authentication: {}", authentication);
             throw new IllegalArgumentException("Unable to determine authenticated investor");
         }
         String email = authentication.getName();
-        return investorRepository.findOneWithDetailsByUserEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
+        log.info("InvestorService - Looking up investor for email: {}", email);
+        
+        var investorOpt = investorRepository.findOneWithDetailsByUserEmail(email);
+        if (investorOpt.isEmpty()) {
+            log.error("InvestorService - Investor not found for email: {}", email);
+            log.error("InvestorService - Total investors in database: {}", investorRepository.count());
+            // Log all investor emails for debugging
+            investorRepository.findAll().forEach(inv -> {
+                if (inv.getUser() != null) {
+                    log.error("InvestorService - Found investor id={} with user email={}", 
+                            inv.getId(), inv.getUser().getEmail());
+                }
+            });
+            throw new ResourceNotFoundException("Investor profile not found for current user with email: " + email);
+        }
+        
+        Investor investor = investorOpt.get();
+        log.info("InvestorService - Investor found: id={}, user email={}", investor.getId(), email);
+        return investor;
     }
 
     private InvestorDashboardDto.InvestorSummary toInvestorSummary(Investor investor) {

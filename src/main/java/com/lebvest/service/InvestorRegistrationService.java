@@ -9,6 +9,8 @@ import com.lebvest.model.enums.Role;
 import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import java.util.Set;
 
 @Service
 public class InvestorRegistrationService {
+
+    private static final Logger log = LoggerFactory.getLogger(InvestorRegistrationService.class);
 
     private final InvestorRepository investorRepository;
     private final UserRepository userRepository;
@@ -71,6 +75,10 @@ public class InvestorRegistrationService {
 
         investorRepository.save(investor);
 
-        return jwtService.generateToken(user, "access", user.getId());
+        log.info("InvestorRegistrationService - Investor registered successfully. User email: {}, User ID: {}", 
+                user.getEmail(), user.getId());
+        String token = jwtService.generateToken(user, "access", user.getId());
+        log.info("InvestorRegistrationService - Token generated for email: {}", user.getEmail());
+        return token;
     }
 }
