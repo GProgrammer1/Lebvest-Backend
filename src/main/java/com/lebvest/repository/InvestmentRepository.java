@@ -46,4 +46,9 @@ public interface InvestmentRepository extends JpaRepository<Investment, Long> {
     List<Investment> findRecentInvestments(Pageable pageable);
 
     List<Investment> findTop5ByOrderByCreatedAtDesc();
+
+    @Query("SELECT i FROM Investment i WHERE " +
+            "LOWER(i.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+            "LOWER(i.company.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+    Page<Investment> searchInvestments(@Param("query") String query, Pageable pageable);
 }

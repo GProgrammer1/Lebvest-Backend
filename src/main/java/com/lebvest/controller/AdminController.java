@@ -1,5 +1,6 @@
 package com.lebvest.controller;
 
+import com.lebvest.model.dto.AdminStatisticsDto;
 import com.lebvest.model.dto.AcceptSignupPayload;
 import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.model.dto.SignupRejectPayload;
@@ -44,5 +45,17 @@ public class AdminController {
     public ResponseEntity<ResponsePayload> readNotification(@RequestBody Long id) {
         ResponsePayload payload = adminService.readNotification(id);
         return ResponseEntity.ok(payload);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<ResponsePayload> getStatistics() {
+        AdminStatisticsDto statistics = adminService.getStatistics();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Statistics retrieved successfully")
+                        .data(Map.of("statistics", statistics))
+                        .build()
+        );
     }
 }

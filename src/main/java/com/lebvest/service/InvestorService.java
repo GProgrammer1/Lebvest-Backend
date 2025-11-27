@@ -7,12 +7,18 @@ import com.lebvest.model.dto.investor.InvestorPreferenceDto;
 import com.lebvest.model.dto.investor.InvestorProfileDto;
 import com.lebvest.model.dto.investor.UpdateInvestorPreferenceRequest;
 import com.lebvest.model.dto.investor.UpdateInvestorProfileRequest;
+import com.lebvest.exception.ResourceNotFoundException;
+import com.lebvest.model.dto.CreateGoalRequest;
+import com.lebvest.model.dto.UpdateGoalRequest;
+
+import java.math.BigDecimal;
 import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.entities.investor.InvestorGoal;
 import com.lebvest.model.entities.investor.InvestorNotification;
 import com.lebvest.model.entities.investor.InvestorPreference;
+import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
@@ -37,13 +43,16 @@ public class InvestorService {
     private final InvestorRepository investorRepository;
     private final InvestmentRepository investmentRepository;
     private final InvestorNotificationRepository investorNotificationRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
 
     public InvestorService(InvestorRepository investorRepository,
                            InvestmentRepository investmentRepository,
-                           InvestorNotificationRepository investorNotificationRepository) {
+                           InvestorNotificationRepository investorNotificationRepository,
+                           InvestorInvestmentRepository investorInvestmentRepository) {
         this.investorRepository = investorRepository;
         this.investmentRepository = investmentRepository;
         this.investorNotificationRepository = investorNotificationRepository;
+        this.investorInvestmentRepository = investorInvestmentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -125,6 +134,23 @@ public class InvestorService {
         // Use a simpler query that only loads user (no collections)
         Investor investor = investorRepository.findByUserEmailForProfile(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
+        
+        return InvestorProfileDto.builder()
+                .id(investor.getId())
+                .name(investor.getUser().getName())
+                .email(investor.getUser().getEmail())
+                .bio(investor.getBio())
+                .imageUrl(investor.getImageUrl())
+                .portfolioValue(investor.getPortfolio_value())
+                .totalInvested(investor.getTotal_invested())
+                .totalReturns(investor.getTotal_returns())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestorProfileDto getPublicInvestorProfile(Long id) {
+        Investor investor = investorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found"));
         
         return InvestorProfileDto.builder()
                 .id(investor.getId())
@@ -396,6 +422,78 @@ public class InvestorService {
 
     private String toSlug(InvestmentType investmentType) {
         return investmentType != null ? investmentType.name().toLowerCase() : null;
+    }
+
+    @Transactional
+    public InvestorDashboardDto.InvestorGoalDto createGoal(CreateGoalRequest request) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        InvestorGoal goal = new InvestorGoal(
+                investor,
+                request.getTitle(),
+                request.getTargetAmount(),
+                BigDecimal.ZERO, // currentAmount starts at 0
+                request.getDeadline()
+        );
+        
+        investor.getGoals().add(goal);
+        investorRepository.save(investor);
+        
+        return toGoalDto(goal);
+    }
+
+    @Transactional
+    public InvestorDashboardDto.InvestorGoalDto updateGoal(Long goalId, UpdateGoalRequest request) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        InvestorGoal goal = investor.getGoals().stream()
+                .filter(g -> g.getId().equals(goalId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Goal not found"));
+        
+        // Update fields if provided
+        if (request.getTitle() != null) {
+            goal.setTitle(request.getTitle());
+        }
+        if (request.getTargetAmount() != null) {
+            goal.setTargetAmount(request.getTargetAmount());
+        }
+        if (request.getDeadline() != null) {
+            goal.setDeadline(request.getDeadline());
+        }
+        // currentAmount is not updated via this endpoint
+        
+        investorRepository.save(investor);
+        
+        return toGoalDto(goal);
+    }
+
+    @Transactional
+    public void deleteGoal(Long goalId) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        InvestorGoal goal = investor.getGoals().stream()
+                .filter(g -> g.getId().equals(goalId))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Goal not found"));
+        
+        investor.getGoals().remove(goal);
+        investorRepository.save(investor);
+    }
+
+    @Transactional(readOnly = true)
+    public InvestorDashboardDto.InvestorInvestmentDto getInvestorInvestmentDetails(Long investorInvestmentId) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investorInvestmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investor investment not found"));
+        
+        // Verify it belongs to the current investor
+        if (!investorInvestment.getInvestor().getId().equals(investor.getId())) {
+            throw new IllegalArgumentException("This investment does not belong to the current investor");
+        }
+        
+        return toInvestorInvestmentDto(investorInvestment);
     }
 }
 
