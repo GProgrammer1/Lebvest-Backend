@@ -51,7 +51,7 @@ public class AdminService {
                         CleanupService cleanupService,
                         AdminNotificationRepository adminNotificationRepository,
                         CompanySignupRequestRepository companySignupRequestRepository,
-                        RabbitTemplate rabbitTemplate) {
+                        @org.springframework.beans.factory.annotation.Autowired(required = false) RabbitTemplate rabbitTemplate) {
         this.userRepo = userRepo;
         this.companyRepo = companyRepo;
         this.passwordEncoder = passwordEncoder;
@@ -94,30 +94,38 @@ public class AdminService {
         Company company = buildCompany(request, user, acceptedKeys);
 
         // 4) Queue the S3 move (pending -> accepted)
-        String moveQueue = resolveQueueName(varsConfig.getSignupCompanyAcceptedMoveQueueName(), "company.signup.accepted.move");
-        var moveEvent = new com.lebvest.model.events.CompanySignupAcceptedMoveEvent(
-                request.getRequestId(),
-                request.getDocuments() // optional: exact pending keys
-        );
-        rabbitTemplate.convertAndSend(moveQueue, moveEvent);
+        if (rabbitTemplate != null) {
+            String moveQueue = resolveQueueName(varsConfig.getSignupCompanyAcceptedMoveQueueName(), "company.signup.accepted.move");
+            var moveEvent = new com.lebvest.model.events.CompanySignupAcceptedMoveEvent(
+                    request.getRequestId(),
+                    request.getDocuments() // optional: exact pending keys
+            );
+            rabbitTemplate.convertAndSend(moveQueue, moveEvent);
+        } else {
+            log.warn("RabbitMQ not available, skipping S3 move event");
+        }
 
         // 5) Queue the accepted email (Admin -> Company)
-        String emailQueue = resolveQueueName(varsConfig.getSignupCompanyEmailQueueName(), "company.signup.email");
-        Map<String, String> templateData = Map.of(
-                "name", user.getName(),
-                "companyName", company.getName(),
-                "loginUrl", varsConfig.getFrontendUrl() + "/signin",
-                "sector", company.getSector() != null ? company.getSector().toString() : "N/A",
-                "email", user.getEmail()
-        );
-        var emailEvent = new com.lebvest.model.events.CompanySignupEmailEvent(
-                "LebVest Account Creation Approved",
-                "CompanySignupSuccess",
-                templateData,
-                null,
-                user.getEmail()
-        );
-        rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        if (rabbitTemplate != null) {
+            String emailQueue = resolveQueueName(varsConfig.getSignupCompanyEmailQueueName(), "company.signup.email");
+            Map<String, String> templateData = Map.of(
+                    "name", user.getName(),
+                    "companyName", company.getName(),
+                    "loginUrl", varsConfig.getFrontendUrl() + "/signin",
+                    "sector", company.getSector() != null ? company.getSector().toString() : "N/A",
+                    "email", user.getEmail()
+            );
+            var emailEvent = new com.lebvest.model.events.CompanySignupEmailEvent(
+                    "LebVest Account Creation Approved",
+                    "CompanySignupSuccess",
+                    templateData,
+                    null,
+                    user.getEmail()
+            );
+            rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        } else {
+            log.warn("RabbitMQ not available, skipping accepted email event");
+        }
 
         return ResponsePayload.builder()
                 .message("Company signup accepted successfully")
@@ -140,22 +148,26 @@ public class AdminService {
                 });
 
         // Queue the rejection email (Admin -> Company)
-        String emailQueue = resolveQueueName(varsConfig.getSignupCompanyEmailQueueName(), "company.signup.email");
-        Map<String, String> templateData = Map.of(
-                "name", req.getName(),
-                "companyName", req.getCompanyName(),
-                "reason", reason,
-                "sector", req.getSector() != null ? req.getSector().getValue() : "sector",
-                "email", req.getEmail()
-        );
-        var emailEvent = new com.lebvest.model.events.CompanySignupEmailEvent(
-                "Company signup rejected",
-                "CompanySignupFailure",
-                templateData,
-                null,
-                req.getEmail()
-        );
-        rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        if (rabbitTemplate != null) {
+            String emailQueue = resolveQueueName(varsConfig.getSignupCompanyEmailQueueName(), "company.signup.email");
+            Map<String, String> templateData = Map.of(
+                    "name", req.getName(),
+                    "companyName", req.getCompanyName(),
+                    "reason", reason,
+                    "sector", req.getSector() != null ? req.getSector().getValue() : "sector",
+                    "email", req.getEmail()
+            );
+            var emailEvent = new com.lebvest.model.events.CompanySignupEmailEvent(
+                    "Company signup rejected",
+                    "CompanySignupFailure",
+                    templateData,
+                    null,
+                    req.getEmail()
+            );
+            rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        } else {
+            log.warn("RabbitMQ not available, skipping rejection email event");
+        }
 
         return ResponsePayload.builder()
                 .message("Request to signup rejected")
