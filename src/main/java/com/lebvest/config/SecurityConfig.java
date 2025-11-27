@@ -37,7 +37,12 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/investments/featured").permitAll()
                                 .requestMatchers("/investments").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/investments/*").permitAll() // Public investment details and updates
                                 .requestMatchers("/investments/*/watchlist").authenticated()
+                                .requestMatchers("/investments/*/invest").authenticated() // Make investment requires auth
+                                .requestMatchers(HttpMethod.GET, "/companies").permitAll() // Public company list
+                                .requestMatchers(HttpMethod.GET, "/companies/*").permitAll() // Public company profiles
+                                .requestMatchers(HttpMethod.GET, "/investors/*").permitAll() // Public investor profiles
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )

@@ -1,6 +1,9 @@
 package com.lebvest.controller;
 
+import com.lebvest.model.dto.CreateGoalRequest;
 import com.lebvest.model.dto.ResponsePayload;
+import com.lebvest.model.dto.UpdateGoalRequest;
+import com.lebvest.model.dto.investor.InvestorDashboardDto;
 import com.lebvest.model.dto.investor.InvestorNotificationDto;
 import com.lebvest.model.dto.investor.InvestorPreferenceDto;
 import com.lebvest.model.dto.investor.InvestorProfileDto;
@@ -140,6 +143,56 @@ public class InvestorController {
                         .status(200)
                         .message("Notification marked as read successfully")
                         .data(Map.of("notification", notification))
+                        .build()
+        );
+    }
+
+    @PostMapping("/goals")
+    public ResponseEntity<ResponsePayload> createGoal(@RequestBody @Valid CreateGoalRequest request) {
+        InvestorDashboardDto.InvestorGoalDto goal = investorService.createGoal(request);
+        return ResponseEntity.status(201).body(
+                ResponsePayload.builder()
+                        .status(201)
+                        .message("Goal created successfully")
+                        .data(Map.of("goal", goal))
+                        .build()
+        );
+    }
+
+    @PutMapping("/goals/{id}")
+    public ResponseEntity<ResponsePayload> updateGoal(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateGoalRequest request) {
+        InvestorDashboardDto.InvestorGoalDto goal = investorService.updateGoal(id, request);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Goal updated successfully")
+                        .data(Map.of("goal", goal))
+                        .build()
+        );
+    }
+
+    @DeleteMapping("/goals/{id}")
+    public ResponseEntity<ResponsePayload> deleteGoal(@PathVariable Long id) {
+        investorService.deleteGoal(id);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Goal deleted successfully")
+                        .data(Map.of())
+                        .build()
+        );
+    }
+
+    @GetMapping("/investments/{id}")
+    public ResponseEntity<ResponsePayload> getInvestorInvestmentDetails(@PathVariable Long id) {
+        InvestorDashboardDto.InvestorInvestmentDto investment = investorService.getInvestorInvestmentDetails(id);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor investment details retrieved successfully")
+                        .data(Map.of("investment", investment))
                         .build()
         );
     }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,6 +20,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @Getter
+@Setter
 public class InvestorGoal {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

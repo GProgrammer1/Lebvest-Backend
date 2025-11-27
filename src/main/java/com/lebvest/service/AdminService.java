@@ -3,6 +3,7 @@ package com.lebvest.service;
 import com.lebvest.config.VarsConfig;
 import com.lebvest.model.dto.AcceptSignupPayload;
 import com.lebvest.model.dto.AdminNotificationDto;
+import com.lebvest.model.dto.AdminStatisticsDto;
 import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.model.dto.SignupRejectPayload;
 import com.lebvest.model.entities.admin.AdminNotification;
@@ -14,6 +15,9 @@ import com.lebvest.model.enums.SignupRequestStatus;
 import com.lebvest.repository.AdminNotificationRepository;
 import com.lebvest.repository.CompanyRepository;
 import com.lebvest.repository.CompanySignupRequestRepository;
+import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestorInvestmentRepository;
+import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
 import com.lebvest.util.AdminNotificationMapper;
 import jakarta.transaction.Transactional;
@@ -40,6 +44,9 @@ public class AdminService {
     private final CleanupService cleanupService;
     private final AdminNotificationRepository adminNotificationRepository;
     private final CompanySignupRequestRepository companySignupRequestRepository;
+    private final InvestmentRepository investmentRepository;
+    private final InvestorRepository investorRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
     //private final RabbitTemplate rabbitTemplate;  // Disabled - RabbitMQ not needed
 
     public AdminService(UserRepository userRepo,
@@ -50,7 +57,10 @@ public class AdminService {
                         S3AsyncClient s3Async,
                         CleanupService cleanupService,
                         AdminNotificationRepository adminNotificationRepository,
-                        CompanySignupRequestRepository companySignupRequestRepository
+                        CompanySignupRequestRepository companySignupRequestRepository,
+                        InvestmentRepository investmentRepository,
+                        InvestorRepository investorRepository,
+                        InvestorInvestmentRepository investorInvestmentRepository
                         //RabbitTemplate rabbitTemplate  // Disabled - RabbitMQ not needed
                         ) {
         this.userRepo = userRepo;
@@ -62,6 +72,9 @@ public class AdminService {
         this.cleanupService = cleanupService;
         this.adminNotificationRepository = adminNotificationRepository;
         this.companySignupRequestRepository = companySignupRequestRepository;
+        this.investmentRepository = investmentRepository;
+        this.investorRepository = investorRepository;
+        this.investorInvestmentRepository = investorInvestmentRepository;
         //this.rabbitTemplate = rabbitTemplate;  // Disabled - RabbitMQ not needed
     }
 
@@ -233,6 +246,52 @@ public class AdminService {
                 .message("Notification marked as read")
                 .status(200)
                 .data(Map.of("notification", notificationDto))
+                .build();
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public AdminStatisticsDto getStatistics() {
+        // Count companies
+        long totalCompanies = companyRepo.count();
+        
+        // Count investors
+        long totalInvestors = investorRepository.count();
+        
+        // Count investments
+        long totalInvestments = investmentRepository.count();
+        
+        // Count active investments (deadline in future)
+        long activeInvestments = investmentRepository.findAll().stream()
+                .filter(inv -> inv.getDeadline() != null && 
+                        inv.getDeadline().isAfter(java.time.LocalDate.now()))
+                .count();
+        
+        // Calculate total raised and target amounts
+        java.math.BigDecimal totalRaisedAmount = investmentRepository.findAll().stream()
+                .map(inv -> inv.getRaisedAmount() != null ? inv.getRaisedAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        java.math.BigDecimal totalTargetAmount = investmentRepository.findAll().stream()
+                .map(inv -> inv.getTargetAmount() != null ? inv.getTargetAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        // Count total investor investments
+        long totalInvestorInvestments = investorInvestmentRepository.count();
+        
+        // Count pending signup requests
+        long pendingSignupRequests = companySignupRequestRepository.findAll().stream()
+                .filter(req -> req.getRequestStatus() == SignupRequestStatus.PENDING)
+                .count();
+        
+        return AdminStatisticsDto.builder()
+                .totalCompanies(totalCompanies)
+                .totalInvestors(totalInvestors)
+                .totalInvestments(totalInvestments)
+                .activeInvestments(activeInvestments)
+                .totalRaisedAmount(totalRaisedAmount)
+                .totalTargetAmount(totalTargetAmount)
+                .totalInvestorInvestments(totalInvestorInvestments)
+                .pendingSignupRequests(pendingSignupRequests)
                 .build();
     }
 }

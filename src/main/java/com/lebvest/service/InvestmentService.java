@@ -4,6 +4,7 @@ import com.lebvest.exception.ResourceNotFoundException;
 import com.lebvest.model.dto.InvestmentDto;
 import com.lebvest.model.dto.InvestmentStatsDto;
 import com.lebvest.model.entities.investment.*;
+import com.lebvest.model.entities.investment.InvestorInvestment;
 import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.entities.investor.User;
 import com.lebvest.model.enums.CompanySector;
@@ -266,6 +267,14 @@ public class InvestmentService {
         return investorRepository.findByUser(user.get()).orElse(null);
     }
 
+    public Page<InvestmentDto> searchInvestments(String query, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Investment> investments = investmentRepository.searchInvestments(query, pageable);
+        
+        List<Long> watchlistIds = getCurrentUserWatchlistIds();
+        return investments.map(inv -> convertToDto(inv, watchlistIds));
+    }
+
     @Transactional(readOnly = true)
     public InvestmentStatsDto getInvestmentStats(Long investmentId) {
         Investment investment = investmentRepository.findById(investmentId)
@@ -274,7 +283,7 @@ public class InvestmentService {
         List<com.lebvest.model.entities.investment.InvestorInvestment> investorInvestments =
                 investorInvestmentRepository.findByInvestment(investment);
 
-        int totalInvestors = investorInvestments.size();
+        Integer totalInvestors = investorInvestments.size();
         BigDecimal targetAmount = investment.getTargetAmount();
         BigDecimal raisedAmount = investment.getRaisedAmount();
 
@@ -322,6 +331,90 @@ public class InvestmentService {
                 .minInvestmentAmount(minInvestmentAmount)
                 .maxInvestmentAmount(maxInvestmentAmount)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public InvestmentDto getInvestmentById(Long investmentId) {
+        Investment investment = investmentRepository.findById(investmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+        
+        List<Long> watchlistIds = getCurrentUserWatchlistIds();
+        return convertToDto(investment, watchlistIds);
+    }
+
+    @Transactional
+    public InvestorInvestment makeInvestment(Long investmentId, BigDecimal amount) {
+        Investor investor = getCurrentInvestor();
+        if (investor == null) {
+            throw new IllegalStateException("User must be an investor to make an investment");
+        }
+
+        Investment investment = investmentRepository.findById(investmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+
+        // Validate amount
+        if (amount.compareTo(investment.getMinInvestment()) < 0) {
+            throw new IllegalArgumentException("Investment amount must be at least " + investment.getMinInvestment());
+        }
+
+        // Check if investment deadline has passed
+        if (investment.getDeadline() != null && investment.getDeadline().isBefore(java.time.LocalDate.now())) {
+            throw new IllegalArgumentException("Investment deadline has passed");
+        }
+
+        // Check if target is already reached
+        if (investment.getRaisedAmount().compareTo(investment.getTargetAmount()) >= 0) {
+            throw new IllegalArgumentException("Investment target amount has already been reached");
+        }
+
+        // Check if this investment would exceed the target
+        BigDecimal newTotalRaised = investment.getRaisedAmount().add(amount);
+        if (newTotalRaised.compareTo(investment.getTargetAmount()) > 0) {
+            BigDecimal remaining = investment.getTargetAmount().subtract(investment.getRaisedAmount());
+            throw new IllegalArgumentException("Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
+        }
+
+        // Create investor investment
+        InvestorInvestment investorInvestment = InvestorInvestment.builder()
+                .investor(investor)
+                .investment(investment)
+                .amount(amount)
+                .investedAt(java.time.LocalDate.now())
+                .currentValue(amount) // Initially same as invested amount
+                .build();
+
+        investorInvestment = investorInvestmentRepository.save(investorInvestment);
+
+        // Update investment raised amount
+        BigDecimal newRaisedAmount = investment.getRaisedAmount().add(amount);
+        investment.setRaisedAmount(newRaisedAmount);
+        investmentRepository.save(investment);
+
+        // Update investor totals
+        investor.setTotal_invested(investor.getTotal_invested().add(amount));
+        investor.setPortfolio_value(investor.getPortfolio_value().add(amount));
+        investorRepository.save(investor);
+
+        return investorInvestment;
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestmentDto.UpdateDto> getInvestmentUpdates(Long investmentId) {
+        Investment investment = investmentRepository.findById(investmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+
+        if (investment.getUpdates() == null) {
+            return List.of();
+        }
+
+        return investment.getUpdates().stream()
+                .sorted((a, b) -> b.getUpdateDate().compareTo(a.getUpdateDate())) // Newest first
+                .map(u -> InvestmentDto.UpdateDto.builder()
+                        .date(u.getUpdateDate())
+                        .title(u.getTitle())
+                        .content(u.getContent())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
 
