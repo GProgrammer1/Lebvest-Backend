@@ -18,7 +18,7 @@ import com.lebvest.repository.UserRepository;
 import com.lebvest.util.AdminNotificationMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+//import org.springframework.amqp.rabbit.core.RabbitTemplate;  // Disabled - RabbitMQ not needed
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -40,7 +40,7 @@ public class AdminService {
     private final CleanupService cleanupService;
     private final AdminNotificationRepository adminNotificationRepository;
     private final CompanySignupRequestRepository companySignupRequestRepository;
-    private final RabbitTemplate rabbitTemplate;
+    //private final RabbitTemplate rabbitTemplate;  // Disabled - RabbitMQ not needed
 
     public AdminService(UserRepository userRepo,
                         CompanyRepository companyRepo,
@@ -50,8 +50,9 @@ public class AdminService {
                         S3AsyncClient s3Async,
                         CleanupService cleanupService,
                         AdminNotificationRepository adminNotificationRepository,
-                        CompanySignupRequestRepository companySignupRequestRepository,
-                        RabbitTemplate rabbitTemplate) {
+                        CompanySignupRequestRepository companySignupRequestRepository
+                        //RabbitTemplate rabbitTemplate  // Disabled - RabbitMQ not needed
+                        ) {
         this.userRepo = userRepo;
         this.companyRepo = companyRepo;
         this.passwordEncoder = passwordEncoder;
@@ -61,7 +62,7 @@ public class AdminService {
         this.cleanupService = cleanupService;
         this.adminNotificationRepository = adminNotificationRepository;
         this.companySignupRequestRepository = companySignupRequestRepository;
-        this.rabbitTemplate = rabbitTemplate;
+        //this.rabbitTemplate = rabbitTemplate;  // Disabled - RabbitMQ not needed
     }
 
     @Transactional
@@ -99,7 +100,7 @@ public class AdminService {
                 request.getRequestId(),
                 request.getDocuments() // optional: exact pending keys
         );
-        rabbitTemplate.convertAndSend(moveQueue, moveEvent);
+        //rabbitTemplate.convertAndSend(moveQueue, moveEvent);  // Disabled - RabbitMQ not needed
 
         // 5) Queue the accepted email (Admin -> Company)
         String emailQueue = resolveQueueName(varsConfig.getSignupCompanyEmailQueueName(), "company.signup.email");
@@ -117,7 +118,7 @@ public class AdminService {
                 null,
                 user.getEmail()
         );
-        rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        //rabbitTemplate.convertAndSend(emailQueue, emailEvent);  // Disabled - RabbitMQ not needed
 
         return ResponsePayload.builder()
                 .message("Company signup accepted successfully")
@@ -155,7 +156,7 @@ public class AdminService {
                 null,
                 req.getEmail()
         );
-        rabbitTemplate.convertAndSend(emailQueue, emailEvent);
+        //rabbitTemplate.convertAndSend(emailQueue, emailEvent);  // Disabled - RabbitMQ not needed
 
         return ResponsePayload.builder()
                 .message("Request to signup rejected")

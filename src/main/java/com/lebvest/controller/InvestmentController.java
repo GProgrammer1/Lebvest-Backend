@@ -1,6 +1,7 @@
 package com.lebvest.controller;
 
 import com.lebvest.model.dto.InvestmentDto;
+import com.lebvest.model.dto.InvestmentStatsDto;
 import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.model.enums.CompanySector;
 import com.lebvest.model.enums.InvestmentCategory;
@@ -103,6 +104,18 @@ public class InvestmentController {
                         .status(200)
                         .message("Investment removed from watchlist successfully")
                         .data(Map.of("investmentId", id))
+                        .build()
+        );
+    }
+
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<ResponsePayload> getInvestmentStats(@PathVariable Long id) {
+        InvestmentStatsDto stats = investmentService.getInvestmentStats(id);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investment statistics fetched successfully")
+                        .data(Map.of("stats", stats))
                         .build()
         );
     }

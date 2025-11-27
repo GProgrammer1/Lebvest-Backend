@@ -11,7 +11,7 @@ spring:
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: none  # Disable Hibernate DDL management - schema is managed manually
+      ddl-auto: none # Disable Hibernate DDL management - schema is managed manually
     show-sql: false
     properties:
       hibernate:
@@ -20,7 +20,7 @@ spring:
 
   # Flyway Configuration
   flyway:
-    enabled: false  # Disabled - using Hibernate ddl-auto: none instead
+    enabled: false # Disabled - using Hibernate ddl-auto: none instead
     baseline-on-migrate: true
     locations: classpath:db/migration
   # Mail Configuration
@@ -40,19 +40,19 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
-  # RabbitMQ Configuration
-  rabbitmq:
-    host: ${RABBITMQ_HOST:localhost}
-    port: ${RABBITMQ_PORT:5672}
-    username: ${RABBITMQ_USERNAME:guest}
-    password: ${RABBITMQ_PASSWORD:guest}
-    listener:
-      simple:
-        retry:
-          enabled: true
-          initial-interval: 1000
-          max-attempts: 3
-          multiplier: 2
+  # RabbitMQ Configuration - DISABLED
+  # rabbitmq:
+  #   host: ${RABBITMQ_HOST:localhost}
+  #   port: ${RABBITMQ_PORT:5672}
+  #   username: ${RABBITMQ_USERNAME:guest}
+  #   password: ${RABBITMQ_PASSWORD:guest}
+  #   listener:
+  #     simple:
+  #       retry:
+  #         enabled: true
+  #         initial-interval: 1000
+  #         max-attempts: 3
+  #         multiplier: 2
 
   # Security Configuration
   security:
@@ -122,4 +122,3 @@ management:
   endpoint:
     health:
       show-details: when-authorized
-

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
-@Service
+//@Service  // Disabled - RabbitMQ not needed
 public class CompanySignupListeners {
 
     private static final Logger log = LoggerFactory.getLogger(CompanySignupListeners.class);
