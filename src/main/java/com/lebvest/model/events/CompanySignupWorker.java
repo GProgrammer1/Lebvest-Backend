@@ -12,7 +12,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
+//@Component  // Disabled - RabbitMQ not needed
 public class CompanySignupWorker {
 
     private S3Service s3Service;

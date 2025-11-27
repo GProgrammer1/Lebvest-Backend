@@ -1,6 +1,8 @@
 package com.lebvest.service;
 
+import com.lebvest.exception.ResourceNotFoundException;
 import com.lebvest.model.dto.InvestmentDto;
+import com.lebvest.model.dto.InvestmentStatsDto;
 import com.lebvest.model.entities.investment.*;
 import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.entities.investor.User;
@@ -10,6 +12,7 @@ import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -23,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,14 +36,17 @@ public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
     private final InvestorRepository investorRepository;
+    private final InvestorInvestmentRepository investorInvestmentRepository;
     private final UserRepository userRepository;
 
     public InvestmentService(
             InvestmentRepository investmentRepository,
             InvestorRepository investorRepository,
+            InvestorInvestmentRepository investorInvestmentRepository,
             UserRepository userRepository) {
         this.investmentRepository = investmentRepository;
         this.investorRepository = investorRepository;
+        this.investorInvestmentRepository = investorInvestmentRepository;
         this.userRepository = userRepository;
     }
 
@@ -145,7 +152,8 @@ public class InvestmentService {
         }
     }
 
-    private InvestmentDto convertToDto(Investment investment, List<Long> watchlistIds) {
+    // Made protected so CompanyService can use it
+    protected InvestmentDto convertToDto(Investment investment, List<Long> watchlistIds) {
         InvestmentDto.InvestmentDtoBuilder builder = InvestmentDto.builder()
                 .id(investment.getId())
                 .title(investment.getTitle())
@@ -256,6 +264,64 @@ public class InvestmentService {
         }
 
         return investorRepository.findByUser(user.get()).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public InvestmentStatsDto getInvestmentStats(Long investmentId) {
+        Investment investment = investmentRepository.findById(investmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+
+        List<com.lebvest.model.entities.investment.InvestorInvestment> investorInvestments =
+                investorInvestmentRepository.findByInvestment(investment);
+
+        int totalInvestors = investorInvestments.size();
+        BigDecimal targetAmount = investment.getTargetAmount();
+        BigDecimal raisedAmount = investment.getRaisedAmount();
+
+        // Calculate progress percentage
+        BigDecimal progressPercentage = BigDecimal.ZERO;
+        if (targetAmount.compareTo(BigDecimal.ZERO) > 0) {
+            progressPercentage = raisedAmount
+                    .divide(targetAmount, 4, RoundingMode.HALF_UP)
+                    .multiply(new BigDecimal("100"))
+                    .setScale(2, RoundingMode.HALF_UP);
+        }
+
+        // Calculate statistics
+        BigDecimal averageInvestmentAmount = BigDecimal.ZERO;
+        BigDecimal minInvestmentAmount = BigDecimal.ZERO;
+        BigDecimal maxInvestmentAmount = BigDecimal.ZERO;
+
+        if (totalInvestors > 0) {
+            BigDecimal totalAmount = investorInvestments.stream()
+                    .map(com.lebvest.model.entities.investment.InvestorInvestment::getAmount)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            averageInvestmentAmount = totalAmount
+                    .divide(new BigDecimal(totalInvestors), 2, RoundingMode.HALF_UP);
+
+            minInvestmentAmount = investorInvestments.stream()
+                    .map(com.lebvest.model.entities.investment.InvestorInvestment::getAmount)
+                    .min(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO);
+
+            maxInvestmentAmount = investorInvestments.stream()
+                    .map(com.lebvest.model.entities.investment.InvestorInvestment::getAmount)
+                    .max(BigDecimal::compareTo)
+                    .orElse(BigDecimal.ZERO);
+        }
+
+        return InvestmentStatsDto.builder()
+                .investmentId(investment.getId())
+                .investmentTitle(investment.getTitle())
+                .targetAmount(targetAmount)
+                .raisedAmount(raisedAmount)
+                .progressPercentage(progressPercentage)
+                .totalInvestors(totalInvestors)
+                .averageInvestmentAmount(averageInvestmentAmount)
+                .minInvestmentAmount(minInvestmentAmount)
+                .maxInvestmentAmount(maxInvestmentAmount)
+                .build();
     }
 }
 
