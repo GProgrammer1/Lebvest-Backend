@@ -1,52 +1,42 @@
 package com.lebvest.service;
 
-import com.lebvest.config.VarsConfig;
-import com.lebvest.controller.AdminNotificationSseController;
 import com.lebvest.exception.ConflictException;
-import com.lebvest.model.dto.Attachment;
 import com.lebvest.model.dto.CompanyRegistrationRequest;
-import com.lebvest.model.dto.CompanySignupEmailEvent;
-import com.lebvest.model.dto.CompanySignupUploadEvent;
-import com.lebvest.model.entities.company.CompanySignupRequest;
+import com.lebvest.model.entities.company.Company;
+import com.lebvest.model.entities.investor.User;
+import com.lebvest.model.enums.Role;
 import com.lebvest.repository.CompanyRepository;
-import com.lebvest.repository.CompanySignupRequestRepository;
 import com.lebvest.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class CompanyRegistrationService {
 
     private static final Logger log = LoggerFactory.getLogger(CompanyRegistrationService.class);
 
-    private final VarsConfig varsConfig;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
-    private final CompanySignupRequestRepository companySignupRequestRepository;
-    private final AdminNotificationSseController adminNotificationSseController;
-    private final RabbitTemplate rabbitTemplate;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    public CompanyRegistrationService(VarsConfig varsConfig,
-                                      UserRepository userRepository,
+    public CompanyRegistrationService(UserRepository userRepository,
                                       CompanyRepository companyRepository,
-                                      CompanySignupRequestRepository companySignupRequestRepository,
-                                      AdminNotificationSseController adminNotificationSseController,
-                                      RabbitTemplate rabbitTemplate) {
-        this.varsConfig = varsConfig;
+                                      PasswordEncoder passwordEncoder,
+                                      JwtService jwtService) {
         this.userRepository = userRepository;
         this.companyRepository = companyRepository;
-        this.companySignupRequestRepository = companySignupRequestRepository;
-        this.adminNotificationSseController = adminNotificationSseController;
-        this.rabbitTemplate = rabbitTemplate;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
+    @Transactional
     public String registerCompany(CompanyRegistrationRequest req, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             StringBuilder errorMessages = new StringBuilder("Validation failed: <br>");
@@ -56,77 +46,49 @@ public class CompanyRegistrationService {
             throw new IllegalArgumentException(errorMessages.toString());
         }
 
-        checkConflict(req);
-
-        CompanySignupRequest signupRequest = buildSignupRequest(req);
-        companySignupRequestRepository.save(signupRequest);
-
-        // Offload uploading to queue: map MultipartFile[] -> Attachment[]
-        var uploadQueueName = varsConfig.getSignupCompanyUploadQueueName();
-        var files = Arrays.stream(req.getDocuments()).map(file -> {
-            try {
-                return new com.lebvest.model.events.Attachment(file.getOriginalFilename(), file.getBytes(), file.getContentType());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to buffer attachment: " + file.getOriginalFilename(), e);
-            }
-        }).toList();
-        var uploadEvent = new com.lebvest.model.events.CompanySignupUploadEvent(signupRequest.getRequestId(), files);
-        rabbitTemplate.convertAndSend(uploadQueueName, uploadEvent);
-
-        // Persist the *intended* S3 keys right away so admins can see doc names
-        String pendingPrefix = varsConfig.getPendingPrefix(signupRequest.getRequestId());
-        List<String> uploadedKeys = Arrays.stream(req.getDocuments())
-                .map(file -> pendingPrefix + "/" + file.getOriginalFilename())
-                .collect(Collectors.toList());
-        signupRequest.setDocuments(uploadedKeys);
-        companySignupRequestRepository.save(signupRequest);
-
-        // SSE notify admins
-        adminNotificationSseController.notifyAllAdmins(signupRequest);
-
-        // Offload email to admins to queue
-        var emailQueueName = varsConfig.getSignupCompanyEmailQueueName();
-        Map<String, String> templateData = Map.of(
-                "name", safe(req.getName()),
-                "email", safe(req.getEmail()),
-                "companyName", safe(req.getCompanyName()),
-                "description", safe(req.getDescription()),
-                "sector", req.getSector() != null ? req.getSector().name() : "N/A"
-        );
-        var emailEvent = new com.lebvest.model.events.CompanySignupEmailEvent(
-                "New Company Registration Request: " + req.getCompanyName(),
-                "CompanyRegistrationEmail",
-                templateData,
-                files,   // forward attachments
-                null     // null -> listener will send to admin email
-        );
-        rabbitTemplate.convertAndSend(emailQueueName, emailEvent);
-
-        return "Request submitted successfully";
-    }
-
-    private String safe(String value) {
-        return value != null ? value : "N/A";
-    }
-
-    private void checkConflict(CompanyRegistrationRequest req){
-        var signupRequest = companySignupRequestRepository.findByEmail(req.getEmail());
-        if (signupRequest.isPresent()) {
-            throw new ConflictException("Company already exists");
+        // Check if user already exists
+        if (userRepository.findByEmail(req.getEmail()).isPresent()) {
+            throw new ConflictException("User with this email already exists");
         }
-    }
 
-    private CompanySignupRequest buildSignupRequest(CompanyRegistrationRequest req) {
-        return CompanySignupRequest.builder()
-                .requestId(UUID.randomUUID())
-                .companyName(req.getCompanyName())
+        // Check if company name already exists
+        if (companyRepository.findByName(req.getCompanyName()).isPresent()) {
+            throw new ConflictException("Company with this name already exists");
+        }
+
+        // Create User with COMPANY role
+        User user = User.builder()
+                .name(req.getName())
+                .email(req.getEmail())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .roles(Set.of(Role.COMPANY))
+                .enabled(true)
+                .locked(false)
+                .build();
+        userRepository.save(user);
+
+        // Handle documents if provided (just store names for now)
+        List<String> documentNames = new ArrayList<>();
+        if (req.getDocuments() != null && req.getDocuments().length > 0) {
+            documentNames = Arrays.stream(req.getDocuments())
+                    .map(file -> file.getOriginalFilename())
+                    .filter(name -> name != null)
+                    .toList();
+        }
+
+        // Create Company directly
+        Company company = Company.builder()
+                .name(req.getCompanyName())
                 .description(req.getDescription())
                 .location(req.getLocation())
                 .foundedYear(req.getFoundedYear())
-                .name(req.getName())
-                .password(req.getPassword())
                 .sector(req.getSector())
-                .email(req.getEmail())
+                .user(user)
+                .documents(documentNames)
                 .build();
+        companyRepository.save(company);
+
+        // Generate JWT token for immediate login
+        return jwtService.generateToken(user, "access", user.getId());
     }
 }

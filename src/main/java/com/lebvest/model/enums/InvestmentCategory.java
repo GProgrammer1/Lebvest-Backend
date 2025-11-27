@@ -1,5 +1,6 @@
 package com.lebvest.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,6 +29,26 @@ public enum InvestmentCategory {
     @Enumerated(EnumType.STRING)
     public String getDisplayName() {
         return displayName;
+    }
+
+    @JsonCreator
+    public static InvestmentCategory fromString(String value) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        // Try to match by enum name first (case-insensitive)
+        for (InvestmentCategory category : InvestmentCategory.values()) {
+            if (category.name().equalsIgnoreCase(value)) {
+                return category;
+            }
+        }
+        // Try to match by display name (case-insensitive)
+        for (InvestmentCategory category : InvestmentCategory.values()) {
+            if (category.displayName.equalsIgnoreCase(value)) {
+                return category;
+            }
+        }
+        throw new IllegalArgumentException("Unknown InvestmentCategory: " + value);
     }
 
     @Override
