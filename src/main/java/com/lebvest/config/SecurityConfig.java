@@ -44,6 +44,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/companies/*").permitAll() // Public company profiles
                                 .requestMatchers(HttpMethod.GET, "/investors/*").permitAll() // Public investor profiles
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/sse/**").permitAll() // SSE endpoints validate token in controller (EventSource can't send headers)
                                 .requestMatchers("/ws/**").permitAll() // WebSocket endpoint
                                 .requestMatchers("/api/user-activity/**").authenticated()
                                 .anyRequest().authenticated()

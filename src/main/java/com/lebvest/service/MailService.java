@@ -58,8 +58,15 @@ public class MailService {
             }
 
             mailSender.send(message);
+            System.out.println("Email sent successfully to: " + to + " with subject: " + subject);
         } catch (MessagingException e) {
+            System.err.println("Failed to send email to: " + to + " - " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to send email with attachments", e);
+        } catch (Exception e) {
+            System.err.println("Unexpected error sending email to: " + to + " - " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to send email", e);
         }
     }
 
