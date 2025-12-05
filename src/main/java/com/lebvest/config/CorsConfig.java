@@ -21,7 +21,11 @@ public class CorsConfig {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
+        // Allow multiple localhost origins for development
         configuration.addAllowedOrigin("http://localhost:3000");
+        configuration.addAllowedOrigin("http://127.0.0.1:3000");
+        configuration.addAllowedOrigin("http://localhost:5173"); // Vite default port
+        configuration.addAllowedOrigin("http://127.0.0.1:5173");
         configuration.setAllowCredentials(true);
 
         //Mapper between cors config and route
