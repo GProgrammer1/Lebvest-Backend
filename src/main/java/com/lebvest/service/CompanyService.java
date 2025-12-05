@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.lebvest.model.enums.CompanySector;
 import com.lebvest.model.enums.Location;
+import com.lebvest.config.VarsConfig;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -43,7 +44,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,6 +63,8 @@ public class CompanyService {
     private final UserRepository userRepository;
     private final InvestmentService investmentService;
     private final com.lebvest.controller.AdminNotificationSseController adminNotificationSseController;
+    private final MailService mailService;
+    private final VarsConfig varsConfig;
 
     public CompanyService(
             CompanyRepository companyRepository,
@@ -70,7 +75,9 @@ public class CompanyService {
             InvestorRepository investorRepository,
             UserRepository userRepository,
             InvestmentService investmentService,
-            com.lebvest.controller.AdminNotificationSseController adminNotificationSseController) {
+            com.lebvest.controller.AdminNotificationSseController adminNotificationSseController,
+            MailService mailService,
+            VarsConfig varsConfig) {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
@@ -80,6 +87,8 @@ public class CompanyService {
         this.userRepository = userRepository;
         this.investmentService = investmentService;
         this.adminNotificationSseController = adminNotificationSseController;
+        this.mailService = mailService;
+        this.varsConfig = varsConfig;
     }
 
     @Transactional
@@ -739,8 +748,54 @@ public class CompanyService {
         verificationDocumentsRepository.save(verificationDocs);
         log.info("Verification documents submitted for company: {}", company.getName());
         
-        // Notify admins about verification document submission
-        adminNotificationSseController.notifyAllAdminsVerification(company);
+        // Notify admins about verification document submission (SSE)
+        try {
+            adminNotificationSseController.notifyAllAdminsVerification(company);
+            log.info("SSE notification sent for company verification: {}", company.getName());
+        } catch (Exception e) {
+            log.error("Failed to send SSE notification for company verification: {}", e.getMessage(), e);
+            // Continue - notification should still be saved in DB
+        }
+        
+        // Send email notification to admin with verification documents
+        try {
+            sendAdminVerificationEmail(company, verificationDocs);
+            log.info("Email notification initiated for company verification: {}", company.getName());
+        } catch (Exception e) {
+            log.error("Failed to initiate email notification for company verification: {}", e.getMessage(), e);
+            // Continue - verification submission should still succeed
+        }
+    }
+    
+    private void sendAdminVerificationEmail(Company company, CompanyVerificationDocuments verificationDocs) {
+        try {
+            String adminEmail = varsConfig.getAdminEmail();
+            if (adminEmail == null || adminEmail.isEmpty()) {
+                log.error("Admin email is not configured in VarsConfig");
+                return;
+            }
+            
+            log.info("Preparing to send verification email to admin: {}", adminEmail);
+            String adminDashboardUrl = varsConfig.getFrontendUrl() + "/admin-dashboard";
+            
+            Map<String, String> templateData = new HashMap<>();
+            templateData.put("companyName", company.getName());
+            templateData.put("representativeName", company.getUser().getName());
+            templateData.put("email", company.getUser().getEmail());
+            templateData.put("adminDashboardUrl", adminDashboardUrl);
+            
+            log.info("Loading email template: CompanyVerificationAdminNotification");
+            String htmlContent = mailService.loadAndFormatEmailTemplate(templateData, "CompanyVerificationAdminNotification");
+            log.info("Email template loaded successfully, sending email to: {}", adminEmail);
+            
+            mailService.sendHtmlMail(adminEmail, "Company Verification Documents Submitted: " + company.getName(), htmlContent);
+            
+            log.info("Admin verification notification email queued for sending to: {}", adminEmail);
+        } catch (Exception e) {
+            log.error("Failed to send admin verification notification email: {}", e.getMessage(), e);
+            e.printStackTrace();
+            // Don't throw - verification submission should still succeed even if email fails
+        }
     }
     
     @Transactional(readOnly = true)

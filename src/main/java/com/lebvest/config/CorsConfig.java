@@ -3,7 +3,6 @@ package com.lebvest.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -21,12 +20,17 @@ public class CorsConfig {
         final CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
-        // Allow multiple localhost origins for development
-        configuration.addAllowedOrigin("http://localhost:3000");
-        configuration.addAllowedOrigin("http://127.0.0.1:3000");
-        configuration.addAllowedOrigin("http://localhost:5173"); // Vite default port
-        configuration.addAllowedOrigin("http://127.0.0.1:5173");
+        // Use setAllowedOriginPatterns when credentials are enabled (required in newer Spring versions)
+        configuration.setAllowedOriginPatterns(java.util.Arrays.asList(
+            "http://localhost:*",
+            "http://127.0.0.1:*"
+        ));
         configuration.setAllowCredentials(true);
+        
+        // Explicitly allow SSE-specific headers
+        configuration.addExposedHeader("Cache-Control");
+        configuration.addExposedHeader("Content-Type");
+        configuration.addExposedHeader("Last-Event-ID");
 
         //Mapper between cors config and route
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
