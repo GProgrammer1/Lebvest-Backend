@@ -13,11 +13,14 @@ import com.lebvest.model.entities.investment.InvestorInvestment;
 import com.lebvest.model.entities.investor.User;
 import org.springframework.web.multipart.MultipartFile;
 import com.lebvest.repository.CompanyRepository;
+import com.lebvest.repository.CompanyVerificationDocumentsRepository;
 import com.lebvest.repository.InvestmentRepository;
 import com.lebvest.repository.InvestmentUpdateRepository;
 import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
+import com.lebvest.model.entities.company.CompanyVerificationDocuments;
+import com.lebvest.model.enums.CompanyStatus;
 import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.RiskLevel;
@@ -48,6 +51,7 @@ public class CompanyService {
     private static final Logger log = LoggerFactory.getLogger(CompanyService.class);
 
     private final CompanyRepository companyRepository;
+    private final CompanyVerificationDocumentsRepository verificationDocumentsRepository;
     private final InvestmentRepository investmentRepository;
     private final InvestmentUpdateRepository investmentUpdateRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
@@ -57,6 +61,7 @@ public class CompanyService {
 
     public CompanyService(
             CompanyRepository companyRepository,
+            CompanyVerificationDocumentsRepository verificationDocumentsRepository,
             InvestmentRepository investmentRepository,
             InvestmentUpdateRepository investmentUpdateRepository,
             InvestorInvestmentRepository investorInvestmentRepository,
@@ -64,6 +69,7 @@ public class CompanyService {
             UserRepository userRepository,
             InvestmentService investmentService) {
         this.companyRepository = companyRepository;
+        this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
         this.investmentUpdateRepository = investmentUpdateRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
@@ -75,6 +81,11 @@ public class CompanyService {
     @Transactional
     public InvestmentDto createInvestment(CreateInvestmentRequest request) {
         Company company = getCurrentCompany();
+        
+        // Check if company is fully verified and can post projects
+        if (!company.getStatus().canPostProjects()) {
+            throw new IllegalStateException("Company must be fully verified to post projects. Please complete the verification process.");
+        }
         
         Investment investment = Investment.builder()
                 .company(company)
@@ -655,6 +666,99 @@ public class CompanyService {
             
             return builder.build();
         });
+    }
+
+    @Transactional
+    public void submitVerificationDocuments(CompanyVerificationRequest request) {
+        Company company = getCurrentCompany();
+        
+        // Check if company is in APPROVED status (can submit step 2)
+        if (company.getStatus() != CompanyStatus.APPROVED) {
+            throw new IllegalStateException("Company must be approved before submitting verification documents");
+        }
+        
+        // Check if verification documents already exist
+        CompanyVerificationDocuments existing = verificationDocumentsRepository.findByCompany(company)
+                .orElse(null);
+        
+        CompanyVerificationDocuments verificationDocs;
+        if (existing != null) {
+            // Update existing
+            verificationDocs = existing;
+        } else {
+            // Create new
+            verificationDocs = CompanyVerificationDocuments.builder()
+                    .company(company)
+                    .isApproved(false)
+                    .build();
+        }
+        
+        // Update all fields
+        verificationDocs.setCertificateOfIncorporation(request.getCertificateOfIncorporation());
+        verificationDocs.setArticlesOfAssociation(request.getArticlesOfAssociation());
+        verificationDocs.setTaxRegistrationCertificate(request.getTaxRegistrationCertificate());
+        verificationDocs.setProofOfRegisteredAddress(request.getProofOfRegisteredAddress());
+        verificationDocs.setShareholderStructure(request.getShareholderStructure());
+        
+        if (request.getUboIds() != null) {
+            verificationDocs.setUboIds(new ArrayList<>(request.getUboIds()));
+        }
+        if (request.getDirectorIds() != null) {
+            verificationDocs.setDirectorIds(new ArrayList<>(request.getDirectorIds()));
+        }
+        if (request.getAuthorizedSignatoryIds() != null) {
+            verificationDocs.setAuthorizedSignatoryIds(new ArrayList<>(request.getAuthorizedSignatoryIds()));
+        }
+        verificationDocs.setBoardResolution(request.getBoardResolution());
+        verificationDocs.setPepSanctionsDeclaration(request.getPepSanctionsDeclaration());
+        verificationDocs.setBankAccountConfirmation(request.getBankAccountConfirmation());
+        
+        if (request.getFinancialStatements() != null) {
+            verificationDocs.setFinancialStatements(new ArrayList<>(request.getFinancialStatements()));
+        }
+        if (request.getManagementAccounts() != null) {
+            verificationDocs.setManagementAccounts(new ArrayList<>(request.getManagementAccounts()));
+        }
+        if (request.getBankStatements() != null) {
+            verificationDocs.setBankStatements(new ArrayList<>(request.getBankStatements()));
+        }
+        verificationDocs.setSourceOfFundsDeclaration(request.getSourceOfFundsDeclaration());
+        
+        // Update company status to PENDING_DOCS
+        company.setStatus(CompanyStatus.PENDING_DOCS);
+        companyRepository.save(company);
+        
+        verificationDocumentsRepository.save(verificationDocs);
+        log.info("Verification documents submitted for company: {}", company.getName());
+    }
+    
+    @Transactional(readOnly = true)
+    public CompanyVerificationRequest getVerificationDocuments() {
+        Company company = getCurrentCompany();
+        CompanyVerificationDocuments docs = verificationDocumentsRepository.findByCompany(company)
+                .orElse(null);
+        
+        if (docs == null) {
+            return null;
+        }
+        
+        return CompanyVerificationRequest.builder()
+                .certificateOfIncorporation(docs.getCertificateOfIncorporation())
+                .articlesOfAssociation(docs.getArticlesOfAssociation())
+                .taxRegistrationCertificate(docs.getTaxRegistrationCertificate())
+                .proofOfRegisteredAddress(docs.getProofOfRegisteredAddress())
+                .shareholderStructure(docs.getShareholderStructure())
+                .uboIds(docs.getUboIds() != null ? new ArrayList<>(docs.getUboIds()) : null)
+                .directorIds(docs.getDirectorIds() != null ? new ArrayList<>(docs.getDirectorIds()) : null)
+                .authorizedSignatoryIds(docs.getAuthorizedSignatoryIds() != null ? new ArrayList<>(docs.getAuthorizedSignatoryIds()) : null)
+                .boardResolution(docs.getBoardResolution())
+                .pepSanctionsDeclaration(docs.getPepSanctionsDeclaration())
+                .bankAccountConfirmation(docs.getBankAccountConfirmation())
+                .financialStatements(docs.getFinancialStatements() != null ? new ArrayList<>(docs.getFinancialStatements()) : null)
+                .managementAccounts(docs.getManagementAccounts() != null ? new ArrayList<>(docs.getManagementAccounts()) : null)
+                .bankStatements(docs.getBankStatements() != null ? new ArrayList<>(docs.getBankStatements()) : null)
+                .sourceOfFundsDeclaration(docs.getSourceOfFundsDeclaration())
+                .build();
     }
 }
 

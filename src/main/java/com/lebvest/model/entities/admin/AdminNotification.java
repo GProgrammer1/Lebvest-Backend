@@ -46,7 +46,7 @@ public class AdminNotification {
     private Boolean isAccepted;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "request_id", referencedColumnName = "id")
+    @JoinColumn(name = "request_id", referencedColumnName = "id", nullable = true)
     private CompanySignupRequest request;
     
     @PrePersist

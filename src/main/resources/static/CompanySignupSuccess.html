@@ -26,7 +26,24 @@
 
                         <p>We're excited to inform you that your company <strong>{{companyName}}</strong> has been successfully reviewed and accepted into the LebVest platform.</p>
 
-                        <p>You can now access your company dashboard, upload documents, connect with investors, and start showcasing your business to the community.</p>
+                        <p style="background-color:#fef3c7;padding:16px;border-radius:6px;border-left:4px solid #f59e0b;margin:20px 0;">
+                            <strong style="color:#92400e;">📋 Next Step Required:</strong><br/>
+                            To complete your registration and unlock the ability to post investment projects, please complete the verification process by submitting your legal, ownership, and financial documents.
+                        </p>
+
+                        <p><strong>What you can do now:</strong></p>
+                        <ul style="margin:10px 0;padding-left:20px;">
+                            <li>Browse available investment opportunities</li>
+                            <li>Access your company dashboard</li>
+                            <li>View investor profiles</li>
+                        </ul>
+
+                        <p><strong>After completing verification:</strong></p>
+                        <ul style="margin:10px 0;padding-left:20px;">
+                            <li>Post new investment projects</li>
+                            <li>Receive investments from verified investors</li>
+                            <li>Full platform access</li>
+                        </ul>
 
                         <p><strong style="color:#0A3161;">Sector:</strong> {{sector}}</p>
                         <p><strong style="color:#0A3161;">Registered Email:</strong> {{email}}</p>
@@ -35,11 +52,14 @@
                     </td>
                 </tr>
 
-                <!-- Button -->
+                <!-- Buttons -->
                 <tr>
                     <td align="center" style="padding: 16px 0;">
-                        <a href="{{loginUrl}}" style="background-color:#0A3161;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;">
-                            Login to your account
+                        <a href="{{verificationUrl}}" style="background-color:#0A3161;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;margin-right:12px;display:inline-block;">
+                            Complete Verification
+                        </a>
+                        <a href="{{loginUrl}}" style="background-color:#f3f4f6;color:#1f2937;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;display:inline-block;">
+                            Login to Dashboard
                         </a>
                     </td>
                 </tr>

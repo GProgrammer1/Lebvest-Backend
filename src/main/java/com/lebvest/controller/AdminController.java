@@ -58,4 +58,10 @@ public class AdminController {
                         .build()
         );
     }
+
+    @PostMapping("/approve-verification/{companyId}")
+    public ResponseEntity<ResponsePayload> approveVerification(@PathVariable Long companyId) {
+        ResponsePayload response = adminService.approveVerificationDocuments(companyId);
+        return ResponseEntity.ok(response);
+    }
 }

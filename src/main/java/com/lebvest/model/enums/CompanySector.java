@@ -17,7 +17,8 @@ public enum CompanySector {
     REAL_ESTATE("Real Estate"),
     HOSPITALITY("Hospitality"),
     ENTERTAINMENT("Entertainment"),
-    MANUFACTURING("Manufacturing");
+    MANUFACTURING("Manufacturing"),
+    OTHER("Other");
 
     private final String value;
 

@@ -61,10 +61,12 @@ public class CompanySignupRequest {
     @NotBlank
     private String companyName;
 
-    @Lob
-    private String description;
-
     private CompanySector sector;
+
+    // Custom sector text when sector is OTHER
+    @Column(length = 255, nullable = true)
+    private String customSector;
+
     @CurrentTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -76,8 +78,20 @@ public class CompanySignupRequest {
     @Column(nullable = false)
     private int foundedYear;
 
+    @Column(nullable = false, length = 255)
+    private String governorate;
+
+    @Column(nullable = false, length = 255)
+    private String city;
+
+    @Column(nullable = true, length = 512)
+    private String location; // Optional - can be built from governorate + city later
+
     @Column(nullable = false)
-    private String location;
+    private String phoneNumber;
+
+    @Column(nullable = false)
+    private String website;
 
     @PrePersist
     public void ensureDefaults() {
