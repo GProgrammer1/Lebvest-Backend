@@ -36,17 +36,26 @@ public class CompanyRegistrationRequest {
     @NotBlank
     private String companyName;
 
-    @NotBlank
-    private String description;
-
     @NotNull
     private CompanySector sector;
+
+    // Custom sector text when sector is OTHER
+    private String customSector;
 
     // Documents are optional - can be null or empty
     private MultipartFile[] documents;
 
     @NotBlank
-    private String location;
+    private String governorate;
+
+    @NotBlank
+    private String city;
+
+    @NotBlank
+    private String phoneNumber;
+
+    @NotBlank
+    private String website;
 
     private int foundedYear;
 //    private final Role role = Role.COMPANY;
@@ -54,10 +63,12 @@ public class CompanyRegistrationRequest {
 public String toString() {
     return "CompanyRegistrationRequest{" +
             "companyName='" + companyName + '\'' +
-            ", description='" + description + '\'' +
             ", sector='" + sector + '\'' +
             ", foundedYear=" + foundedYear +
-            ", location='" + location + '\'' +
+            ", governorate='" + governorate + '\'' +
+            ", city='" + city + '\'' +
+            ", phoneNumber='" + phoneNumber + '\'' +
+            ", website='" + website + '\'' +
             ", email='" + email + '\'' +
             ", name='" + name + '\'' +
             ", password='[PROTECTED]'" +  // mask sensitive data!

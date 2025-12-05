@@ -11,7 +11,7 @@ spring:
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: none # Disable Hibernate DDL management - schema is managed manually
+      ddl-auto: update # Disable Hibernate DDL management - schema is managed manually
     show-sql: false
     properties:
       hibernate:
@@ -91,7 +91,7 @@ aws:
 
 # Application Custom Configuration
 admin:
-  email: ${ADMIN_EMAIL:admin@lebvest.com}
+  email: ${ADMIN_EMAIL:bousleimengeorgio139@gmail.com}
 
 frontend:
   url: ${FRONTEND_URL:http://localhost:3000}

@@ -1,10 +1,13 @@
 package com.lebvest.service;
 
+import com.lebvest.config.VarsConfig;
+import com.lebvest.controller.AdminNotificationSseController;
 import com.lebvest.exception.ConflictException;
 import com.lebvest.model.dto.CompanyRegistrationRequest;
-import com.lebvest.model.entities.company.Company;
+import com.lebvest.model.entities.company.CompanySignupRequest;
 import com.lebvest.model.entities.investor.User;
 import com.lebvest.repository.CompanyRepository;
+import com.lebvest.repository.CompanySignupRequestRepository;
 import com.lebvest.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,22 +26,37 @@ class CompanyRegistrationServiceTest {
 
     private UserRepository userRepository;
     private CompanyRepository companyRepository;
+    private CompanySignupRequestRepository companySignupRequestRepository;
     private PasswordEncoder passwordEncoder;
     private JwtService jwtService;
+    private LocalFileStorageService localFileStorageService;
+    private MailService mailService;
+    private VarsConfig varsConfig;
+    private AdminNotificationSseController adminNotificationSseController;
     private CompanyRegistrationService companyRegistrationService;
 
     @BeforeEach
     void setUp() {
         userRepository = mock(UserRepository.class);
         companyRepository = mock(CompanyRepository.class);
+        companySignupRequestRepository = mock(CompanySignupRequestRepository.class);
         passwordEncoder = mock(PasswordEncoder.class);
         jwtService = mock(JwtService.class);
+        localFileStorageService = mock(LocalFileStorageService.class);
+        mailService = mock(MailService.class);
+        varsConfig = mock(VarsConfig.class);
+        adminNotificationSseController = mock(AdminNotificationSseController.class);
 
         companyRegistrationService = new CompanyRegistrationService(
                 userRepository,
                 companyRepository,
+                companySignupRequestRepository,
                 passwordEncoder,
-                jwtService
+                jwtService,
+                localFileStorageService,
+                mailService,
+                varsConfig,
+                adminNotificationSseController
         );
     }
 
@@ -63,6 +81,10 @@ class CompanyRegistrationServiceTest {
         request.setPassword("password123");
         request.setCompanyName("TestCorp");
         request.setName("Test User");
+        request.setGovernorate("Beirut");
+        request.setCity("Beirut");
+        request.setPhoneNumber("+961 1 234 567");
+        request.setWebsite("https://www.test.com");
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
@@ -79,50 +101,77 @@ class CompanyRegistrationServiceTest {
         request.setPassword("password123");
         request.setCompanyName("TestCorp");
         request.setName("Test User");
+        request.setGovernorate("Beirut");
+        request.setCity("Beirut");
+        request.setPhoneNumber("+961 1 234 567");
+        request.setWebsite("https://www.test.com");
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
-        when(companyRepository.findByName(request.getCompanyName())).thenReturn(Optional.of(mock(Company.class)));
+        when(companyRepository.findByName(request.getCompanyName())).thenReturn(Optional.of(mock(com.lebvest.model.entities.company.Company.class)));
 
         assertThrows(ConflictException.class, () ->
                 companyRegistrationService.registerCompany(request, bindingResult));
     }
 
     @Test
-    void registerCompany_shouldCreateUserAndCompany_returnJwtToken() {
+    void registerCompany_shouldThrowConflict_ifSignupRequestAlreadyExists() {
+        CompanyRegistrationRequest request = new CompanyRegistrationRequest();
+        request.setEmail("test@example.com");
+        request.setPassword("password123");
+        request.setCompanyName("TestCorp");
+        request.setName("Test User");
+        request.setGovernorate("Beirut");
+        request.setCity("Beirut");
+        request.setPhoneNumber("+961 1 234 567");
+        request.setWebsite("https://www.test.com");
+
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(bindingResult.hasErrors()).thenReturn(false);
+        when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
+        when(companyRepository.findByName(request.getCompanyName())).thenReturn(Optional.empty());
+        when(companySignupRequestRepository.findByEmail(request.getEmail())).thenReturn(Optional.of(mock(CompanySignupRequest.class)));
+
+        assertThrows(ConflictException.class, () ->
+                companyRegistrationService.registerCompany(request, bindingResult));
+    }
+
+    @Test
+    void registerCompany_shouldCreateSignupRequest_sendEmailAndNotification() {
         CompanyRegistrationRequest request = getCompanyRegistrationRequest();
 
         BindingResult bindingResult = mock(BindingResult.class);
         when(bindingResult.hasErrors()).thenReturn(false);
         when(userRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(companyRepository.findByName(request.getCompanyName())).thenReturn(Optional.empty());
+        when(companySignupRequestRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(localFileStorageService.savePendingFiles(any(), any())).thenReturn(List.of("uploads/pending/file1.pdf"));
+        when(varsConfig.getAdminEmail()).thenReturn("admin@example.com");
+        when(varsConfig.getFrontendUrl()).thenReturn("http://localhost:3000");
         
-        User savedUser = mock(User.class);
-        when(savedUser.getId()).thenReturn(1L);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
-        
-        Company savedCompany = mock(Company.class);
-        when(companyRepository.save(any(Company.class))).thenReturn(savedCompany);
-        
-        when(jwtService.generateToken(any(), eq("access"), eq(1L))).thenReturn("jwt-token");
+        CompanySignupRequest savedRequest = mock(CompanySignupRequest.class);
+        when(companySignupRequestRepository.save(any(CompanySignupRequest.class))).thenReturn(savedRequest);
 
-        String result = companyRegistrationService.registerCompany(request, bindingResult);
+        // Should not throw exception
+        assertDoesNotThrow(() -> companyRegistrationService.registerCompany(request, bindingResult));
 
-        assertNotNull(result);
-        assertEquals("jwt-token", result);
-        verify(userRepository).save(any(User.class));
-        verify(companyRepository).save(any(Company.class));
-        verify(jwtService).generateToken(any(), eq("access"), eq(1L));
+        verify(companySignupRequestRepository).save(any(CompanySignupRequest.class));
+        verify(localFileStorageService).savePendingFiles(any(), any());
+        verify(mailService).loadAndFormatEmailTemplate(any(), eq("CompanySignupAdminNotification"));
+        verify(mailService).sendHtmlMail(anyString(), anyString(), anyString());
+        verify(adminNotificationSseController).notifyAllAdmins(any(CompanySignupRequest.class));
     }
 
     private static CompanyRegistrationRequest getCompanyRegistrationRequest() {
         CompanyRegistrationRequest request = new CompanyRegistrationRequest();
         request.setEmail("test@example.com");
         request.setCompanyName("TestCorp");
-        request.setDescription("Test description");
-        request.setLocation("BEIRUT");
+        request.setGovernorate("Beirut");
+        request.setCity("Beirut");
+        request.setPhoneNumber("+961 1 234 567");
+        request.setWebsite("https://www.testcorp.com");
         request.setFoundedYear(2023);
         request.setName("John Doe");
         request.setPassword("password123");

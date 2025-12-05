@@ -231,5 +231,30 @@ public class CompanyController {
                         .build()
         );
     }
+
+    @PostMapping("/verification")
+    public ResponseEntity<ResponsePayload> submitVerificationDocuments(
+            @RequestBody @Valid CompanyVerificationRequest request) {
+        companyService.submitVerificationDocuments(request);
+        return ResponseEntity.status(201).body(
+                ResponsePayload.builder()
+                        .status(201)
+                        .message("Verification documents submitted successfully. Awaiting admin approval.")
+                        .data(Map.of())
+                        .build()
+        );
+    }
+
+    @GetMapping("/verification")
+    public ResponseEntity<ResponsePayload> getVerificationDocuments() {
+        CompanyVerificationRequest docs = companyService.getVerificationDocuments();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Verification documents retrieved successfully")
+                        .data(Map.of("documents", docs != null ? docs : Map.of()))
+                        .build()
+        );
+    }
 }
 
