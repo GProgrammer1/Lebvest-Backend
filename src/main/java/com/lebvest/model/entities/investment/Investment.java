@@ -87,6 +87,10 @@ public class Investment {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private InvestmentStatus status = InvestmentStatus.PENDING_REVIEW;
+
     @OneToOne(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)

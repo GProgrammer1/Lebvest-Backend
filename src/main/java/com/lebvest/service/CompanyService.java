@@ -23,6 +23,7 @@ import com.lebvest.model.entities.company.CompanyVerificationDocuments;
 import com.lebvest.model.enums.CompanyStatus;
 import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.enums.InvestmentCategory;
+import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.RiskLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class CompanyService {
     private final InvestorRepository investorRepository;
     private final UserRepository userRepository;
     private final InvestmentService investmentService;
+    private final com.lebvest.controller.AdminNotificationSseController adminNotificationSseController;
 
     public CompanyService(
             CompanyRepository companyRepository,
@@ -67,7 +69,8 @@ public class CompanyService {
             InvestorInvestmentRepository investorInvestmentRepository,
             InvestorRepository investorRepository,
             UserRepository userRepository,
-            InvestmentService investmentService) {
+            InvestmentService investmentService,
+            com.lebvest.controller.AdminNotificationSseController adminNotificationSseController) {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
@@ -76,6 +79,7 @@ public class CompanyService {
         this.investorRepository = investorRepository;
         this.userRepository = userRepository;
         this.investmentService = investmentService;
+        this.adminNotificationSseController = adminNotificationSseController;
     }
 
     @Transactional
@@ -103,9 +107,13 @@ public class CompanyService {
                 .deadline(request.getDeadline())
                 .imageUrl(request.getImageUrl())
                 .fundingStage(request.getFundingStage())
+                .status(InvestmentStatus.PENDING_REVIEW) // New investments require admin approval
                 .build();
 
         Investment savedInvestment = investmentRepository.save(investment);
+
+        // Notify admins about new project posting
+        adminNotificationSseController.notifyAllAdminsProject(savedInvestment);
 
         // Add highlights if provided
         if (request.getHighlights() != null && !request.getHighlights().isEmpty()) {
@@ -730,6 +738,9 @@ public class CompanyService {
         
         verificationDocumentsRepository.save(verificationDocs);
         log.info("Verification documents submitted for company: {}", company.getName());
+        
+        // Notify admins about verification document submission
+        adminNotificationSseController.notifyAllAdminsVerification(company);
     }
     
     @Transactional(readOnly = true)

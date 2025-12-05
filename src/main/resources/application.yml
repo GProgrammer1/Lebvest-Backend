@@ -2,16 +2,23 @@ spring:
   application:
     name: lebvest
 
-  # Database Configuration (MySQL)
+  # Database Configuration (MySQL/AWS RDS)
   datasource:
-    url: jdbc:mysql://localhost:3306/lebvest?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:lebvest}?createDatabaseIfNotExist=${CREATE_DB_IF_NOT_EXIST:false}&useSSL=${DB_USE_SSL:true}&requireSSL=${DB_REQUIRE_SSL:false}&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionTimeout=30000&socketTimeout=60000
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
   # JPA Configuration
   jpa:
     hibernate:
-      ddl-auto: update # Disable Hibernate DDL management - schema is managed manually
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -69,7 +76,7 @@ spring:
 
 # Server Configuration
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${PORT:${SERVER_PORT:8080}}
   error:
     include-message: always
     include-stacktrace: on_param

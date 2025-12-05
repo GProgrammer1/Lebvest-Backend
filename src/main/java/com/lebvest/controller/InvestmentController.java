@@ -123,6 +123,18 @@ public class InvestmentController {
         );
     }
 
+    @GetMapping("/{id}/watchlist/status")
+    public ResponseEntity<ResponsePayload> getWatchlistStatus(@PathVariable Long id) {
+        com.lebvest.model.dto.WatchlistStatusDto status = investmentService.getWatchlistStatus(id);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Watchlist status retrieved successfully")
+                        .data(Map.of("watchlistStatus", status))
+                        .build()
+        );
+    }
+
     @GetMapping("/search")
     public ResponseEntity<ResponsePayload> searchInvestments(
             @RequestParam("q") String query,

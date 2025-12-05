@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -24,4 +25,5 @@ public class AdminNotificationDto {
     private Boolean isAccepted;
     private boolean isRead;
     public LocalDateTime createdAt;
+    private List<String> documentUrls; // URLs to documents for viewing
 }

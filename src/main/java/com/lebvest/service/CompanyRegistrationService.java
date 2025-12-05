@@ -119,11 +119,38 @@ public class CompanyRegistrationService {
         companySignupRequestRepository.saveAndFlush(signupRequest);
         log.info("Company signup request created with ID: {}", signupRequest.getId());
 
+        // Send confirmation email to company (Step 1)
+        sendCompanyConfirmationEmail(signupRequest);
+
         // Send email to admin
         sendAdminNotificationEmail(signupRequest);
 
         // Create admin notification (request is now saved and has an ID)
         adminNotificationSseController.notifyAllAdmins(signupRequest);
+    }
+
+    private void sendCompanyConfirmationEmail(CompanySignupRequest request) {
+        try {
+            Map<String, String> templateData = new HashMap<>();
+            templateData.put("name", request.getName());
+            templateData.put("companyName", request.getCompanyName());
+            templateData.put("email", request.getEmail());
+            // Use custom sector if sector is OTHER, otherwise use the sector display name
+            String sectorDisplay = request.getSector() != null 
+                ? (request.getSector() == com.lebvest.model.enums.CompanySector.OTHER && request.getCustomSector() != null && !request.getCustomSector().trim().isEmpty()
+                    ? request.getCustomSector() 
+                    : request.getSector().toString())
+                : "N/A";
+            templateData.put("sector", sectorDisplay);
+
+            String htmlContent = mailService.loadAndFormatEmailTemplate(templateData, "CompanyRegistrationEmail");
+            mailService.sendHtmlMail(request.getEmail(), "Registration Request Received - LebVest", htmlContent);
+            
+            log.info("Company confirmation email sent to: {}", request.getEmail());
+        } catch (Exception e) {
+            log.error("Failed to send company confirmation email: {}", e.getMessage(), e);
+            // Don't throw - registration should still succeed even if email fails
+        }
     }
 
     private void sendAdminNotificationEmail(CompanySignupRequest request) {
