@@ -9,6 +9,7 @@ import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.entities.investor.User;
 import com.lebvest.model.enums.CompanySector;
 import com.lebvest.model.enums.InvestmentCategory;
+import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
@@ -68,9 +69,9 @@ public class InvestmentService {
         Sort sortObj = buildSort(sort);
         Pageable pageable = PageRequest.of(page, size, sortObj);
 
-        // Query with filters
+        // Query with filters - only show APPROVED investments to public
         Page<Investment> investments = investmentRepository.findInvestmentsWithFilters(
-                category, riskLevel, minReturn, location, sector, investmentType, minAmount, maxAmount, pageable
+                category, riskLevel, minReturn, location, sector, investmentType, minAmount, maxAmount, InvestmentStatus.APPROVED, pageable
         );
 
         // Get current user's watchlist if authenticated
@@ -269,10 +270,31 @@ public class InvestmentService {
 
     public Page<InvestmentDto> searchInvestments(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Investment> investments = investmentRepository.searchInvestments(query, pageable);
+        Page<Investment> investments = investmentRepository.searchInvestments(query, InvestmentStatus.APPROVED, pageable);
         
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
         return investments.map(inv -> convertToDto(inv, watchlistIds));
+    }
+
+    @Transactional(readOnly = true)
+    public com.lebvest.model.dto.WatchlistStatusDto getWatchlistStatus(Long investmentId) {
+        Investment investment = investmentRepository.findById(investmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+        
+        Investor investor = getCurrentInvestor();
+        if (investor == null) {
+            return com.lebvest.model.dto.WatchlistStatusDto.builder()
+                    .isWatchlisted(false)
+                    .build();
+        }
+        
+        boolean isWatchlisted = investor.getWatchlist().contains(investment);
+        
+        // If watchlisted, find when it was added (we'd need to track this, for now return null)
+        return com.lebvest.model.dto.WatchlistStatusDto.builder()
+                .isWatchlisted(isWatchlisted)
+                .addedAt(null) // TODO: Track watchlist addition date if needed
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -337,6 +359,12 @@ public class InvestmentService {
     public InvestmentDto getInvestmentById(Long investmentId) {
         Investment investment = investmentRepository.findById(investmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
+        
+        // Only return APPROVED investments for public access
+        // Admin endpoints should use AdminService.getProjectForReview instead
+        if (investment.getStatus() != InvestmentStatus.APPROVED) {
+            throw new ResourceNotFoundException("Investment not found or not available");
+        }
         
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
         return convertToDto(investment, watchlistIds);

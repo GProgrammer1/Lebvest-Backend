@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum AdminNotificationType {
     SIGNUP_REQUEST("Signup Request"),
     PROJECT_PROPOSAL("Project Proposal"),
+    VERIFICATION_REQUEST("Verification Request"),
     APP_STAT_UPDATE("App Stats Update");
 
     private final String value;

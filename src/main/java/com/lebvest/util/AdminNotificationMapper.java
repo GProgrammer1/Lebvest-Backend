@@ -2,10 +2,25 @@ package com.lebvest.util;
 
 import com.lebvest.model.dto.AdminNotificationDto;
 import com.lebvest.model.entities.admin.AdminNotification;
+import com.lebvest.model.entities.company.CompanySignupRequest;
+import com.lebvest.model.entities.company.CompanyVerificationDocuments;
+import com.lebvest.model.entities.investment.Investment;
+import com.lebvest.model.enums.AdminNotificationType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AdminNotificationMapper implements GenericMapper<AdminNotification, AdminNotificationDto>{
+
+    @Value("${server.port:8080}")
+    private String serverPort;
+
+    @Value("${server.address:localhost}")
+    private String serverAddress;
 
     public AdminNotification toEntity(AdminNotificationDto adminNotificationDto) {
         return AdminNotification.builder()
@@ -19,18 +34,136 @@ public class AdminNotificationMapper implements GenericMapper<AdminNotification,
                 .build();
     }
 
-    public static AdminNotificationDto toDto(AdminNotification adminNotification) {
+    public AdminNotificationDto toDto(AdminNotification adminNotification) {
+        List<String> documentUrls = extractDocumentUrls(adminNotification);
+        
         return AdminNotificationDto
                 .builder()
                 .id(adminNotification.getId())
                 .adminId(adminNotification.getAdmin().getId())
-                .reqId(adminNotification.getRequest().getId())
+                .reqId(adminNotification.getRequest() != null ? adminNotification.getRequest().getId() : null)
                 .title(adminNotification.getTitle())
                 .message(adminNotification.getMessage())
                 .isAccepted(adminNotification.getIsAccepted())
                 .isRead(adminNotification.isRead())
                 .type(adminNotification.getType())
                 .createdAt(adminNotification.getCreatedAt())
+                .documentUrls(documentUrls)
                 .build();
+    }
+
+    // Static method for backward compatibility
+ 
+
+    private List<String> extractDocumentUrls(AdminNotification notification) {
+        List<String> urls = new ArrayList<>();
+        
+        if (notification.getType() == AdminNotificationType.SIGNUP_REQUEST) {
+            // Extract documents from CompanySignupRequest
+            CompanySignupRequest request = notification.getRequest();
+            if (request != null && request.getDocuments() != null) {
+                urls.addAll(request.getDocuments().stream()
+                        .map(this::convertPathToUrl)
+                        .collect(Collectors.toList()));
+            }
+        } else if (notification.getType() == AdminNotificationType.PROJECT_PROPOSAL) {
+            // Extract documents from Investment
+            // Note: We need to add investment reference to AdminNotification entity
+            // For now, this will be handled when we create the notification
+        }
+        // Add verification documents extraction when we add that notification type
+        
+        return urls;
+    }
+
+    /**
+     * Extract all document URLs from CompanyVerificationDocuments
+     */
+    public List<String> extractVerificationDocumentUrls(CompanyVerificationDocuments docs) {
+        List<String> urls = new ArrayList<>();
+        
+        if (docs == null) {
+            return urls;
+        }
+        
+        // Single document fields
+        addIfNotNull(urls, docs.getCertificateOfIncorporation());
+        addIfNotNull(urls, docs.getArticlesOfAssociation());
+        addIfNotNull(urls, docs.getTaxRegistrationCertificate());
+        addIfNotNull(urls, docs.getProofOfRegisteredAddress());
+        addIfNotNull(urls, docs.getShareholderStructure());
+        addIfNotNull(urls, docs.getBoardResolution());
+        addIfNotNull(urls, docs.getPepSanctionsDeclaration());
+        addIfNotNull(urls, docs.getBankAccountConfirmation());
+        addIfNotNull(urls, docs.getSourceOfFundsDeclaration());
+        
+        // List fields
+        if (docs.getUboIds() != null) {
+            urls.addAll(docs.getUboIds());
+        }
+        if (docs.getDirectorIds() != null) {
+            urls.addAll(docs.getDirectorIds());
+        }
+        if (docs.getAuthorizedSignatoryIds() != null) {
+            urls.addAll(docs.getAuthorizedSignatoryIds());
+        }
+        if (docs.getFinancialStatements() != null) {
+            urls.addAll(docs.getFinancialStatements());
+        }
+        if (docs.getManagementAccounts() != null) {
+            urls.addAll(docs.getManagementAccounts());
+        }
+        if (docs.getBankStatements() != null) {
+            urls.addAll(docs.getBankStatements());
+        }
+        
+        // Convert all paths to URLs
+        return urls.stream()
+                .map(this::convertPathToUrl)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Extract document URLs from Investment
+     */
+    public List<String> extractInvestmentDocumentUrls(Investment investment) {
+        List<String> urls = new ArrayList<>();
+        
+        if (investment == null || investment.getDocuments() == null) {
+            return urls;
+        }
+        
+        urls.addAll(investment.getDocuments().stream()
+                .map(doc -> doc.getUrl())
+                .map(this::convertPathToUrl)
+                .collect(Collectors.toList()));
+        
+        return urls;
+    }
+
+    private void addIfNotNull(List<String> list, String value) {
+        if (value != null && !value.trim().isEmpty()) {
+            list.add(value);
+        }
+    }
+
+    /**
+     * Convert file path to accessible URL
+     * Assumes files are served via /api/files/{path}
+     */
+    private String convertPathToUrl(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            return null;
+        }
+        
+        // If already a full URL, return as is
+        if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
+            return filePath;
+        }
+        
+        // Convert relative path to URL
+        // Format: http://localhost:8080/api/files/{path}
+        String baseUrl = "http://" + serverAddress + ":" + serverPort;
+        return baseUrl + "/api/files/" + filePath.replace("\\", "/");
     }
 }

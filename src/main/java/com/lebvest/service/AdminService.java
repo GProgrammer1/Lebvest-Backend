@@ -1,15 +1,19 @@
 package com.lebvest.service;
 
 import com.lebvest.config.VarsConfig;
-import com.lebvest.model.dto.AcceptSignupPayload;
-import com.lebvest.model.dto.AdminNotificationDto;
-import com.lebvest.model.dto.AdminStatisticsDto;
-import com.lebvest.model.dto.ResponsePayload;
-import com.lebvest.model.dto.SignupRejectPayload;
+import com.lebvest.model.dto.*;
+import com.lebvest.model.dto.AdminProjectReviewDto;
+import com.lebvest.model.dto.ApproveProjectRequest;
+import com.lebvest.model.dto.RejectProjectRequest;
+import com.lebvest.model.dto.UserDto;
+import com.lebvest.model.dto.UpdateUserStatusRequest;
+import com.lebvest.model.dto.WatchlistStatusDto;
 import com.lebvest.model.entities.admin.AdminNotification;
 import com.lebvest.model.entities.company.Company;
 import com.lebvest.model.entities.company.CompanySignupRequest;
 import com.lebvest.model.entities.investor.User;
+import com.lebvest.model.enums.InvestmentCategory;
+import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.Role;
 import com.lebvest.model.enums.SignupRequestStatus;
 import com.lebvest.repository.AdminNotificationRepository;
@@ -20,8 +24,13 @@ import com.lebvest.repository.InvestmentRepository;
 import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import com.lebvest.model.entities.company.CompanyVerificationDocuments;
 import com.lebvest.model.enums.CompanyStatus;
+import com.lebvest.service.UserActivityService;
 import com.lebvest.util.AdminNotificationMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +62,8 @@ public class AdminService {
     private final LocalFileStorageService localFileStorageService;
     private final CompanyVerificationDocumentsRepository verificationDocumentsRepository;
     private final MailService mailService;
+    private final UserActivityService userActivityService;
+    private final AdminNotificationMapper adminNotificationMapper;
     //private final RabbitTemplate rabbitTemplate;  // Disabled - RabbitMQ not needed
 
     public AdminService(UserRepository userRepo,
@@ -69,7 +80,9 @@ public class AdminService {
                         InvestorInvestmentRepository investorInvestmentRepository,
                         LocalFileStorageService localFileStorageService,
                         CompanyVerificationDocumentsRepository verificationDocumentsRepository,
-                        MailService mailService
+                        MailService mailService,
+                        UserActivityService userActivityService,
+                        AdminNotificationMapper adminNotificationMapper
                         //RabbitTemplate rabbitTemplate  // Disabled - RabbitMQ not needed
                         ) {
         this.userRepo = userRepo;
@@ -87,6 +100,8 @@ public class AdminService {
         this.localFileStorageService = localFileStorageService;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.mailService = mailService;
+        this.userActivityService = userActivityService;
+        this.adminNotificationMapper = adminNotificationMapper;
         //this.rabbitTemplate = rabbitTemplate;  // Disabled - RabbitMQ not needed
     }
 
@@ -238,12 +253,71 @@ public class AdminService {
 
     public ResponsePayload getAllNotifications() {
         List<AdminNotificationDto> notifications = adminNotificationRepository.findAll()
-                .stream().map(AdminNotificationMapper::toDto).toList();
+                .stream().map(notification -> populateDocumentUrls(adminNotificationMapper.toDto(notification), notification)).toList();
         return ResponsePayload.builder()
                 .message("Notifications retrieved successfully")
                 .status(200)
                 .data(Map.of("notifications", notifications))
                 .build();
+    }
+    
+    /**
+     * Populate document URLs in notification DTO based on notification type
+     */
+    private AdminNotificationDto populateDocumentUrls(AdminNotificationDto dto, AdminNotification notification) {
+        List<String> documentUrls = new ArrayList<>();
+        
+        try {
+            if (notification.getType() == com.lebvest.model.enums.AdminNotificationType.SIGNUP_REQUEST) {
+                // Extract from CompanySignupRequest
+                if (notification.getRequest() != null && notification.getRequest().getDocuments() != null) {
+                    documentUrls = notification.getRequest().getDocuments().stream()
+                            .map(path -> convertPathToUrl(path))
+                            .filter(url -> url != null)
+                            .collect(Collectors.toList());
+                }
+            } else if (notification.getType() == com.lebvest.model.enums.AdminNotificationType.PROJECT_PROPOSAL) {
+                // Extract from Investment documents
+                if (notification.getInvestment() != null && notification.getInvestment().getDocuments() != null) {
+                    documentUrls = notification.getInvestment().getDocuments().stream()
+                            .map(doc -> doc.getUrl())
+                            .map(path -> convertPathToUrl(path))
+                            .filter(url -> url != null)
+                            .collect(Collectors.toList());
+                }
+            } else if (notification.getType() == com.lebvest.model.enums.AdminNotificationType.VERIFICATION_REQUEST) {
+                // Extract from CompanyVerificationDocuments
+                if (notification.getCompany() != null) {
+                    CompanyVerificationDocuments docs = verificationDocumentsRepository.findByCompany(notification.getCompany()).orElse(null);
+                    if (docs != null) {
+                        documentUrls = adminNotificationMapper.extractVerificationDocumentUrls(docs);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error extracting document URLs for notification {}: {}", notification.getId(), e.getMessage());
+        }
+        
+        dto.setDocumentUrls(documentUrls);
+        return dto;
+    }
+    
+    /**
+     * Convert file path to accessible URL
+     */
+    private String convertPathToUrl(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            return null;
+        }
+        
+        // If already a full URL, return as is
+        if (filePath.startsWith("http://") || filePath.startsWith("https://")) {
+            return filePath;
+        }
+        
+        // Convert relative path to URL
+        // Format: http://localhost:8080/api/files/{path}
+        return varsConfig.getFrontendUrl().replace(":3000", ":8080") + "/api/files/" + filePath.replace("\\", "/");
     }
 
     public CompanySignupRequest updateRequestStatus(Long id, SignupRequestStatus status) {
@@ -259,7 +333,7 @@ public class AdminService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid admin notification id: " + id));
         notification.setRead(true);
         adminNotificationRepository.save(notification);
-        var notificationDto = AdminNotificationMapper.toDto(notification);
+        var notificationDto = populateDocumentUrls(adminNotificationMapper.toDto(notification), notification);
 
         return ResponsePayload.builder()
                 .message("Notification marked as read")
@@ -362,5 +436,286 @@ public class AdminService {
         } catch (Exception e) {
             log.error("Failed to send verification approval email: {}", e.getMessage(), e);
         }
+    }
+
+    // ========== PROJECT REVIEW METHODS ==========
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<AdminProjectReviewDto> getPendingProjects(
+            InvestmentStatus status,
+            InvestmentCategory category,
+            String search,
+            int page,
+            int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        
+        // If status is null, we want all projects (for "All" filter)
+        // The repository query handles null status correctly
+        Page<com.lebvest.model.entities.investment.Investment> investments = 
+                investmentRepository.findPendingInvestmentsForAdmin(status, category, search, pageable);
+        
+        return investments.map(this::convertToAdminReviewDto);
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public AdminProjectReviewDto getProjectForReview(Long projectId) {
+        com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+        return convertToAdminReviewDto(investment);
+    }
+
+    @Transactional
+    public AdminProjectReviewDto approveProject(Long projectId, ApproveProjectRequest request) {
+        com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+        
+        if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
+            throw new IllegalStateException("Investment is not in PENDING_REVIEW status");
+        }
+        
+        investment.setStatus(InvestmentStatus.APPROVED);
+        investmentRepository.save(investment);
+        
+        // TODO: Send notification to company about approval
+        log.info("Project {} approved by admin", projectId);
+        
+        return convertToAdminReviewDto(investment);
+    }
+
+    @Transactional
+    public AdminProjectReviewDto rejectProject(Long projectId, RejectProjectRequest request) {
+        com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+        
+        if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
+            throw new IllegalStateException("Investment is not in PENDING_REVIEW status");
+        }
+        
+        investment.setStatus(InvestmentStatus.REJECTED);
+        investmentRepository.save(investment);
+        
+        // TODO: Send notification to company about rejection with reason
+        log.info("Project {} rejected by admin. Reason: {}", projectId, request.getReason());
+        
+        return convertToAdminReviewDto(investment);
+    }
+
+    private AdminProjectReviewDto convertToAdminReviewDto(com.lebvest.model.entities.investment.Investment investment) {
+        AdminProjectReviewDto.AdminProjectReviewDtoBuilder builder = AdminProjectReviewDto.builder()
+                .id(investment.getId())
+                .title(investment.getTitle())
+                .companyName(investment.getCompany().getName())
+                .companyId(investment.getCompany().getId())
+                .description(investment.getDescription())
+                .category(investment.getCategory())
+                .riskLevel(investment.getRiskLevel())
+                .expectedReturn(investment.getExpectedReturn())
+                .minInvestment(investment.getMinInvestment())
+                .targetAmount(investment.getTargetAmount())
+                .raisedAmount(investment.getRaisedAmount())
+                .location(investment.getLocation())
+                .sector(investment.getCompany().getSector() != null ? investment.getCompany().getSector().getValue() : null)
+                .investmentType(investment.getInvestmentType())
+                .durationMonths(investment.getDurationMonths())
+                .imageUrl(investment.getImageUrl())
+                .fundingStage(investment.getFundingStage())
+                .deadline(investment.getDeadline())
+                .createdAt(investment.getCreatedAt())
+                .submittedDate(investment.getCreatedAt()) // Use createdAt as submitted date
+                .status(investment.getStatus());
+
+        // Convert highlights
+        if (investment.getHighlights() != null) {
+            builder.highlights(investment.getHighlights().stream()
+                    .map(com.lebvest.model.entities.investment.InvestmentHighlight::getHighlight)
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        // Convert team members
+        if (investment.getTeamMembers() != null) {
+            builder.team(investment.getTeamMembers().stream()
+                    .map(tm -> AdminProjectReviewDto.TeamMemberDto.builder()
+                            .name(tm.getName())
+                            .role(tm.getRole())
+                            .bio(tm.getBio())
+                            .imageUrl(tm.getImageUrl())
+                            .build())
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        // Convert financials
+        if (investment.getFinancials() != null) {
+            builder.financials(investment.getFinancials().stream()
+                    .map(f -> AdminProjectReviewDto.FinancialDto.builder()
+                            .revenue(f.getRevenue())
+                            .expenses(f.getExpenses())
+                            .profit(f.getProfit())
+                            .year(f.getYear())
+                            .build())
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        // Convert documents
+        if (investment.getDocuments() != null) {
+            builder.documents(investment.getDocuments().stream()
+                    .map(d -> AdminProjectReviewDto.DocumentDto.builder()
+                            .title(d.getTitle())
+                            .type(d.getType())
+                            .url(d.getUrl())
+                            .build())
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        // Convert updates
+        if (investment.getUpdates() != null) {
+            builder.updates(investment.getUpdates().stream()
+                    .map(u -> AdminProjectReviewDto.UpdateDto.builder()
+                            .date(u.getUpdateDate())
+                            .title(u.getTitle())
+                            .content(u.getContent())
+                            .build())
+                    .collect(java.util.stream.Collectors.toList()));
+        }
+
+        return builder.build();
+    }
+
+    // ========== USER MANAGEMENT METHODS ==========
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<UserDto> getAllUsers(
+            Role role,
+            String status,
+            String search,
+            int page,
+            int size) {
+        // Get all users first (we'll filter in memory for now)
+        // In production, you'd want to add proper JPA queries with filters
+        List<User> allUsersList = userRepo.findAll();
+        
+        // Apply filters
+        java.util.stream.Stream<User> filteredStream = allUsersList.stream();
+        
+        // Filter by role
+        if (role != null) {
+            filteredStream = filteredStream.filter(user -> user.getRoles().contains(role));
+        }
+        
+        // Filter by status
+        if (status != null && !status.equals("All")) {
+            filteredStream = filteredStream.filter(user -> {
+                String userStatus = determineUserStatus(user);
+                return userStatus.equals(status);
+            });
+        }
+        
+        // Filter by search
+        if (search != null && !search.isEmpty()) {
+            String searchLower = search.toLowerCase();
+            filteredStream = filteredStream.filter(user -> 
+                (user.getName() != null && user.getName().toLowerCase().contains(searchLower)) ||
+                (user.getEmail() != null && user.getEmail().toLowerCase().contains(searchLower))
+            );
+        }
+        
+        // Convert to DTOs
+        List<UserDto> filteredList = filteredStream
+                .map(this::convertToUserDto)
+                .collect(java.util.stream.Collectors.toList());
+        
+        // Manual pagination
+        int start = page * size;
+        int end = Math.min(start + size, filteredList.size());
+        List<UserDto> pageContent = start < filteredList.size() 
+                ? filteredList.subList(start, end) 
+                : new java.util.ArrayList<>();
+        
+        return new org.springframework.data.domain.PageImpl<>(
+                pageContent,
+                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")),
+                filteredList.size()
+        );
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public UserDto getUserDetails(Long userId) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return convertToUserDto(user);
+    }
+
+    @Transactional
+    public UserDto updateUserStatus(Long userId, UpdateUserStatusRequest request) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        
+        String status = request.getStatus().toLowerCase();
+        if ("active".equals(status)) {
+            user.setEnabled(true);
+            user.setLocked(false);
+        } else if ("inactive".equals(status)) {
+            user.setEnabled(false);
+        } else if ("locked".equals(status)) {
+            user.setLocked(true);
+        } else {
+            throw new IllegalArgumentException("Invalid status: " + status);
+        }
+        
+        userRepo.save(user);
+        log.info("User {} status updated to {}", userId, status);
+        
+        return convertToUserDto(user);
+    }
+
+    private UserDto convertToUserDto(User user) {
+        String status = determineUserStatus(user);
+        UserDto.UserDtoBuilder builder = UserDto.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .roles(user.getRoles())
+                .status(status)
+                .createdAt(user.getCreatedAt())
+                .enabled(user.isEnabled())
+                .locked(user.isLocked());
+        
+        // If user is a company, include company verification information
+        if (user.getRoles() != null && user.getRoles().contains(Role.COMPANY)) {
+            Company company = companyRepo.findByUser(user).orElse(null);
+            if (company != null) {
+                builder.companyId(company.getId())
+                       .companyStatus(company.getStatus());
+                
+                // Check verification documents approval status
+                CompanyVerificationDocuments verificationDocs = 
+                        verificationDocumentsRepository.findByCompany(company).orElse(null);
+                if (verificationDocs != null) {
+                    builder.verificationDocumentsApproved(verificationDocs.getIsApproved());
+                } else {
+                    builder.verificationDocumentsApproved(false);
+                }
+            }
+        }
+        
+        // Include online presence information
+        boolean isOnline = userActivityService.isUserOnline(user.getId());
+        builder.isOnline(isOnline);
+        if (isOnline) {
+            builder.lastSeen(userActivityService.getLastActivity(user.getId()));
+        }
+        
+        return builder.build();
+    }
+
+    private String determineUserStatus(User user) {
+        if (user.isLocked()) {
+            return "locked";
+        }
+        if (!user.isEnabled()) {
+            return "inactive";
+        }
+        // Check if it's a company with pending signup
+        // This is a simplified check - you might want to enhance this
+        return "active";
     }
 }

@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/companies/*").permitAll() // Public company profiles
                                 .requestMatchers(HttpMethod.GET, "/investors/*").permitAll() // Public investor profiles
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/ws/**").permitAll() // WebSocket endpoint
+                                .requestMatchers("/api/user-activity/**").authenticated()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

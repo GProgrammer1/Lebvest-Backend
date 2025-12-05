@@ -49,6 +49,14 @@ public class AdminNotification {
     @JoinColumn(name = "request_id", referencedColumnName = "id", nullable = true)
     private CompanySignupRequest request;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "investment_id", referencedColumnName = "id", nullable = true)
+    private com.lebvest.model.entities.investment.Investment investment;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = true)
+    private com.lebvest.model.entities.company.Company company;
+    
     @PrePersist
     protected void onCreate() {
         isRead = false;
