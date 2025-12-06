@@ -174,7 +174,8 @@ public class CompanyRegistrationService {
     private void sendAdminNotificationEmail(CompanySignupRequest request) {
         try {
             String adminEmail = varsConfig.getAdminEmail();
-            String adminDashboardUrl = varsConfig.getFrontendUrl() + "/admin-dashboard";
+            // Redirect to sign-in page with redirect parameter - handles auth automatically
+            String adminDashboardUrl = varsConfig.getFrontendUrl() + "/signin?redirect=/admin-dashboard";
             
             Map<String, String> templateData = new HashMap<>();
             templateData.put("companyName", request.getCompanyName());
