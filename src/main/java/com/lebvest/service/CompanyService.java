@@ -39,6 +39,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.lebvest.model.enums.CompanySector;
 import com.lebvest.model.enums.Location;
 import com.lebvest.config.VarsConfig;
+import com.lebvest.exception.BadRequestException;
+import com.lebvest.model.dto.investor.ChangePasswordRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -67,6 +70,7 @@ public class CompanyService {
     private final com.lebvest.controller.AdminNotificationSseController adminNotificationSseController;
     private final MailService mailService;
     private final VarsConfig varsConfig;
+    private final PasswordEncoder passwordEncoder;
 
     public CompanyService(
             CompanyRepository companyRepository,
@@ -79,7 +83,8 @@ public class CompanyService {
             InvestmentService investmentService,
             com.lebvest.controller.AdminNotificationSseController adminNotificationSseController,
             MailService mailService,
-            VarsConfig varsConfig) {
+            VarsConfig varsConfig,
+            PasswordEncoder passwordEncoder) {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
@@ -91,6 +96,7 @@ public class CompanyService {
         this.adminNotificationSseController = adminNotificationSseController;
         this.mailService = mailService;
         this.varsConfig = varsConfig;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -297,6 +303,32 @@ public class CompanyService {
         return company;
     }
 
+    private Company getCurrentCompanyWithRelations() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new IllegalArgumentException("Unable to determine authenticated company");
+        }
+
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        // Fetch company with basic relations (user, socialMedia) - can't fetch multiple bags in one query
+        Company company = companyRepository.findByUserWithBasicRelations(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Company profile not found for current user"));
+
+        // Initialize lazy collections by accessing them (Hibernate will fetch them)
+        // This is safe because we're in a @Transactional method
+        if (company.getTeamMembers() != null) {
+            company.getTeamMembers().size(); // Force initialization
+        }
+        if (company.getFinancials() != null) {
+            company.getFinancials().size(); // Force initialization
+        }
+
+        return company;
+    }
+
     @Transactional
     public CompanyFinancial addFinancial(AddCompanyFinancialRequest request) {
         Company company = getCurrentCompany();
@@ -343,8 +375,13 @@ public class CompanyService {
             Path uploadsBasePath = Paths.get(projectRoot, "uploads", "companies", String.valueOf(company.getId()), "documents");
             
             // Create directory structure if it doesn't exist
-            Files.createDirectories(uploadsBasePath);
-            log.info("Upload directory: {}", uploadsBasePath.toAbsolutePath());
+            try {
+                Files.createDirectories(uploadsBasePath);
+                log.info("Upload directory: {}", uploadsBasePath.toAbsolutePath());
+            } catch (IOException e) {
+                log.error("Failed to create upload directory: {}", uploadsBasePath.toAbsolutePath(), e);
+                throw new RuntimeException("Failed to create upload directory: " + e.getMessage(), e);
+            }
             
             // Generate unique filename to avoid conflicts
             String originalFileName = file.getOriginalFilename();
@@ -367,24 +404,31 @@ public class CompanyService {
             
             // Save file locally using absolute path
             Path targetFilePath = uploadsBasePath.resolve(uniqueFileName);
-            Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            
-            log.info("File uploaded successfully: {}", targetFilePath.toAbsolutePath());
+            try {
+                Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                log.info("File uploaded successfully: {}", targetFilePath.toAbsolutePath());
+            } catch (IOException e) {
+                log.error("Failed to save file to: {}", targetFilePath.toAbsolutePath(), e);
+                throw new RuntimeException("Failed to save file: " + e.getMessage() + ". Please check file permissions and disk space.", e);
+            }
             
             // Store relative path for database (e.g., "uploads/companies/1/documents/filename.pdf")
             String relativePath = "uploads/companies/" + company.getId() + "/documents/" + uniqueFileName;
             
-            // Add to company's documents list
-            if (company.getDocuments() == null) {
-                company.setDocuments(new ArrayList<>());
-            }
-            company.getDocuments().add(relativePath);
-            companyRepository.save(company);
+            // Note: We don't add to company.documents here because:
+            // 1. Verification documents are stored in CompanyVerificationDocuments entity
+            // 2. Adding to @ElementCollection causes Hibernate to delete and re-insert all documents
+            // 3. This method is used for verification document uploads, not general company documents
+            // The URL will be stored in CompanyVerificationDocuments when submitVerificationDocuments is called
             
             return relativePath;
-        } catch (IOException e) {
-            log.error("Failed to upload document: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to upload document: " + e.getMessage(), e);
+        } catch (RuntimeException e) {
+            // Re-throw RuntimeException as-is (already wrapped from inner try-catch blocks)
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error uploading document: {}", e.getMessage(), e);
+            log.error("Stack trace:", e);
+            throw new RuntimeException("Unexpected error uploading document: " + e.getMessage(), e);
         }
     }
 
@@ -403,7 +447,7 @@ public class CompanyService {
 
     @Transactional(readOnly = true)
     public CompanyProfileDto getCurrentCompanyProfile() {
-        Company company = getCurrentCompany();
+        Company company = getCurrentCompanyWithRelations();
         return convertToProfileDto(company);
     }
 
@@ -716,36 +760,54 @@ public class CompanyService {
                     .build();
         }
         
-        // Update all fields
-        verificationDocs.setCertificateOfIncorporation(request.getCertificateOfIncorporation());
-        verificationDocs.setArticlesOfAssociation(request.getArticlesOfAssociation());
-        verificationDocs.setTaxRegistrationCertificate(request.getTaxRegistrationCertificate());
-        verificationDocs.setProofOfRegisteredAddress(request.getProofOfRegisteredAddress());
-        verificationDocs.setShareholderStructure(request.getShareholderStructure());
+        // Update all fields - only update if provided (not null and not empty)
+        if (request.getCertificateOfIncorporation() != null && !request.getCertificateOfIncorporation().trim().isEmpty()) {
+            verificationDocs.setCertificateOfIncorporation(request.getCertificateOfIncorporation());
+        }
+        if (request.getArticlesOfAssociation() != null && !request.getArticlesOfAssociation().trim().isEmpty()) {
+            verificationDocs.setArticlesOfAssociation(request.getArticlesOfAssociation());
+        }
+        if (request.getTaxRegistrationCertificate() != null && !request.getTaxRegistrationCertificate().trim().isEmpty()) {
+            verificationDocs.setTaxRegistrationCertificate(request.getTaxRegistrationCertificate());
+        }
+        if (request.getProofOfRegisteredAddress() != null && !request.getProofOfRegisteredAddress().trim().isEmpty()) {
+            verificationDocs.setProofOfRegisteredAddress(request.getProofOfRegisteredAddress());
+        }
+        if (request.getShareholderStructure() != null && !request.getShareholderStructure().trim().isEmpty()) {
+            verificationDocs.setShareholderStructure(request.getShareholderStructure());
+        }
         
-        if (request.getUboIds() != null) {
+        if (request.getUboIds() != null && !request.getUboIds().isEmpty()) {
             verificationDocs.setUboIds(new ArrayList<>(request.getUboIds()));
         }
-        if (request.getDirectorIds() != null) {
+        if (request.getDirectorIds() != null && !request.getDirectorIds().isEmpty()) {
             verificationDocs.setDirectorIds(new ArrayList<>(request.getDirectorIds()));
         }
-        if (request.getAuthorizedSignatoryIds() != null) {
+        if (request.getAuthorizedSignatoryIds() != null && !request.getAuthorizedSignatoryIds().isEmpty()) {
             verificationDocs.setAuthorizedSignatoryIds(new ArrayList<>(request.getAuthorizedSignatoryIds()));
         }
-        verificationDocs.setBoardResolution(request.getBoardResolution());
-        verificationDocs.setPepSanctionsDeclaration(request.getPepSanctionsDeclaration());
-        verificationDocs.setBankAccountConfirmation(request.getBankAccountConfirmation());
+        if (request.getBoardResolution() != null && !request.getBoardResolution().trim().isEmpty()) {
+            verificationDocs.setBoardResolution(request.getBoardResolution());
+        }
+        if (request.getPepSanctionsDeclaration() != null && !request.getPepSanctionsDeclaration().trim().isEmpty()) {
+            verificationDocs.setPepSanctionsDeclaration(request.getPepSanctionsDeclaration());
+        }
+        if (request.getBankAccountConfirmation() != null && !request.getBankAccountConfirmation().trim().isEmpty()) {
+            verificationDocs.setBankAccountConfirmation(request.getBankAccountConfirmation());
+        }
         
-        if (request.getFinancialStatements() != null) {
+        if (request.getFinancialStatements() != null && !request.getFinancialStatements().isEmpty()) {
             verificationDocs.setFinancialStatements(new ArrayList<>(request.getFinancialStatements()));
         }
-        if (request.getManagementAccounts() != null) {
+        if (request.getManagementAccounts() != null && !request.getManagementAccounts().isEmpty()) {
             verificationDocs.setManagementAccounts(new ArrayList<>(request.getManagementAccounts()));
         }
-        if (request.getBankStatements() != null) {
+        if (request.getBankStatements() != null && !request.getBankStatements().isEmpty()) {
             verificationDocs.setBankStatements(new ArrayList<>(request.getBankStatements()));
         }
-        verificationDocs.setSourceOfFundsDeclaration(request.getSourceOfFundsDeclaration());
+        if (request.getSourceOfFundsDeclaration() != null && !request.getSourceOfFundsDeclaration().trim().isEmpty()) {
+            verificationDocs.setSourceOfFundsDeclaration(request.getSourceOfFundsDeclaration());
+        }
         
         // Update company status to PENDING_DOCS
         company.setStatus(CompanyStatus.PENDING_DOCS);
@@ -849,6 +911,80 @@ public class CompanyService {
                 .bankStatements(docs.getBankStatements() != null ? new ArrayList<>(docs.getBankStatements()) : null)
                 .sourceOfFundsDeclaration(docs.getSourceOfFundsDeclaration())
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        // Validate that new password and confirmation match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("New password and confirmation password do not match");
+        }
+
+        // Get current company
+        Company company = getCurrentCompany();
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), company.getUser().getPassword())) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        // Update password
+        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+        company.getUser().setPassword(encodedNewPassword);
+        companyRepository.save(company);
+        log.info("Password changed successfully for company: {}", company.getName());
+    }
+
+    @Transactional
+    public String uploadProfileImage(MultipartFile file) {
+        Company company = getCurrentCompany();
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is required");
+        }
+        if (!file.getContentType().startsWith("image/")) {
+            throw new BadRequestException("Only image files are allowed.");
+        }
+        if (file.getSize() > 5 * 1024 * 1024) { // 5MB limit
+            throw new BadRequestException("File size cannot exceed 5MB.");
+        }
+
+        try {
+            String projectRoot = System.getProperty("user.dir");
+            Path uploadsBasePath = Paths.get(projectRoot, "uploads", "companies", String.valueOf(company.getId()), "profile");
+
+            Files.createDirectories(uploadsBasePath);
+            log.info("Profile image upload directory: {}", uploadsBasePath.toAbsolutePath());
+
+            String originalFileName = file.getOriginalFilename();
+            String fileExtension = "";
+            String baseFileName = originalFileName;
+            int lastDotIndex = originalFileName.lastIndexOf('.');
+            if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+                fileExtension = originalFileName.substring(lastDotIndex);
+                baseFileName = originalFileName.substring(0, lastDotIndex);
+            }
+
+            String sanitizedBaseName = baseFileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedBaseName + fileExtension;
+
+            Path targetFilePath = uploadsBasePath.resolve(uniqueFileName);
+            Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            log.info("Profile image uploaded successfully to: {}", targetFilePath.toAbsolutePath());
+
+            String relativePath = "uploads/companies/" + company.getId() + "/profile/" + uniqueFileName;
+            company.setLogo(relativePath);
+            companyRepository.save(company);
+
+            return relativePath;
+        } catch (IOException e) {
+            log.error("Failed to save profile image file: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to save profile image file: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("An unexpected error occurred during profile image upload: {}", e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred during profile image upload: " + e.getMessage(), e);
+        }
     }
 }
 

@@ -19,6 +19,12 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     Optional<Company> findByName(String name);
     Optional<Company> findByUser(User user);
     
+    @Query("SELECT DISTINCT c FROM Company c " +
+           "LEFT JOIN FETCH c.user " +
+           "LEFT JOIN FETCH c.socialMedia " +
+           "WHERE c.user = :user")
+    Optional<Company> findByUserWithBasicRelations(@Param("user") User user);
+    
     @Query("SELECT c FROM Company c WHERE (:sector IS NULL OR c.sector = :sector) AND (:location IS NULL OR c.location = :location)")
     Page<Company> findBySectorAndLocation(@Param("sector") CompanySector sector, @Param("location") Location location, Pageable pageable);
     

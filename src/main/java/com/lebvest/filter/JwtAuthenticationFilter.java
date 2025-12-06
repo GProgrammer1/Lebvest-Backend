@@ -10,6 +10,7 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -49,8 +50,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String method = request.getMethod();
             log.info("JWT Filter - {} request to: {}", method, requestPath);
             
+            // Log content type for multipart requests
+            String contentType = request.getContentType();
+            log.info("JWT Filter - Content-Type: {}", contentType);
+            
             String authHeader = request.getHeader("Authorization");
             log.info("JWT Filter - Authorization header present: {}", authHeader != null);
+            if (authHeader != null) {
+                log.info("JWT Filter - Authorization header starts with Bearer: {}", authHeader.startsWith("Bearer "));
+            }
             
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 log.info("JWT Filter - No valid Authorization header, allowing request to proceed");
@@ -91,8 +99,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.warn("JWT Filter - Username is null, cannot authenticate");
                 } else {
                     log.debug("JWT Filter - Authentication already exists in SecurityContext");
+                    // Log current authentication for debugging
+                    Authentication existingAuth = SecurityContextHolder.getContext().getAuthentication();
+                    if (existingAuth != null) {
+                        log.info("JWT Filter - Existing authentication: {}, authorities: {}", 
+                                existingAuth.getName(), existingAuth.getAuthorities());
+                    }
                 }
             }
+            
+            // Log SecurityContext state before proceeding
+            Authentication finalAuth = SecurityContextHolder.getContext().getAuthentication();
+            log.info("JWT Filter - Final SecurityContext authentication: {}", 
+                    finalAuth != null ? finalAuth.getName() + " with authorities: " + finalAuth.getAuthorities() : "null");
+            
             filterChain.doFilter(request, response);
         } catch (Exception e) {
             log.error("JWT Filter - Unexpected error in filter chain", e);

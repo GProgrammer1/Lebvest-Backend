@@ -18,6 +18,7 @@ public class InvestorProfileDto {
     private BigDecimal portfolioValue;
     private BigDecimal totalInvested;
     private BigDecimal totalReturns;
+    private Boolean profilePublic;
 }
 
 
