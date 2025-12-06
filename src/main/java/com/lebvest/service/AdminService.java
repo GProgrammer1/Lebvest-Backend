@@ -460,10 +460,34 @@ public class AdminService {
 
         // Update company status to FULLY_VERIFIED
         company.setStatus(CompanyStatus.FULLY_VERIFIED);
-        companyRepo.save(company);
+        Company savedCompany = companyRepo.save(company);
+        
+        // Verify the status was saved
+        if (savedCompany.getStatus() != CompanyStatus.FULLY_VERIFIED) {
+            log.error("CRITICAL: Company status was not saved correctly! Expected FULLY_VERIFIED but got: {}", 
+                    savedCompany.getStatus());
+            throw new IllegalStateException("Failed to update company status to FULLY_VERIFIED");
+        }
 
-        log.info("Company status updated to FULLY_VERIFIED for company: {} (ID: {})", 
-                company.getName(), companyId);
+        log.info("Company status updated to FULLY_VERIFIED for company: {} (ID: {}). Verified status: {}", 
+                company.getName(), companyId, savedCompany.getStatus());
+
+        // Update all related notifications to mark them as accepted
+        List<AdminNotification> relatedNotifications = adminNotificationRepository.findAll().stream()
+                .filter(notif -> notif.getCompany() != null && notif.getCompany().getId().equals(companyId))
+                .filter(notif -> notif.getType() == com.lebvest.model.enums.AdminNotificationType.VERIFICATION_REQUEST)
+                .filter(notif -> notif.getIsAccepted() == null) // Only update pending ones
+                .toList();
+        
+        log.info("Found {} notification(s) to update for company {} (ID: {})", 
+                relatedNotifications.size(), company.getName(), companyId);
+        
+        for (AdminNotification notification : relatedNotifications) {
+            notification.setIsAccepted(true);
+            adminNotificationRepository.save(notification);
+            log.info("Updated notification {} to accepted for company {} (ID: {})", 
+                    notification.getId(), company.getName(), companyId);
+        }
 
         // Send email to company
         sendVerificationApprovalEmail(company);
@@ -504,10 +528,34 @@ public class AdminService {
 
         // Update company status back to APPROVED (so they can resubmit)
         company.setStatus(CompanyStatus.APPROVED);
-        companyRepo.save(company);
+        Company savedCompany = companyRepo.save(company);
+        
+        // Verify the status was saved
+        if (savedCompany.getStatus() != CompanyStatus.APPROVED) {
+            log.error("CRITICAL: Company status was not saved correctly! Expected APPROVED but got: {}", 
+                    savedCompany.getStatus());
+            throw new IllegalStateException("Failed to update company status to APPROVED");
+        }
 
-        log.info("Company status updated to APPROVED for company: {} (ID: {})", 
-                company.getName(), companyId);
+        log.info("Company status updated to APPROVED for company: {} (ID: {}). Verified status: {}", 
+                company.getName(), companyId, savedCompany.getStatus());
+
+        // Update all related notifications to mark them as rejected
+        List<AdminNotification> relatedNotifications = adminNotificationRepository.findAll().stream()
+                .filter(notif -> notif.getCompany() != null && notif.getCompany().getId().equals(companyId))
+                .filter(notif -> notif.getType() == com.lebvest.model.enums.AdminNotificationType.VERIFICATION_REQUEST)
+                .filter(notif -> notif.getIsAccepted() == null) // Only update pending ones
+                .toList();
+        
+        log.info("Found {} notification(s) to update for company {} (ID: {})", 
+                relatedNotifications.size(), company.getName(), companyId);
+        
+        for (AdminNotification notification : relatedNotifications) {
+            notification.setIsAccepted(false);
+            adminNotificationRepository.save(notification);
+            log.info("Updated notification {} to rejected for company {} (ID: {})", 
+                    notification.getId(), company.getName(), companyId);
+        }
 
         // Send rejection email to company
         sendVerificationRejectionEmail(company, reason);
