@@ -27,10 +27,12 @@ public class CorsConfig {
         ));
         configuration.setAllowCredentials(true);
         
-        // Explicitly allow SSE-specific headers
+        // Explicitly allow SSE-specific headers (for admin notifications)
         configuration.addExposedHeader("Cache-Control");
         configuration.addExposedHeader("Content-Type");
         configuration.addExposedHeader("Last-Event-ID");
+        // Explicitly expose Authorization header (for file uploads)
+        configuration.addExposedHeader("Authorization");
 
         //Mapper between cors config and route
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

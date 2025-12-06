@@ -54,6 +54,21 @@ public class GlobalExceptionHandler{
                         .build()
         );
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorPayload> handleBadRequestException(
+            BadRequestException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("BadRequestException at {}: {}", request.getRequestURI(), ex.getMessage());
+        return ResponseEntity.badRequest().body(
+                ErrorPayload.builder()
+                        .status(400)
+                        .path(request.getRequestURI())
+                        .message(ex.getMessage())
+                        .build()
+        );
+    }
     @ExceptionHandler(MessagingException.class)
     public ResponseEntity<ErrorPayload> handleMessagingException(
             MessagingException e, HttpServletRequest request) {
@@ -62,6 +77,21 @@ public class GlobalExceptionHandler{
                         .message("Failed to send email: " + e.getMessage())
                         .status(500)
                         .path(request.getRequestURI())
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorPayload> handleRuntimeException(
+            RuntimeException ex,
+            HttpServletRequest request
+    ) {
+        log.error("RuntimeException at {}: {}", request.getRequestURI(), ex.getMessage(), ex);
+        return ResponseEntity.status(500).body(
+                ErrorPayload.builder()
+                        .status(500)
+                        .path(request.getRequestURI())
+                        .message(ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred")
                         .build()
         );
     }

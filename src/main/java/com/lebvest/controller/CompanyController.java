@@ -1,6 +1,7 @@
 package com.lebvest.controller;
 
 import com.lebvest.model.dto.*;
+import com.lebvest.model.dto.investor.ChangePasswordRequest;
 import com.lebvest.model.entities.company.CompanyFinancial;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.RiskLevel;
@@ -131,10 +132,15 @@ public class CompanyController {
             );
         } catch (Exception e) {
             log.error("Error uploading document: {}", e.getMessage(), e);
+            log.error("Exception type: {}", e.getClass().getName());
+            if (e.getCause() != null) {
+                log.error("Caused by: {}", e.getCause().getMessage());
+            }
+            String errorMessage = e.getMessage() != null ? e.getMessage() : "An unexpected error occurred while uploading the document";
             return ResponseEntity.status(500).body(
                     ResponsePayload.builder()
                             .status(500)
-                            .message("Failed to upload document: " + e.getMessage())
+                            .message(errorMessage)
                             .data(Map.of())
                             .build()
             );
@@ -163,6 +169,58 @@ public class CompanyController {
                         .data(Map.of("profile", profile))
                         .build()
         );
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<ResponsePayload> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        companyService.changePassword(request);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Password changed successfully")
+                        .data(Map.of())
+                        .build()
+        );
+    }
+
+    @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponsePayload> uploadProfileImage(@RequestPart("file") MultipartFile file) {
+        log.info("Received company profile image upload request. File name: {}, Size: {}, Content type: {}",
+                file != null ? file.getOriginalFilename() : "null",
+                file != null ? file.getSize() : 0,
+                file != null ? file.getContentType() : "null");
+
+        if (file == null || file.isEmpty()) {
+            log.warn("Profile image upload failed: file is null or empty");
+            return ResponseEntity.badRequest().body(
+                    ResponsePayload.builder()
+                            .status(400)
+                            .message("File is required. Please select an image file to upload.")
+                            .data(Map.of())
+                            .build()
+            );
+        }
+
+        try {
+            String imageUrl = companyService.uploadProfileImage(file);
+            log.info("Profile image uploaded successfully: {}", imageUrl);
+            return ResponseEntity.status(201).body(
+                    ResponsePayload.builder()
+                            .status(201)
+                            .message("Profile image uploaded successfully")
+                            .data(Map.of("imageUrl", imageUrl))
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Error uploading profile image: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(
+                    ResponsePayload.builder()
+                            .status(500)
+                            .message("Failed to upload profile image: " + e.getMessage())
+                            .data(Map.of())
+                            .build()
+            );
+        }
     }
 
     @GetMapping("/dashboard")

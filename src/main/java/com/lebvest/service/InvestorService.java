@@ -7,9 +7,11 @@ import com.lebvest.model.dto.investor.InvestorPreferenceDto;
 import com.lebvest.model.dto.investor.InvestorProfileDto;
 import com.lebvest.model.dto.investor.UpdateInvestorPreferenceRequest;
 import com.lebvest.model.dto.investor.UpdateInvestorProfileRequest;
-import com.lebvest.exception.ResourceNotFoundException;
+import com.lebvest.model.dto.investor.ChangePasswordRequest;
+import com.lebvest.exception.BadRequestException;
 import com.lebvest.model.dto.CreateGoalRequest;
 import com.lebvest.model.dto.UpdateGoalRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import com.lebvest.model.entities.investment.Investment;
@@ -30,6 +32,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import java.util.Comparator;
 import java.util.HashSet;
@@ -44,15 +52,18 @@ public class InvestorService {
     private final InvestmentRepository investmentRepository;
     private final InvestorNotificationRepository investorNotificationRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public InvestorService(InvestorRepository investorRepository,
                            InvestmentRepository investmentRepository,
                            InvestorNotificationRepository investorNotificationRepository,
-                           InvestorInvestmentRepository investorInvestmentRepository) {
+                           InvestorInvestmentRepository investorInvestmentRepository,
+                           PasswordEncoder passwordEncoder) {
         this.investorRepository = investorRepository;
         this.investmentRepository = investmentRepository;
         this.investorNotificationRepository = investorNotificationRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
@@ -144,6 +155,7 @@ public class InvestorService {
                 .portfolioValue(investor.getPortfolio_value())
                 .totalInvested(investor.getTotal_invested())
                 .totalReturns(investor.getTotal_returns())
+                .profilePublic(investor.getProfilePublic() != null ? investor.getProfilePublic() : false)
                 .build();
     }
 
@@ -152,16 +164,30 @@ public class InvestorService {
         Investor investor = investorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found"));
         
-        return InvestorProfileDto.builder()
+        Boolean isPublic = investor.getProfilePublic() != null ? investor.getProfilePublic() : false;
+        
+        // Contact info (email), bio, and imageUrl are always public
+        InvestorProfileDto.InvestorProfileDtoBuilder builder = InvestorProfileDto.builder()
                 .id(investor.getId())
                 .name(investor.getUser().getName())
                 .email(investor.getUser().getEmail())
                 .bio(investor.getBio())
                 .imageUrl(investor.getImageUrl())
-                .portfolioValue(investor.getPortfolio_value())
-                .totalInvested(investor.getTotal_invested())
-                .totalReturns(investor.getTotal_returns())
-                .build();
+                .profilePublic(isPublic);
+        
+        // Only include portfolio/investment details if profile is public
+        if (isPublic) {
+            builder.portfolioValue(investor.getPortfolio_value())
+                   .totalInvested(investor.getTotal_invested())
+                   .totalReturns(investor.getTotal_returns());
+        } else {
+            // Set private portfolio values to zero
+            builder.portfolioValue(BigDecimal.ZERO)
+                   .totalInvested(BigDecimal.ZERO)
+                   .totalReturns(BigDecimal.ZERO);
+        }
+        
+        return builder.build();
     }
 
     @Transactional
@@ -180,6 +206,9 @@ public class InvestorService {
         if (request.getImageUrl() != null) {
             investor.setImageUrl(request.getImageUrl());
         }
+        if (request.getProfilePublic() != null) {
+            investor.setProfilePublic(request.getProfilePublic());
+        }
         
         investorRepository.save(investor);
         
@@ -192,6 +221,7 @@ public class InvestorService {
                 .portfolioValue(investor.getPortfolio_value())
                 .totalInvested(investor.getTotal_invested())
                 .totalReturns(investor.getTotal_returns())
+                .profilePublic(investor.getProfilePublic() != null ? investor.getProfilePublic() : false)
                 .build();
     }
 
@@ -241,6 +271,101 @@ public class InvestorService {
                 .riskLevels(toSlugSet(preferences.getRiskLevels()))
                 .locations(toSlugSet(preferences.getLocations()))
                 .build();
+    }
+
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        // Validate that new password and confirmation match
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BadRequestException("New password and confirmation password do not match");
+        }
+
+        // Get current investor
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new IllegalArgumentException("Unable to determine authenticated investor");
+        }
+        String email = authentication.getName();
+        
+        Investor investor = investorRepository.findByUserEmailForProfile(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
+        
+        // Verify current password
+        if (!passwordEncoder.matches(request.getCurrentPassword(), investor.getUser().getPassword())) {
+            throw new BadRequestException("Current password is incorrect");
+        }
+
+        // Update password
+        String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
+        investor.getUser().setPassword(encodedNewPassword);
+        
+        investorRepository.save(investor);
+    }
+
+    @Transactional
+    public String uploadProfileImage(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File is required");
+        }
+
+        // Validate file type (images only)
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new IllegalArgumentException("Only image files are allowed");
+        }
+
+        // Get current investor
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new IllegalArgumentException("Unable to determine authenticated investor");
+        }
+        String email = authentication.getName();
+        
+        Investor investor = investorRepository.findByUserEmailForProfile(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
+
+        try {
+            // Get project root directory
+            String projectRoot = System.getProperty("user.dir");
+            Path uploadsBasePath = Paths.get(projectRoot, "uploads", "investors", String.valueOf(investor.getId()), "profile");
+            
+            // Create directory structure if it doesn't exist
+            Files.createDirectories(uploadsBasePath);
+            
+            // Generate unique filename to avoid conflicts
+            String originalFileName = file.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isEmpty()) {
+                originalFileName = "image";
+            }
+            
+            // Extract file extension
+            String fileExtension = "";
+            String baseFileName = originalFileName;
+            int lastDotIndex = originalFileName.lastIndexOf('.');
+            if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
+                fileExtension = originalFileName.substring(lastDotIndex);
+                baseFileName = originalFileName.substring(0, lastDotIndex);
+            }
+            
+            // Sanitize base filename and create unique name
+            String sanitizedBaseName = baseFileName.replaceAll("[^a-zA-Z0-9.-]", "_");
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedBaseName + fileExtension;
+            
+            // Save file locally using absolute path
+            Path targetFilePath = uploadsBasePath.resolve(uniqueFileName);
+            Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            // Store relative path for database (e.g., "uploads/investors/1/profile/filename.jpg")
+            String relativePath = "uploads/investors/" + investor.getId() + "/profile/" + uniqueFileName;
+            
+            // Update investor's image URL
+            investor.setImageUrl(relativePath);
+            investorRepository.save(investor);
+            
+            return relativePath;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload profile image: " + e.getMessage(), e);
+        }
     }
 
     @Transactional(readOnly = true)

@@ -9,16 +9,23 @@ import com.lebvest.model.dto.investor.InvestorPreferenceDto;
 import com.lebvest.model.dto.investor.InvestorProfileDto;
 import com.lebvest.model.dto.investor.UpdateInvestorPreferenceRequest;
 import com.lebvest.model.dto.investor.UpdateInvestorProfileRequest;
+import com.lebvest.model.dto.investor.ChangePasswordRequest;
 import com.lebvest.service.InvestorService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/investors/me")
+@CrossOrigin(origins = {"http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:5173", "http://127.0.0.1:5173"})
 public class InvestorController {
 
     private final InvestorService investorService;
@@ -97,6 +104,59 @@ public class InvestorController {
                         .data(Map.of("profile", profile))
                         .build()
         );
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<ResponsePayload> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        investorService.changePassword(request);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Password changed successfully")
+                        .data(Map.of())
+                        .build()
+        );
+    }
+
+    @PostMapping(value = "/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponsePayload> uploadProfileImage(@RequestPart("file") MultipartFile file) {
+        log.info("=== Profile Image Upload Endpoint Reached ===");
+        log.info("Received profile image upload request. File name: {}, Size: {}, Content type: {}", 
+                file != null ? file.getOriginalFilename() : "null",
+                file != null ? file.getSize() : 0,
+                file != null ? file.getContentType() : "null");
+        
+        if (file == null || file.isEmpty()) {
+            log.warn("Profile image upload failed: file is null or empty");
+            return ResponseEntity.badRequest().body(
+                    ResponsePayload.builder()
+                            .status(400)
+                            .message("File is required. Please select an image file to upload.")
+                            .data(Map.of())
+                            .build()
+            );
+        }
+        
+        try {
+            String imageUrl = investorService.uploadProfileImage(file);
+            log.info("Profile image uploaded successfully: {}", imageUrl);
+            return ResponseEntity.status(201).body(
+                    ResponsePayload.builder()
+                            .status(201)
+                            .message("Profile image uploaded successfully")
+                            .data(Map.of("imageUrl", imageUrl))
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Error uploading profile image: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(
+                    ResponsePayload.builder()
+                            .status(500)
+                            .message("Failed to upload profile image: " + e.getMessage())
+                            .data(Map.of())
+                            .build()
+            );
+        }
     }
 
     @GetMapping("/preferences")

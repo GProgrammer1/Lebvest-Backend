@@ -45,6 +45,9 @@ public class Investor {
 
     private String imageUrl;
 
+    @Column(name = "profile_public", nullable = false)
+    private Boolean profilePublic = false;
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "investor_watchlist",
@@ -84,6 +87,9 @@ public class Investor {
         }
         if (total_returns == null) {
             total_returns = BigDecimal.ZERO;
+        }
+        if (profilePublic == null) {
+            profilePublic = false;
         }
     }
 }
