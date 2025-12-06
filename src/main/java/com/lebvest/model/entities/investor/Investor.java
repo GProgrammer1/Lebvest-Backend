@@ -49,6 +49,23 @@ public class Investor {
 
     private String imageUrl;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "classification", length = 20)
+    private com.lebvest.model.enums.InvestorClassification classification;
+
+    @Column(name = "annual_income", precision = 15, scale = 2)
+    private BigDecimal annualIncome;
+
+    @Column(name = "risk_profile_assessment", length = 500)
+    private String riskProfileAssessment;
+
+    @Column(name = "kyc_verified", nullable = false)
+    @Builder.Default
+    private Boolean kycVerified = false;
+
+    @Column(name = "kyc_notes", length = 1000)
+    private String kycNotes;
+
     @Column(name = "profile_public", nullable = false)
     private Boolean profilePublic = false;
 

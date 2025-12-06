@@ -69,4 +69,22 @@ public class InvestorInvestment {
     @NonNull
     @Column(name = "current_value", nullable = false, precision = 15, scale = 2)
     private BigDecimal currentValue;
+
+    /** Expected return amount (principal + interest). */
+    @Column(name = "expected_return_amount", precision = 15, scale = 2)
+    private BigDecimal expectedReturnAmount;
+
+    /** Maturity date for this investment. */
+    @Column(name = "maturity_date")
+    private LocalDate maturityDate;
+
+    /** Whether this investment has matured. */
+    @Column(name = "is_matured", nullable = false)
+    @Builder.Default
+    private Boolean isMatured = false;
+
+    /** Whether payout has been requested. */
+    @Column(name = "payout_requested", nullable = false)
+    @Builder.Default
+    private Boolean payoutRequested = false;
 }

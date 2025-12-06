@@ -74,6 +74,8 @@ public class CompanyService {
     private final MailService mailService;
     private final VarsConfig varsConfig;
     private final PasswordEncoder passwordEncoder;
+    private final FileValidationService fileValidationService;
+    private final S3Service s3Service;
 
     public CompanyService(
             CompanyRepository companyRepository,
@@ -88,7 +90,9 @@ public class CompanyService {
             com.lebvest.controller.AdminNotificationSseController adminNotificationSseController,
             MailService mailService,
             VarsConfig varsConfig,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            FileValidationService fileValidationService,
+            S3Service s3Service) {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
@@ -102,6 +106,8 @@ public class CompanyService {
         this.mailService = mailService;
         this.varsConfig = varsConfig;
         this.passwordEncoder = passwordEncoder;
+        this.fileValidationService = fileValidationService;
+        this.s3Service = s3Service;
     }
 
     @Transactional
@@ -370,69 +376,38 @@ public class CompanyService {
     public String uploadDocument(MultipartFile file) {
         Company company = getCurrentCompany();
         
-        if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File is required");
-        }
+        // Validate file using FileValidationService
+        fileValidationService.validateFile(file, false);
         
         try {
-            // Get project root directory (where the application is running from)
-            String projectRoot = System.getProperty("user.dir");
-            Path uploadsBasePath = Paths.get(projectRoot, "uploads", "companies", String.valueOf(company.getId()), "documents");
-            
-            // Create directory structure if it doesn't exist
-            try {
-                Files.createDirectories(uploadsBasePath);
-                log.info("Upload directory: {}", uploadsBasePath.toAbsolutePath());
-            } catch (IOException e) {
-                log.error("Failed to create upload directory: {}", uploadsBasePath.toAbsolutePath(), e);
-                throw new RuntimeException("Failed to create upload directory: " + e.getMessage(), e);
-            }
-            
-            // Generate unique filename to avoid conflicts
+            // Generate unique filename
             String originalFileName = file.getOriginalFilename();
             if (originalFileName == null || originalFileName.isEmpty()) {
                 originalFileName = "file";
             }
             
-            // Extract file extension
-            String fileExtension = "";
-            String baseFileName = originalFileName;
-            int lastDotIndex = originalFileName.lastIndexOf('.');
-            if (lastDotIndex > 0 && lastDotIndex < originalFileName.length() - 1) {
-                fileExtension = originalFileName.substring(lastDotIndex); // includes the dot
-                baseFileName = originalFileName.substring(0, lastDotIndex);
-            }
+            String sanitizedFileName = fileValidationService.sanitizeFilename(originalFileName);
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
             
-            // Sanitize base filename and create unique name
-            String sanitizedBaseName = baseFileName.replaceAll("[^a-zA-Z0-9.-]", "_");
-            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedBaseName + fileExtension;
+            // Upload to S3
+            String prefix = "companies/" + company.getId() + "/documents";
+            String s3Key = s3Service.uploadFile(
+                    prefix,
+                    uniqueFileName,
+                    file.getInputStream(),
+                    file.getSize(),
+                    file.getContentType()
+            );
             
-            // Save file locally using absolute path
-            Path targetFilePath = uploadsBasePath.resolve(uniqueFileName);
-            try {
-                Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                log.info("File uploaded successfully: {}", targetFilePath.toAbsolutePath());
-            } catch (IOException e) {
-                log.error("Failed to save file to: {}", targetFilePath.toAbsolutePath(), e);
-                throw new RuntimeException("Failed to save file: " + e.getMessage() + ". Please check file permissions and disk space.", e);
-            }
+            log.info("File uploaded to S3 successfully: {}", s3Key);
             
-            // Store relative path for database (e.g., "uploads/companies/1/documents/filename.pdf")
-            String relativePath = "uploads/companies/" + company.getId() + "/documents/" + uniqueFileName;
-            
-            // Note: We don't add to company.documents here because:
-            // 1. Verification documents are stored in CompanyVerificationDocuments entity
-            // 2. Adding to @ElementCollection causes Hibernate to delete and re-insert all documents
-            // 3. This method is used for verification document uploads, not general company documents
-            // The URL will be stored in CompanyVerificationDocuments when submitVerificationDocuments is called
-            
-            return relativePath;
-        } catch (RuntimeException e) {
-            // Re-throw RuntimeException as-is (already wrapped from inner try-catch blocks)
-            throw e;
+            // Return S3 key for database storage
+            return s3Key;
+        } catch (IOException e) {
+            log.error("Failed to upload file to S3: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("Unexpected error uploading document: {}", e.getMessage(), e);
-            log.error("Stack trace:", e);
             throw new RuntimeException("Unexpected error uploading document: " + e.getMessage(), e);
         }
     }

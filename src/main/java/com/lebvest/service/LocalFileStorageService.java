@@ -263,6 +263,42 @@ public class LocalFileStorageService {
         }
     }
 
+    /**
+     * Save payout evidence file
+     * @param payoutRequestId The ID of the payout request
+     * @param evidenceFile The evidence file to save
+     * @return Relative path to the saved file
+     */
+    public String savePayoutEvidence(Long payoutRequestId, MultipartFile evidenceFile) {
+        if (evidenceFile == null || evidenceFile.isEmpty()) {
+            throw new RuntimeException("Evidence file is required");
+        }
+
+        try {
+            Path uploadsBase = getUploadsBaseDirectory();
+            Path payoutDir = uploadsBase.resolve("payouts").resolve(payoutRequestId.toString());
+            Files.createDirectories(payoutDir);
+
+            String originalFileName = evidenceFile.getOriginalFilename();
+            if (originalFileName == null || originalFileName.isEmpty()) {
+                originalFileName = "evidence";
+            }
+
+            String sanitizedFileName = sanitizeFileName(originalFileName);
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
+
+            Path targetPath = payoutDir.resolve(uniqueFileName);
+            Files.copy(evidenceFile.getInputStream(), targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+            String relativePath = UPLOADS_BASE_DIR + "/payouts/" + payoutRequestId.toString() + "/" + uniqueFileName;
+            log.info("Payout evidence saved: {}", relativePath);
+            return relativePath;
+        } catch (IOException e) {
+            log.error("Failed to save payout evidence: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to save payout evidence: " + e.getMessage(), e);
+        }
+    }
+
     private String sanitizeFileName(String fileName) {
         // Remove or replace invalid characters
         return fileName.replaceAll("[^a-zA-Z0-9.\\-_]", "_");
