@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +18,7 @@ public class AdminNotificationDto {
     private Long id;
     private Long adminId;
     private Long reqId;
+    private Long companyId; // For verification requests
     private String title;
     private String message;
     private AdminNotificationType type;

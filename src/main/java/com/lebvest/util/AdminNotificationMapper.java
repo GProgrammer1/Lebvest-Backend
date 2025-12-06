@@ -42,6 +42,7 @@ public class AdminNotificationMapper implements GenericMapper<AdminNotification,
                 .id(adminNotification.getId())
                 .adminId(adminNotification.getAdmin().getId())
                 .reqId(adminNotification.getRequest() != null ? adminNotification.getRequest().getId() : null)
+                .companyId(adminNotification.getCompany() != null ? adminNotification.getCompany().getId() : null)
                 .title(adminNotification.getTitle())
                 .message(adminNotification.getMessage())
                 .isAccepted(adminNotification.getIsAccepted())
@@ -68,10 +69,18 @@ public class AdminNotificationMapper implements GenericMapper<AdminNotification,
             }
         } else if (notification.getType() == AdminNotificationType.PROJECT_PROPOSAL) {
             // Extract documents from Investment
-            // Note: We need to add investment reference to AdminNotification entity
-            // For now, this will be handled when we create the notification
+            Investment investment = notification.getInvestment();
+            if (investment != null) {
+                urls.addAll(extractInvestmentDocumentUrls(investment));
+            }
+        } else if (notification.getType() == AdminNotificationType.VERIFICATION_REQUEST) {
+            // Extract documents from CompanyVerificationDocuments
+            if (notification.getCompany() != null) {
+                // Note: This will be populated by AdminService.populateDocumentUrls
+                // which has access to verificationDocumentsRepository
+                // For now, return empty list - documents will be added in AdminService
+            }
         }
-        // Add verification documents extraction when we add that notification type
         
         return urls;
     }

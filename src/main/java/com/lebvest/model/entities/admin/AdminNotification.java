@@ -35,6 +35,7 @@ public class AdminNotification {
     private String title;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", columnDefinition = "VARCHAR(50)")
     private AdminNotificationType type;
 
     @CreationTimestamp

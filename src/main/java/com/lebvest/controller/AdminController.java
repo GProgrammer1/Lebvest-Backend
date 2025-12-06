@@ -76,6 +76,15 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/reject-verification/{companyId}")
+    public ResponseEntity<ResponsePayload> rejectVerification(
+            @PathVariable Long companyId,
+            @RequestBody(required = false) Map<String, String> requestBody) {
+        String reason = requestBody != null ? requestBody.get("reason") : null;
+        ResponsePayload response = adminService.rejectVerificationDocuments(companyId, reason);
+        return ResponseEntity.ok(response);
+    }
+
     // ========== PROJECT REVIEW ENDPOINTS ==========
 
     @GetMapping("/projects/pending")
