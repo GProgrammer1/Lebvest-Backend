@@ -34,6 +34,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import com.lebvest.model.enums.CompanySector;
 import com.lebvest.model.enums.Location;
 import com.lebvest.config.VarsConfig;
@@ -689,9 +691,13 @@ public class CompanyService {
     public void submitVerificationDocuments(CompanyVerificationRequest request) {
         Company company = getCurrentCompany();
         
-        // Check if company is in APPROVED status (can submit step 2)
-        if (company.getStatus() != CompanyStatus.APPROVED) {
-            throw new IllegalStateException("Company must be approved before submitting verification documents");
+        // Check if company is in APPROVED or PENDING_DOCS status (can submit/update step 2)
+        // APPROVED: First time submitting verification documents
+        // PENDING_DOCS: Resubmitting/updating verification documents
+        if (company.getStatus() != CompanyStatus.APPROVED && company.getStatus() != CompanyStatus.PENDING_DOCS) {
+            log.warn("Company {} attempted to submit verification documents but status is: {}", 
+                    company.getName(), company.getStatus());
+            throw new IllegalStateException("Company must be approved (or have pending documents) before submitting verification documents. Current status: " + company.getStatus());
         }
         
         // Check if verification documents already exist
@@ -748,14 +754,32 @@ public class CompanyService {
         verificationDocumentsRepository.save(verificationDocs);
         log.info("Verification documents submitted for company: {}", company.getName());
         
-        // Notify admins about verification document submission (SSE)
-        try {
-            adminNotificationSseController.notifyAllAdminsVerification(company);
-            log.info("SSE notification sent for company verification: {}", company.getName());
-        } catch (Exception e) {
-            log.error("Failed to send SSE notification for company verification: {}", e.getMessage(), e);
-            // Continue - notification should still be saved in DB
-        }
+        // Store company ID for notification after transaction commits
+        Long companyId = company.getId();
+        String companyName = company.getName();
+        
+        // Notify admins about verification document submission (SSE) - AFTER transaction commits
+        // This prevents race condition where async notification might run before transaction commits
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    try {
+                        log.info(">>> TRIGGERING SSE NOTIFICATION (after commit) for company verification: {} (ID: {}) <<<", 
+                                companyName, companyId);
+                        // Reload company to ensure we have the latest data after commit
+                        Company reloadedCompany = companyRepository.findById(companyId)
+                                .orElseThrow(() -> new IllegalArgumentException("Company not found: " + companyId));
+                        adminNotificationSseController.notifyAllAdminsVerification(reloadedCompany);
+                        log.info("✓ SSE notification method called successfully for company verification: {}", companyName);
+                    } catch (Exception e) {
+                        log.error("✗✗✗ FAILED to trigger SSE notification for company verification: {} (ID: {}) - {} ✗✗✗", 
+                                companyName, companyId, e.getMessage(), e);
+                        // Continue - notification should still be saved in DB
+                    }
+                }
+            }
+        );
         
         // Send email notification to admin with verification documents
         try {

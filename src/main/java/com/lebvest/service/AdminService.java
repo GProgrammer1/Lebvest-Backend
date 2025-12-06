@@ -35,6 +35,7 @@ import com.lebvest.util.AdminNotificationMapper;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 //import org.springframework.amqp.rabbit.core.RabbitTemplate;  // Disabled - RabbitMQ not needed
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -252,8 +253,41 @@ public class AdminService {
     }
 
     public ResponsePayload getAllNotifications() {
+        // Get current admin user from security context
+        org.springframework.security.core.Authentication authentication = 
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.warn("Unauthenticated request to get notifications");
+            return ResponsePayload.builder()
+                    .message("Unauthorized")
+                    .status(401)
+                    .data(Map.of("notifications", new ArrayList<>()))
+                    .build();
+        }
+        
+        String email = authentication.getName();
+        User currentAdmin = userRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Admin user not found"));
+        
+        log.info("Fetching notifications for admin: {} (ID: {})", email, currentAdmin.getId());
+        
+        // Filter notifications by current admin
         List<AdminNotificationDto> notifications = adminNotificationRepository.findAll()
-                .stream().map(notification -> populateDocumentUrls(adminNotificationMapper.toDto(notification), notification)).toList();
+                .stream()
+                .filter(notification -> notification.getAdmin().getId().equals(currentAdmin.getId()))
+                .map(notification -> populateDocumentUrls(adminNotificationMapper.toDto(notification), notification))
+                .sorted((a, b) -> {
+                    // Sort by createdAt descending (newest first)
+                    if (a.getCreatedAt() != null && b.getCreatedAt() != null) {
+                        return b.getCreatedAt().compareTo(a.getCreatedAt());
+                    }
+                    return 0;
+                })
+                .toList();
+        
+        log.info("Found {} notifications for admin: {} (ID: {})", notifications.size(), email, currentAdmin.getId());
+        
         return ResponsePayload.builder()
                 .message("Notifications retrieved successfully")
                 .status(200)
@@ -393,12 +427,32 @@ public class AdminService {
         Company company = companyRepo.findById(companyId)
                 .orElseThrow(() -> new IllegalArgumentException("Company not found"));
 
-        if (company.getStatus() != CompanyStatus.PENDING_DOCS) {
-            throw new IllegalStateException("Company is not in PENDING_DOCS status");
+        log.info("Attempting to approve verification for company: {} (ID: {}), current status: {}", 
+                company.getName(), companyId, company.getStatus());
+
+        // Check if already fully verified
+        if (company.getStatus() == CompanyStatus.FULLY_VERIFIED) {
+            log.info("Company {} (ID: {}) is already FULLY_VERIFIED", company.getName(), companyId);
+            return ResponsePayload.builder()
+                    .status(200)
+                    .message("Company is already fully verified.")
+                    .data(Map.of("companyId", companyId, "status", "FULLY_VERIFIED"))
+                    .build();
+        }
+
+        // Allow approval if company is in PENDING_DOCS or APPROVED status
+        // (APPROVED allows re-approval if documents were resubmitted)
+        if (company.getStatus() != CompanyStatus.PENDING_DOCS && company.getStatus() != CompanyStatus.APPROVED) {
+            log.warn("Cannot approve verification for company {} (ID: {}). Current status: {}, expected: PENDING_DOCS or APPROVED", 
+                    company.getName(), companyId, company.getStatus());
+            throw new IllegalStateException("Company must be in PENDING_DOCS or APPROVED status to approve verification. Current status: " + company.getStatus());
         }
 
         CompanyVerificationDocuments docs = verificationDocumentsRepository.findByCompany(company)
                 .orElseThrow(() -> new IllegalArgumentException("Verification documents not found"));
+
+        log.info("Found verification documents for company: {} (ID: {}), isApproved: {}", 
+                company.getName(), companyId, docs.getIsApproved());
 
         // Approve documents
         docs.setIsApproved(true);
@@ -408,15 +462,62 @@ public class AdminService {
         company.setStatus(CompanyStatus.FULLY_VERIFIED);
         companyRepo.save(company);
 
+        log.info("Company status updated to FULLY_VERIFIED for company: {} (ID: {})", 
+                company.getName(), companyId);
+
         // Send email to company
         sendVerificationApprovalEmail(company);
 
-        log.info("Verification documents approved for company: {}", company.getName());
+        log.info("Verification documents approved for company: {} (ID: {})", company.getName(), companyId);
 
         return ResponsePayload.builder()
                 .status(200)
                 .message("Company verification approved. Company can now post projects.")
                 .data(Map.of("companyId", companyId, "status", "FULLY_VERIFIED"))
+                .build();
+    }
+
+    @Transactional
+    public ResponsePayload rejectVerificationDocuments(Long companyId, String reason) {
+        Company company = companyRepo.findById(companyId)
+                .orElseThrow(() -> new IllegalArgumentException("Company not found"));
+
+        log.info("Attempting to reject verification for company: {} (ID: {}), current status: {}", 
+                company.getName(), companyId, company.getStatus());
+
+        // Allow rejection if company is in PENDING_DOCS or APPROVED status
+        if (company.getStatus() != CompanyStatus.PENDING_DOCS && company.getStatus() != CompanyStatus.APPROVED) {
+            log.warn("Cannot reject verification for company {} (ID: {}). Current status: {}, expected: PENDING_DOCS or APPROVED", 
+                    company.getName(), companyId, company.getStatus());
+            throw new IllegalStateException("Company must be in PENDING_DOCS or APPROVED status to reject verification. Current status: " + company.getStatus());
+        }
+
+        CompanyVerificationDocuments docs = verificationDocumentsRepository.findByCompany(company)
+                .orElseThrow(() -> new IllegalArgumentException("Verification documents not found"));
+
+        log.info("Found verification documents for company: {} (ID: {}), isApproved: {}", 
+                company.getName(), companyId, docs.getIsApproved());
+
+        // Reject documents
+        docs.setIsApproved(false);
+        verificationDocumentsRepository.save(docs);
+
+        // Update company status back to APPROVED (so they can resubmit)
+        company.setStatus(CompanyStatus.APPROVED);
+        companyRepo.save(company);
+
+        log.info("Company status updated to APPROVED for company: {} (ID: {})", 
+                company.getName(), companyId);
+
+        // Send rejection email to company
+        sendVerificationRejectionEmail(company, reason);
+
+        log.info("Verification documents rejected for company: {} (ID: {})", company.getName(), companyId);
+
+        return ResponsePayload.builder()
+                .status(200)
+                .message("Company verification rejected. Company can resubmit documents.")
+                .data(Map.of("companyId", companyId, "status", "APPROVED"))
                 .build();
     }
 
@@ -435,6 +536,25 @@ public class AdminService {
             log.info("Verification approval email sent to: {}", companyEmail);
         } catch (Exception e) {
             log.error("Failed to send verification approval email: {}", e.getMessage(), e);
+        }
+    }
+
+    private void sendVerificationRejectionEmail(Company company, String reason) {
+        try {
+            String companyEmail = company.getUser().getEmail();
+            String loginUrl = varsConfig.getFrontendUrl() + "/signin";
+
+            Map<String, String> templateData = new HashMap<>();
+            templateData.put("name", company.getUser().getName());
+            templateData.put("companyName", company.getName());
+            templateData.put("reason", reason != null ? reason : "Documents did not meet verification requirements.");
+            templateData.put("loginUrl", loginUrl);
+
+            String htmlContent = mailService.loadAndFormatEmailTemplate(templateData, "CompanyVerificationRejection");
+            mailService.sendHtmlMail(companyEmail, "Verification Documents Rejected - Action Required", htmlContent);
+            log.info("Verification rejection email sent to: {}", companyEmail);
+        } catch (Exception e) {
+            log.error("Failed to send verification rejection email: {}", e.getMessage(), e);
         }
     }
 
@@ -582,59 +702,91 @@ public class AdminService {
 
     // ========== USER MANAGEMENT METHODS ==========
 
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    @org.springframework.transaction.annotation.Transactional(readOnly = true, timeout = 30)
     public Page<UserDto> getAllUsers(
             Role role,
             String status,
             String search,
             int page,
             int size) {
-        // Get all users first (we'll filter in memory for now)
-        // In production, you'd want to add proper JPA queries with filters
-        List<User> allUsersList = userRepo.findAll();
-        
-        // Apply filters
-        java.util.stream.Stream<User> filteredStream = allUsersList.stream();
-        
-        // Filter by role
-        if (role != null) {
-            filteredStream = filteredStream.filter(user -> user.getRoles().contains(role));
-        }
-        
-        // Filter by status
-        if (status != null && !status.equals("All")) {
-            filteredStream = filteredStream.filter(user -> {
-                String userStatus = determineUserStatus(user);
-                return userStatus.equals(status);
-            });
-        }
-        
-        // Filter by search
-        if (search != null && !search.isEmpty()) {
-            String searchLower = search.toLowerCase();
-            filteredStream = filteredStream.filter(user -> 
-                (user.getName() != null && user.getName().toLowerCase().contains(searchLower)) ||
-                (user.getEmail() != null && user.getEmail().toLowerCase().contains(searchLower))
+        try {
+            log.info("Fetching users - page: {}, size: {}, role: {}, status: {}, search: {}", page, size, role, status, search);
+            
+            // Use pagination at database level to avoid loading all users
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+            Page<User> userPage;
+            
+            // If no filters, use simple pagination
+            if (role == null && (status == null || status.equals("All")) && (search == null || search.isEmpty())) {
+                userPage = userRepo.findAll(pageable);
+            } else {
+                // For now, still load all (but with timeout protection)
+                // TODO: Optimize with proper JPA queries
+                List<User> allUsersList = userRepo.findAll();
+                log.info("Loaded {} users from database", allUsersList.size());
+                
+                // Apply filters
+                java.util.stream.Stream<User> filteredStream = allUsersList.stream();
+                
+                // Filter by role
+                if (role != null) {
+                    filteredStream = filteredStream.filter(user -> user.getRoles().contains(role));
+                }
+                
+                // Filter by status
+                if (status != null && !status.equals("All")) {
+                    filteredStream = filteredStream.filter(user -> {
+                        String userStatus = determineUserStatus(user);
+                        return userStatus.equals(status);
+                    });
+                }
+                
+                // Filter by search
+                if (search != null && !search.isEmpty()) {
+                    String searchLower = search.toLowerCase();
+                    filteredStream = filteredStream.filter(user -> 
+                        (user.getName() != null && user.getName().toLowerCase().contains(searchLower)) ||
+                        (user.getEmail() != null && user.getEmail().toLowerCase().contains(searchLower))
+                    );
+                }
+                
+                // Convert to list
+                List<User> filteredList = filteredStream.collect(java.util.stream.Collectors.toList());
+                
+                // Manual pagination
+                int start = page * size;
+                int end = Math.min(start + size, filteredList.size());
+                List<User> pageContent = start < filteredList.size() 
+                        ? filteredList.subList(start, end) 
+                        : new java.util.ArrayList<>();
+                
+                // Convert to DTOs
+                List<UserDto> dtoList = pageContent.stream()
+                        .map(this::convertToUserDto)
+                        .collect(java.util.stream.Collectors.toList());
+                
+                return new org.springframework.data.domain.PageImpl<>(
+                        dtoList,
+                        pageable,
+                        filteredList.size()
+                );
+            }
+            
+            // Convert to DTOs
+            List<UserDto> dtoList = userPage.getContent().stream()
+                    .map(this::convertToUserDto)
+                    .collect(java.util.stream.Collectors.toList());
+            
+            log.info("Returning {} users (page {} of {})", dtoList.size(), page, userPage.getTotalPages());
+            return new org.springframework.data.domain.PageImpl<>(
+                    dtoList,
+                    pageable,
+                    userPage.getTotalElements()
             );
+        } catch (Exception e) {
+            log.error("Error fetching users: {}", e.getMessage(), e);
+            throw e;
         }
-        
-        // Convert to DTOs
-        List<UserDto> filteredList = filteredStream
-                .map(this::convertToUserDto)
-                .collect(java.util.stream.Collectors.toList());
-        
-        // Manual pagination
-        int start = page * size;
-        int end = Math.min(start + size, filteredList.size());
-        List<UserDto> pageContent = start < filteredList.size() 
-                ? filteredList.subList(start, end) 
-                : new java.util.ArrayList<>();
-        
-        return new org.springframework.data.domain.PageImpl<>(
-                pageContent,
-                PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt")),
-                filteredList.size()
-        );
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)

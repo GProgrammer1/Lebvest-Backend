@@ -196,23 +196,38 @@ public class AdminNotificationSseController {
     @Async("taskExecutor")
     public void notifyAllAdminsVerification(com.lebvest.model.entities.company.Company company) {
         try {
-            log.info("Starting notification for company verification: {}", company.getName());
+            log.info("=== STARTING SSE NOTIFICATION FOR COMPANY VERIFICATION ===");
+            log.info("Company: {} (ID: {})", company.getName(), company.getId());
+            log.info("Company Status: {}", company.getStatus());
+            
             List<User> admins = userRepository.findAll().stream()
                     .filter(user -> user.getRoles().contains(Role.ADMIN))
                     .toList();
 
             log.info("Found {} admin(s) to notify", admins.size());
+            admins.forEach(admin -> log.info("  - Admin: {} (ID: {})", admin.getEmail(), admin.getId()));
             
             if (admins.isEmpty()) {
                 log.warn("No admins found in database. Notification will not be sent.");
                 return;
             }
 
+            log.info("Checking SSE connection status for {} admin(s)...", admins.size());
+            admins.forEach(admin -> {
+                SseEmitter existingEmitter = emitters.get(admin.getId());
+                if (existingEmitter != null) {
+                    log.info("  ✓ Admin {} (ID: {}) has active SSE connection", admin.getEmail(), admin.getId());
+                } else {
+                    log.warn("  ✗ Admin {} (ID: {}) does NOT have active SSE connection", admin.getEmail(), admin.getId());
+                }
+            });
+
             CompletableFuture.allOf(
                     admins.stream().map(
                             (admin) -> CompletableFuture.supplyAsync(() -> {
                                 try {
-                                    log.info("Creating notification for admin: {} (ID: {})", admin.getEmail(), admin.getId());
+                                    log.info("--- Creating SSE notification for admin: {} (ID: {}) ---", admin.getEmail(), admin.getId());
+                                    
                                     AdminNotification notification = AdminNotification.builder()
                                             .admin(admin)
                                             .message("Company " + company.getName() + " has submitted verification documents for review")
@@ -222,27 +237,49 @@ public class AdminNotificationSseController {
                                             .company(company)
                                             .build();
 
+                                    log.info("Notification object created for admin {} (ID: {}): Type={}, Title={}, Company={}", 
+                                            admin.getEmail(), admin.getId(), 
+                                            notification.getType(), 
+                                            notification.getTitle(), 
+                                            company.getName());
+
                                     adminNotificationRepository.save(notification);
-                                    log.info("Notification saved to database for admin: {} (ID: {})", admin.getEmail(), admin.getId());
+                                    log.info("✓ Notification saved to database for admin: {} (ID: {}), Notification ID: {}", 
+                                            admin.getEmail(), admin.getId(), notification.getId());
                                     
                                     AdminNotificationDto dto = adminNotificationMapper.toDto(notification);
+                                    log.info("Notification DTO created for admin {} (ID: {}): DTO ID={}", 
+                                            admin.getEmail(), admin.getId(), dto.getId());
+                                    
                                     SseEmitter emitter = emitters.get(admin.getId());
                                     if (emitter != null) {
                                         try {
-                                            log.info("Sending SSE event to admin: {} (ID: {})", admin.getEmail(), admin.getId());
+                                            log.info(">>> Sending SSE 'verification-request' event to admin: {} (ID: {}) <<<", 
+                                                    admin.getEmail(), admin.getId());
+                                            log.info("SSE Event Details: name='verification-request', notificationId={}, companyName={}", 
+                                                    dto.getId(), company.getName());
+                                            
                                             emitter.send(SseEmitter.event()
                                                     .name("verification-request")
                                                     .data(dto));
-                                            log.info("SSE event sent successfully to admin: {} (ID: {})", admin.getEmail(), admin.getId());
+                                            
+                                            log.info("✓✓✓ SSE event sent SUCCESSFULLY to admin: {} (ID: {}) ✓✓✓", 
+                                                    admin.getEmail(), admin.getId());
                                         } catch (IOException e) {
-                                            log.error("Failed to send SSE event to admin {}: {}", admin.getId(), e.getMessage(), e);
+                                            log.error("✗✗✗ FAILED to send SSE event to admin {} (ID: {}): {} ✗✗✗", 
+                                                    admin.getId(), admin.getEmail(), e.getMessage(), e);
                                             emitters.remove(admin.getId());
                                         }
                                     } else {
-                                        log.warn("No SSE emitter found for admin: {} (ID: {}). Admin may not be connected. Notification saved to DB.", admin.getEmail(), admin.getId());
+                                        log.warn("✗✗✗ No SSE emitter found for admin: {} (ID: {}). Admin may not be connected. Notification saved to DB. ✗✗✗", 
+                                                admin.getEmail(), admin.getId());
                                     }
+                                    
+                                    log.info("--- Completed notification processing for admin: {} (ID: {}) ---", 
+                                            admin.getEmail(), admin.getId());
                                 } catch (Exception e) {
-                                    log.error("Error creating notification for admin {}: {}", admin.getId(), e.getMessage(), e);
+                                    log.error("✗✗✗ ERROR creating notification for admin {} (ID: {}): {} ✗✗✗", 
+                                            admin.getId(), admin.getEmail(), e.getMessage(), e);
                                     e.printStackTrace();
                                 }
                             return null;
@@ -250,14 +287,14 @@ public class AdminNotificationSseController {
 
                     ).toArray(CompletableFuture[]::new)
             ).thenRun(() -> {
-                log.info("Completed notification process for company verification: {}", company.getName());
+                log.info("=== COMPLETED notification process for company verification: {} ===", company.getName());
             }).exceptionally(ex -> {
-                log.error("Error in notification process for company verification: {}", ex.getMessage(), ex);
+                log.error("=== ERROR in notification process for company verification: {} ===", ex.getMessage(), ex);
                 ex.printStackTrace();
                 return null;
             });
         } catch (Exception e) {
-            log.error("Critical error in notifyAllAdminsVerification: {}", e.getMessage(), e);
+            log.error("=== CRITICAL ERROR in notifyAllAdminsVerification for company: {} ===", company.getName(), e);
             e.printStackTrace();
         }
     }
