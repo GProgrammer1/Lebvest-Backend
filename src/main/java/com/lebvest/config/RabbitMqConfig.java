@@ -6,7 +6,7 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-//@Configuration  // Disabled - RabbitMQ not needed
+@Configuration
 public class RabbitMqConfig {
 
     @Bean
@@ -22,6 +22,21 @@ public class RabbitMqConfig {
     @Bean
     public Queue signupAcceptedMoveQueue() {
         return new Queue("company.signup.accepted.move");
+    }
+
+    @Bean
+    public Queue emailQueue() {
+        return new Queue("email.queue", true); // durable
+    }
+
+    @Bean
+    public Queue documentProcessingQueue() {
+        return new Queue("document.processing.queue", true);
+    }
+
+    @Bean
+    public Queue payoutCalculationQueue() {
+        return new Queue("payout.calculation.queue", true);
     }
 
     @Bean

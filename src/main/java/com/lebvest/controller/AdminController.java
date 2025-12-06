@@ -12,6 +12,8 @@ import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.Role;
 import com.lebvest.service.AdminService;
+import com.lebvest.service.InvestorKycService;
+import com.lebvest.model.enums.InvestorClassification;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,9 +29,11 @@ import java.util.Map;
 public class AdminController {
 
     private final AdminService adminService;
+    private final InvestorKycService investorKycService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, InvestorKycService investorKycService) {
         this.adminService = adminService;
+        this.investorKycService = investorKycService;
     }
     @PostMapping("/accept-request")
     public ResponseEntity<ResponsePayload> acceptRequest(@RequestBody AcceptSignupPayload payload) {
@@ -236,6 +240,33 @@ public class AdminController {
                         .status(200)
                         .message("User status updated successfully")
                         .data(java.util.Map.of("user", user))
+                        .build()
+        );
+    }
+
+    // ========== INVESTOR KYC ENDPOINTS ==========
+
+    @PutMapping("/investors/{investorId}/kyc")
+    public ResponseEntity<ResponsePayload> updateInvestorKyc(
+            @PathVariable Long investorId,
+            @RequestBody java.util.Map<String, Object> request) {
+        InvestorClassification classification = InvestorClassification.valueOf(
+                request.get("classification").toString().toUpperCase());
+        String kycNotes = request.get("kycNotes") != null ? request.get("kycNotes").toString() : null;
+        
+        var investor = investorKycService.updateKycClassification(investorId, classification, kycNotes);
+        
+        java.util.Map<String, Object> investorData = new java.util.HashMap<>();
+        investorData.put("id", investor.getId());
+        investorData.put("classification", investor.getClassification());
+        investorData.put("kycVerified", investor.getKycVerified());
+        investorData.put("kycNotes", investor.getKycNotes());
+        
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investor KYC updated successfully")
+                        .data(java.util.Map.of("investor", investorData))
                         .build()
         );
     }

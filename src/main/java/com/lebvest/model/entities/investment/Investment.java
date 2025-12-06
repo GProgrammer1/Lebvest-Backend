@@ -3,6 +3,9 @@ package com.lebvest.model.entities.investment;
 import com.lebvest.model.entities.company.Company;
 import com.lebvest.model.enums.*;
 import jakarta.persistence.*;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -23,6 +26,8 @@ import java.util.List;
         indexes = {
                 @Index(name = "idx_inv_company", columnList = "company_id"),
                 @Index(name = "idx_inv_category", columnList = "category"),
+                @Index(name = "idx_inv_status", columnList = "status"),
+                @Index(name = "idx_inv_deadline", columnList = "deadline")
         })
 @RequiredArgsConstructor
 @Data
@@ -90,6 +95,17 @@ public class Investment {
 
     @Column(name = "duration_months", nullable = false)
     private Integer durationMonths;
+
+    @Column(name = "maturity_date")
+    private LocalDate maturityDate;
+
+    @Column(name = "expected_return_date")
+    private LocalDate expectedReturnDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "funding_status", nullable = false)
+    @Builder.Default
+    private FundingStatus fundingStatus = FundingStatus.PENDING;
 
     @Column(name = "image_url", length = 512)
     private String imageUrl;

@@ -16,7 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "companies")
+@Table(name = "companies", indexes = {
+        @Index(name = "idx_company_user", columnList = "user_id"),
+        @Index(name = "idx_company_name", columnList = "name"),
+        @Index(name = "idx_company_status", columnList = "status")
+})
 @RequiredArgsConstructor
 @SuperBuilder
 @Data

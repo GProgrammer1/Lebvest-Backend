@@ -402,6 +402,15 @@ public class InvestmentService {
             throw new IllegalArgumentException("Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
         }
 
+        // Calculate maturity date for this specific investment
+        java.time.LocalDate maturityDate = investment.getMaturityDate();
+        if (maturityDate == null && investment.getDurationMonths() != null) {
+            maturityDate = java.time.LocalDate.now().plusMonths(investment.getDurationMonths());
+        }
+        
+        // Calculate expected return amount
+        BigDecimal expectedReturnAmount = calculateExpectedReturn(amount, investment.getExpectedReturn());
+        
         // Create investor investment
         InvestorInvestment investorInvestment = InvestorInvestment.builder()
                 .investor(investor)
@@ -409,6 +418,10 @@ public class InvestmentService {
                 .amount(amount)
                 .investedAt(java.time.LocalDate.now())
                 .currentValue(amount) // Initially same as invested amount
+                .expectedReturnAmount(expectedReturnAmount)
+                .maturityDate(maturityDate)
+                .isMatured(false)
+                .payoutRequested(false)
                 .build();
 
         investorInvestment = investorInvestmentRepository.save(investorInvestment);
@@ -416,6 +429,23 @@ public class InvestmentService {
         // Update investment raised amount
         BigDecimal newRaisedAmount = investment.getRaisedAmount().add(amount);
         investment.setRaisedAmount(newRaisedAmount);
+        
+        // Update funding status
+        if (newRaisedAmount.compareTo(investment.getTargetAmount()) >= 0) {
+            investment.setFundingStatus(com.lebvest.model.enums.FundingStatus.COMPLETED);
+        } else if (investment.getFundingStatus() == com.lebvest.model.enums.FundingStatus.PENDING) {
+            investment.setFundingStatus(com.lebvest.model.enums.FundingStatus.PAID);
+        }
+        
+        // Calculate maturity date if not set (based on durationMonths)
+        if (investment.getMaturityDate() == null && investment.getDurationMonths() != null) {
+            java.time.LocalDate maturityDate = java.time.LocalDate.now()
+                    .plusMonths(investment.getDurationMonths());
+            investment.setMaturityDate(maturityDate);
+            
+            // Calculate expected return date (same as maturity for now)
+            investment.setExpectedReturnDate(maturityDate);
+        }
         investmentRepository.save(investment);
 
         // Update investor totals
@@ -424,6 +454,27 @@ public class InvestmentService {
         investorRepository.save(investor);
 
         return investorInvestment;
+    }
+    
+    /**
+     * Calculate expected return amount based on principal and return rate
+     */
+    private BigDecimal calculateExpectedReturn(BigDecimal principal, BigDecimal expectedReturnRate) {
+        // expectedReturnRate is a percentage (e.g., 10.5 for 10.5%)
+        BigDecimal rate = expectedReturnRate.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+        return principal.multiply(BigDecimal.ONE.add(rate));
+    }
+    
+    /**
+     * Calculate percentage funded for an investment
+     */
+    public BigDecimal calculatePercentageFunded(Investment investment) {
+        if (investment.getTargetAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            return BigDecimal.ZERO;
+        }
+        return investment.getRaisedAmount()
+                .divide(investment.getTargetAmount(), 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
     }
 
     @Transactional(readOnly = true)

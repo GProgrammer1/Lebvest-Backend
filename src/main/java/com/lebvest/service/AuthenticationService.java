@@ -87,9 +87,15 @@ public class AuthenticationService {
                 throw new IllegalArgumentException("Invalid role");
         }
         if (exists) {
-            String token = jwtService.generateToken(user, "access", user.getId());
-            return Map.of("token", token,
-                    "role", role);
+            String accessToken = jwtService.generateToken(user, "access", user.getId());
+            String refreshToken = jwtService.generateToken(user, "refresh", user.getId());
+            return Map.of(
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken,
+                    "token", accessToken, // Keep for backward compatibility
+                    "role", role,
+                    "tokenType", "Bearer"
+            );
         } else {
             throw new IllegalArgumentException("User not found");
         }
