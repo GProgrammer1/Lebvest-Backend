@@ -1,11 +1,15 @@
 package com.lebvest.controller;
 
 import com.lebvest.model.dto.*;
+import com.lebvest.model.dto.AcceptInvestmentRequestRequest;
+import com.lebvest.model.dto.InvestmentRequestDto;
+import com.lebvest.model.dto.RejectInvestmentRequestRequest;
 import com.lebvest.model.dto.investor.ChangePasswordRequest;
 import com.lebvest.model.entities.company.CompanyFinancial;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.service.CompanyService;
+import com.lebvest.service.InvestmentRequestService;
 import org.springframework.data.domain.Page;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +30,11 @@ import java.util.Map;
 public class CompanyController {
 
     private final CompanyService companyService;
+    private final InvestmentRequestService investmentRequestService;
 
-    public CompanyController(CompanyService companyService) {
+    public CompanyController(CompanyService companyService, InvestmentRequestService investmentRequestService) {
         this.companyService = companyService;
+        this.investmentRequestService = investmentRequestService;
     }
 
     @PostMapping("/investments")
@@ -311,6 +317,63 @@ public class CompanyController {
                         .status(200)
                         .message("Verification documents retrieved successfully")
                         .data(Map.of("documents", docs != null ? docs : Map.of()))
+                        .build()
+        );
+    }
+
+    // Investment Request Management Endpoints
+    @GetMapping("/investment-requests")
+    public ResponseEntity<ResponsePayload> getInvestmentRequests(
+            @RequestParam(required = false, defaultValue = "PENDING") String status) {
+        List<InvestmentRequestDto> requests = companyService.getInvestmentRequests(status);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investment requests retrieved successfully")
+                        .data(Map.of("requests", requests))
+                        .build()
+        );
+    }
+
+    @PostMapping("/investment-requests/{requestId}/accept")
+    public ResponseEntity<ResponsePayload> acceptInvestmentRequest(
+            @PathVariable Long requestId,
+            @RequestBody(required = false) AcceptInvestmentRequestRequest request) {
+        if (request == null) {
+            request = new AcceptInvestmentRequestRequest();
+        }
+        var investmentRequest = investmentRequestService.acceptInvestmentRequest(requestId, request);
+        
+        Map<String, Object> requestData = new HashMap<>();
+        requestData.put("id", investmentRequest.getId());
+        requestData.put("status", investmentRequest.getStatus().toString());
+        requestData.put("acceptedAt", investmentRequest.getAcceptedAt());
+        
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investment request accepted successfully")
+                        .data(Map.of("investmentRequest", requestData))
+                        .build()
+        );
+    }
+
+    @PostMapping("/investment-requests/{requestId}/reject")
+    public ResponseEntity<ResponsePayload> rejectInvestmentRequest(
+            @PathVariable Long requestId,
+            @RequestBody @Valid RejectInvestmentRequestRequest request) {
+        var investmentRequest = investmentRequestService.rejectInvestmentRequest(requestId, request);
+        
+        Map<String, Object> requestData = new HashMap<>();
+        requestData.put("id", investmentRequest.getId());
+        requestData.put("status", investmentRequest.getStatus().toString());
+        requestData.put("rejectedAt", investmentRequest.getRejectedAt());
+        
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investment request rejected successfully")
+                        .data(Map.of("investmentRequest", requestData))
                         .build()
         );
     }

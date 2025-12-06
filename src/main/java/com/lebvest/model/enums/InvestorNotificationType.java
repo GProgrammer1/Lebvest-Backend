@@ -8,7 +8,8 @@ public enum InvestorNotificationType {
     NEW_OPPORTUNITY("New Opportunity"),
     UPDATE("Update"),
     THRESHOLD("Threshold"),
-    NEWS("News");
+    NEWS("News"),
+    INVESTMENT_ACCEPTED("Investment Accepted");
 
     private final String displayName;
 

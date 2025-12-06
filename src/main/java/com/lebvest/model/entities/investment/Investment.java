@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,6 +31,22 @@ public class Investment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    private Long version; // Optimistic locking to prevent race conditions
+
+    @Version
+    @Column(nullable = false, columnDefinition = "BIGINT DEFAULT 0")
+    @ColumnDefault("0")
+    public Long getVersion() {
+        if (version == null) {
+            version = 0L;
+        }
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version == null ? 0L : version;
+    }
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
@@ -125,4 +142,25 @@ public class Investment {
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<InvestorInvestment> investorInvestments = new ArrayList<>();
+
+    @PrePersist
+    private void ensureVersionBeforePersist() {
+        if (this.version == null) {
+            this.version = 0L;
+        }
+    }
+
+    @PostLoad
+    private void initializeVersion() {
+        if (this.version == null) {
+            this.version = 0L;
+        }
+    }
+
+    @PreUpdate
+    private void ensureVersionBeforeUpdate() {
+        if (this.version == null) {
+            this.version = 0L;
+        }
+    }
 }

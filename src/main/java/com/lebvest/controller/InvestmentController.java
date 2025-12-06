@@ -1,9 +1,6 @@
 package com.lebvest.controller;
 
-import com.lebvest.model.dto.InvestmentDto;
-import com.lebvest.model.dto.InvestmentStatsDto;
-import com.lebvest.model.dto.MakeInvestmentRequest;
-import com.lebvest.model.dto.ResponsePayload;
+import com.lebvest.model.dto.*;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import jakarta.validation.Valid;
 import com.lebvest.model.enums.CompanySector;
@@ -12,6 +9,7 @@ import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.service.InvestmentService;
+import com.lebvest.service.InvestmentRequestService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,9 +25,11 @@ import java.util.Map;
 public class InvestmentController {
 
     private final InvestmentService investmentService;
+    private final InvestmentRequestService investmentRequestService;
 
-    public InvestmentController(InvestmentService investmentService) {
+    public InvestmentController(InvestmentService investmentService, InvestmentRequestService investmentRequestService) {
         this.investmentService = investmentService;
+        this.investmentRequestService = investmentRequestService;
     }
 
     @GetMapping
@@ -177,20 +177,24 @@ public class InvestmentController {
     public ResponseEntity<ResponsePayload> makeInvestment(
             @PathVariable Long id,
             @RequestBody @Valid MakeInvestmentRequest request) {
-        InvestorInvestment investorInvestment = investmentService.makeInvestment(id, request.getAmount());
+        // Create investment request instead of direct investment
+        com.lebvest.model.entities.investment.InvestmentRequest investmentRequest = 
+                investmentRequestService.createInvestmentRequest(id, 
+                        new CreateInvestmentRequestRequest() {{
+                            setAmount(request.getAmount());
+                        }});
         
-        Map<String, Object> investmentData = new HashMap<>();
-        investmentData.put("id", investorInvestment.getId());
-        investmentData.put("amount", investorInvestment.getAmount());
-        investmentData.put("investedAt", investorInvestment.getInvestedAt());
-        investmentData.put("currentValue", investorInvestment.getCurrentValue());
-        investmentData.put("investmentId", investorInvestment.getInvestment().getId());
+        Map<String, Object> requestData = new HashMap<>();
+        requestData.put("id", investmentRequest.getId());
+        requestData.put("amount", investmentRequest.getAmount());
+        requestData.put("status", investmentRequest.getStatus().toString());
+        requestData.put("createdAt", investmentRequest.getCreatedAt());
         
         return ResponseEntity.status(201).body(
                 ResponsePayload.builder()
                         .status(201)
-                        .message("Investment made successfully")
-                        .data(Map.of("investorInvestment", investmentData))
+                        .message("Investment request submitted successfully. The company will review your request.")
+                        .data(Map.of("investmentRequest", requestData))
                         .build()
         );
     }

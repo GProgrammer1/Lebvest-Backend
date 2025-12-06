@@ -5,7 +5,9 @@ import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -17,6 +19,8 @@ import java.util.Set;
 @Data
 @RequiredArgsConstructor
 @SuperBuilder
+@EqualsAndHashCode(exclude = {"investor"})
+@ToString(exclude = {"investor"})
 public class InvestorPreference implements Serializable {
 
     /**

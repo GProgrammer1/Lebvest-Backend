@@ -4,14 +4,14 @@ import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.enums.InvestorNotificationType;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "investor_notifications")
-@RequiredArgsConstructor
+@NoArgsConstructor
 @Data
 public class InvestorNotification {
     @Id

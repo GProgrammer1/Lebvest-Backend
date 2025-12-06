@@ -104,6 +104,20 @@ admin:
 frontend:
   url: ${FRONTEND_URL:http://localhost:3000}
 
+# File Upload Configuration
+file:
+  upload:
+    # Base directory for file uploads (absolute path recommended)
+    # If not set, defaults to {project_root}/uploads
+    # Use absolute path to prevent files from being lost on restart
+    base-dir: ${UPLOADS_BASE_DIR:}
+
+# Stripe Configuration
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:sk_test_...}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_...}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_...}
+
 url:
   pending-prefix: ${PENDING_PREFIX:pending/}
   accepted-prefix: ${ACCEPTED_PREFIX:accepted/}

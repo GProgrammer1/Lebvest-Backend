@@ -1,14 +1,14 @@
 package com.lebvest.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 
 public enum CompanyNotificationType {
     INVESTOR_INQUIRY("Investor Inquiry"),
     INVESTOR_REQUEST("Investor Request"),
     FUNDING_MILESTONE("Funding Milestone"),
-    ADMIN_MESSAGE("Admin Message");
+    ADMIN_MESSAGE("Admin Message"),
+    PROJECT_APPROVED("Project Approved"),
+    PROJECT_REJECTED("Project Rejected");
 
     private final String displayName;
 
@@ -17,7 +17,6 @@ public enum CompanyNotificationType {
     }
 
     @JsonValue
-    @Enumerated(EnumType.STRING)
     public String getDisplayName() {
         return displayName;
     }

@@ -92,14 +92,7 @@ public class CompanyRegistrationService {
             throw new ConflictException("A signup request with this email already exists");
         }
 
-        // Save files to local storage in pending folder
-        List<String> documentPaths = new ArrayList<>();
-        if (req.getDocuments() != null && req.getDocuments().length > 0) {
-            UUID requestId = UUID.randomUUID();
-            documentPaths = localFileStorageService.savePendingFiles(requestId, req.getDocuments());
-        }
-
-        // Create CompanySignupRequest (not Company yet - pending admin approval)
+        // Create CompanySignupRequest first to get its ID (needed for file paths)
         CompanySignupRequest signupRequest = CompanySignupRequest.builder()
                 .name(req.getName())
                 .email(req.getEmail())
@@ -112,12 +105,37 @@ public class CompanyRegistrationService {
                 .city(req.getCity())
                 .phoneNumber(req.getPhoneNumber())
                 .website(req.getWebsite())
-                .documents(documentPaths)
                 .build();
         
-        // Save and flush to ensure the request has an ID before creating notifications
+        // Save and flush to get the request ID before saving files
         companySignupRequestRepository.saveAndFlush(signupRequest);
-        log.info("Company signup request created with ID: {}", signupRequest.getId());
+        log.info("Company signup request created with ID: {} (requestId: {})", signupRequest.getId(), signupRequest.getRequestId());
+        
+        // Save files to local storage in pending folder using the request's requestId
+        List<String> documentPaths = new ArrayList<>();
+        if (req.getDocuments() != null && req.getDocuments().length > 0) {
+            log.info("Starting file upload for signup request ID: {} (requestId: {}). Number of files: {}", 
+                    signupRequest.getId(), signupRequest.getRequestId(), req.getDocuments().length);
+            
+            UUID requestId = signupRequest.getRequestId(); // Use the request's UUID, not a random one
+            log.info("Using requestId for file upload: {}", requestId);
+            
+            documentPaths = localFileStorageService.savePendingFiles(requestId, req.getDocuments());
+            log.info("File upload completed. Saved {} document paths for request ID: {}", 
+                    documentPaths.size(), signupRequest.getId());
+            
+            // Verify files were actually saved
+            for (String path : documentPaths) {
+                log.info("Document path saved to database: {}", path);
+            }
+            
+            // Update the signup request with document paths
+            signupRequest.setDocuments(documentPaths);
+            companySignupRequestRepository.saveAndFlush(signupRequest);
+            log.info("Updated signup request with {} document paths", documentPaths.size());
+        } else {
+            log.warn("No documents provided in signup request for company: {}", req.getCompanyName());
+        }
 
         // Send confirmation email to company (Step 1)
         sendCompanyConfirmationEmail(signupRequest);
