@@ -4,7 +4,9 @@ import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -20,6 +22,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Data
 @SuperBuilder
+@EqualsAndHashCode(exclude = {"preferences", "watchlist", "investments", "notifications", "goals"})
+@ToString(exclude = {"preferences", "watchlist", "investments", "notifications", "goals"})
 public class Investor {
 
     @Id

@@ -1,6 +1,4 @@
 package com.lebvest.controller;
-
-import com.lebvest.model.dto.*;
 import com.lebvest.model.dto.AdminProjectReviewDto;
 import com.lebvest.model.dto.AdminStatisticsDto;
 import com.lebvest.model.dto.AcceptSignupPayload;
@@ -15,12 +13,14 @@ import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.Role;
 import com.lebvest.service.AdminService;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin")
 //@PreAuthorize("hasRole('ADMIN')")
@@ -89,18 +89,42 @@ public class AdminController {
 
     @GetMapping("/projects/pending")
     public ResponseEntity<ResponsePayload> getPendingProjects(
-            @RequestParam(required = false) InvestmentStatus status,
+            @RequestParam(required = false) String status,
             @RequestParam(required = false) InvestmentCategory category,
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
         
-        // Default to PENDING_REVIEW if no status specified
-        if (status == null) {
-            status = InvestmentStatus.PENDING_REVIEW;
+        log.debug("Getting projects with status={}, category={}, search={}, page={}, size={}", 
+                status, category, search, page, size);
+        
+        InvestmentStatus investmentStatus = null;
+        if (status != null && !status.trim().isEmpty()) {
+            if (status.equalsIgnoreCase("ALL")) {
+                // Explicitly "All" selected - return all statuses (null)
+                investmentStatus = null;
+                log.info("Filtering projects: ALL statuses");
+            } else {
+                try {
+                    investmentStatus = InvestmentStatus.valueOf(status.toUpperCase());
+                    log.info("Filtering projects by status: {}", investmentStatus);
+                } catch (IllegalArgumentException e) {
+                    // Invalid status provided, default to PENDING_REVIEW
+                    log.warn("Invalid status provided: '{}'. Defaulting to PENDING_REVIEW.", status);
+                    investmentStatus = InvestmentStatus.PENDING_REVIEW;
+                }
+            }
+        } else {
+            // No status provided - default to PENDING_REVIEW for backward compatibility
+            investmentStatus = InvestmentStatus.PENDING_REVIEW;
+            log.info("No status provided, defaulting to PENDING_REVIEW");
         }
         
-        Page<AdminProjectReviewDto> projects = adminService.getPendingProjects(status, category, search, page, size);
+        Page<AdminProjectReviewDto> projects = adminService.getPendingProjects(investmentStatus, category, search, page, size);
+        
+        log.info("Retrieved {} projects with status {} (total: {}, page: {})", 
+                projects.getContent().size(), investmentStatus != null ? investmentStatus : "ALL", 
+                projects.getTotalElements(), projects.getNumber());
         
         java.util.Map<String, Object> data = new java.util.HashMap<>();
         data.put("projects", projects.getContent());

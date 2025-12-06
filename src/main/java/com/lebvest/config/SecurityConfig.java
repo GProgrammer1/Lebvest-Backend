@@ -50,8 +50,10 @@ public class SecurityConfig {
                                 .requestMatchers("/sse/**").permitAll() // SSE endpoints validate token in controller (EventSource can't send headers)
                                 .requestMatchers("/ws/**").permitAll() // WebSocket endpoint
                                 .requestMatchers(HttpMethod.GET, "/uploads/**").permitAll() // Allow public access to uploaded files
-                                .requestMatchers("/api/user-activity/**").authenticated()
-                                .anyRequest().authenticated()
+                                                .requestMatchers(HttpMethod.GET, "/api/files/**").permitAll() // Allow access to files (paths are UUID-based, hard to guess)
+                                                .requestMatchers(HttpMethod.POST, "/payments/stripe/webhook").permitAll() // Stripe webhook (validated by signature)
+                                                .requestMatchers("/api/user-activity/**").authenticated()
+                                                .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

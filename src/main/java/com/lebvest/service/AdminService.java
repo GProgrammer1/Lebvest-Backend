@@ -10,7 +10,9 @@ import com.lebvest.model.dto.UpdateUserStatusRequest;
 import com.lebvest.model.dto.WatchlistStatusDto;
 import com.lebvest.model.entities.admin.AdminNotification;
 import com.lebvest.model.entities.company.Company;
+import com.lebvest.model.entities.company.CompanyNotification;
 import com.lebvest.model.entities.company.CompanySignupRequest;
+import com.lebvest.model.enums.CompanyNotificationType;
 import com.lebvest.model.entities.investor.User;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.InvestmentStatus;
@@ -20,6 +22,7 @@ import com.lebvest.repository.AdminNotificationRepository;
 import com.lebvest.repository.CompanyRepository;
 import com.lebvest.repository.CompanySignupRequestRepository;
 import com.lebvest.repository.CompanyVerificationDocumentsRepository;
+import com.lebvest.repository.CompanyNotificationRepository;
 import com.lebvest.repository.InvestmentRepository;
 import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
@@ -32,7 +35,10 @@ import com.lebvest.model.entities.company.CompanyVerificationDocuments;
 import com.lebvest.model.enums.CompanyStatus;
 import com.lebvest.service.UserActivityService;
 import com.lebvest.util.AdminNotificationMapper;
+import com.lebvest.controller.CompanyNotificationSseController;
 import jakarta.transaction.Transactional;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 //import org.springframework.amqp.rabbit.core.RabbitTemplate;  // Disabled - RabbitMQ not needed
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -65,6 +71,8 @@ public class AdminService {
     private final MailService mailService;
     private final UserActivityService userActivityService;
     private final AdminNotificationMapper adminNotificationMapper;
+    private final CompanyNotificationRepository companyNotificationRepository;
+    private final CompanyNotificationSseController companyNotificationSseController;
     //private final RabbitTemplate rabbitTemplate;  // Disabled - RabbitMQ not needed
 
     public AdminService(UserRepository userRepo,
@@ -83,7 +91,9 @@ public class AdminService {
                         CompanyVerificationDocumentsRepository verificationDocumentsRepository,
                         MailService mailService,
                         UserActivityService userActivityService,
-                        AdminNotificationMapper adminNotificationMapper
+                        AdminNotificationMapper adminNotificationMapper,
+                        CompanyNotificationRepository companyNotificationRepository,
+                        CompanyNotificationSseController companyNotificationSseController
                         //RabbitTemplate rabbitTemplate  // Disabled - RabbitMQ not needed
                         ) {
         this.userRepo = userRepo;
@@ -103,6 +113,8 @@ public class AdminService {
         this.mailService = mailService;
         this.userActivityService = userActivityService;
         this.adminNotificationMapper = adminNotificationMapper;
+        this.companyNotificationRepository = companyNotificationRepository;
+        this.companyNotificationSseController = companyNotificationSseController;
         //this.rabbitTemplate = rabbitTemplate;  // Disabled - RabbitMQ not needed
     }
 
@@ -304,7 +316,15 @@ public class AdminService {
         try {
             if (notification.getType() == com.lebvest.model.enums.AdminNotificationType.SIGNUP_REQUEST) {
                 // Extract from CompanySignupRequest
-                if (notification.getRequest() != null && notification.getRequest().getDocuments() != null) {
+                // If request was approved, files may have been moved to accepted, so check Company documents first
+                if (notification.getCompany() != null && notification.getCompany().getDocuments() != null && !notification.getCompany().getDocuments().isEmpty()) {
+                    // Use Company documents (accepted paths) if available - these are the correct paths after approval
+                    documentUrls = notification.getCompany().getDocuments().stream()
+                            .map(path -> convertPathToUrl(path))
+                            .filter(url -> url != null)
+                            .collect(Collectors.toList());
+                } else if (notification.getRequest() != null && notification.getRequest().getDocuments() != null) {
+                    // Fallback to request documents (pending paths) for unapproved requests
                     documentUrls = notification.getRequest().getDocuments().stream()
                             .map(path -> convertPathToUrl(path))
                             .filter(url -> url != null)
@@ -606,6 +626,55 @@ public class AdminService {
         }
     }
 
+    private void sendProjectApprovalEmail(Company company, com.lebvest.model.entities.investment.Investment investment, String reviewNotes) {
+        try {
+            String companyEmail = company.getUser().getEmail();
+            String dashboardUrl = varsConfig.getFrontendUrl() + "/company-dashboard";
+
+            Map<String, String> templateData = new HashMap<>();
+            templateData.put("name", company.getUser().getName());
+            templateData.put("companyName", company.getName());
+            templateData.put("projectTitle", investment.getTitle());
+            templateData.put("dashboardUrl", dashboardUrl);
+            if (reviewNotes != null && !reviewNotes.trim().isEmpty()) {
+                templateData.put("reviewNotes", reviewNotes);
+            } else {
+                templateData.put("reviewNotes", "");
+            }
+
+            String htmlContent = mailService.loadAndFormatEmailTemplate(templateData, "ProjectApproval");
+            mailService.sendHtmlMail(companyEmail, "Project Approved - " + investment.getTitle(), htmlContent);
+            log.info("Project approval email sent to: {}", companyEmail);
+        } catch (Exception e) {
+            log.error("Failed to send project approval email: {}", e.getMessage(), e);
+        }
+    }
+
+    private void sendProjectRejectionEmail(Company company, com.lebvest.model.entities.investment.Investment investment, String reason, String reviewNotes) {
+        try {
+            String companyEmail = company.getUser().getEmail();
+            String dashboardUrl = varsConfig.getFrontendUrl() + "/company-dashboard";
+
+            Map<String, String> templateData = new HashMap<>();
+            templateData.put("name", company.getUser().getName());
+            templateData.put("companyName", company.getName());
+            templateData.put("projectTitle", investment.getTitle());
+            templateData.put("reason", reason != null ? reason : "Project did not meet our requirements.");
+            templateData.put("dashboardUrl", dashboardUrl);
+            if (reviewNotes != null && !reviewNotes.trim().isEmpty()) {
+                templateData.put("reviewNotes", reviewNotes);
+            } else {
+                templateData.put("reviewNotes", "");
+            }
+
+            String htmlContent = mailService.loadAndFormatEmailTemplate(templateData, "ProjectRejection");
+            mailService.sendHtmlMail(companyEmail, "Project Rejected - " + investment.getTitle(), htmlContent);
+            log.info("Project rejection email sent to: {}", companyEmail);
+        } catch (Exception e) {
+            log.error("Failed to send project rejection email: {}", e.getMessage(), e);
+        }
+    }
+
     // ========== PROJECT REVIEW METHODS ==========
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -634,38 +703,143 @@ public class AdminService {
 
     @Transactional
     public AdminProjectReviewDto approveProject(Long projectId, ApproveProjectRequest request) {
-        com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+        int maxRetries = 3;
+        int attempt = 0;
         
-        if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
-            throw new IllegalStateException("Investment is not in PENDING_REVIEW status");
+        while (attempt < maxRetries) {
+            try {
+                com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
+                        .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+                
+                if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
+                    throw new IllegalStateException("Investment is not in PENDING_REVIEW status. Current status: " + investment.getStatus());
+                }
+                
+                // Initialize version if null (for existing records before migration)
+                if (investment.getVersion() == null) {
+                    investment.setVersion(0L);
+                }
+                
+                investment.setStatus(InvestmentStatus.APPROVED);
+                com.lebvest.model.entities.investment.Investment savedInvestment = investmentRepository.save(investment);
+                
+                Company company = savedInvestment.getCompany();
+                String reviewNotes = request.getReviewNotes() != null && !request.getReviewNotes().trim().isEmpty() 
+                        ? request.getReviewNotes() 
+                        : null;
+                
+                // Build notification message
+                String notificationMessage = "Your project \"" + savedInvestment.getTitle() + "\" has been approved and is now live on the platform.";
+                if (reviewNotes != null) {
+                    notificationMessage += "\n\nAdmin Notes: " + reviewNotes;
+                }
+                
+                // Send SSE notification asynchronously (pass IDs to avoid detached entity issues)
+                companyNotificationSseController.notifyCompany(
+                        company.getId(),
+                        CompanyNotificationType.PROJECT_APPROVED,
+                        "Project Approved",
+                        notificationMessage,
+                        savedInvestment.getId()
+                );
+                
+                // Send email notification
+                sendProjectApprovalEmail(company, savedInvestment, reviewNotes);
+                
+                log.info("Project {} approved by admin. Notification sent to company {} (ID: {})", 
+                        projectId, company.getName(), company.getId());
+                
+                return convertToAdminReviewDto(savedInvestment);
+                
+            } catch (ObjectOptimisticLockingFailureException e) {
+                attempt++;
+                if (attempt >= maxRetries) {
+                    log.error("Failed to approve project {} after {} retries due to concurrent modification", projectId, maxRetries);
+                    throw new IllegalStateException("Project status was modified by another process. Please refresh and try again.");
+                }
+                log.warn("Optimistic locking failure on project {} approval, retrying (attempt {}/{})", projectId, attempt, maxRetries);
+                try {
+                    Thread.sleep(100 * attempt); // Exponential backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Thread interrupted during retry");
+                }
+            }
         }
         
-        investment.setStatus(InvestmentStatus.APPROVED);
-        investmentRepository.save(investment);
-        
-        // TODO: Send notification to company about approval
-        log.info("Project {} approved by admin", projectId);
-        
-        return convertToAdminReviewDto(investment);
+        throw new IllegalStateException("Failed to approve project after retries");
     }
 
     @Transactional
     public AdminProjectReviewDto rejectProject(Long projectId, RejectProjectRequest request) {
-        com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
-                .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+        int maxRetries = 3;
+        int attempt = 0;
         
-        if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
-            throw new IllegalStateException("Investment is not in PENDING_REVIEW status");
+        while (attempt < maxRetries) {
+            try {
+                com.lebvest.model.entities.investment.Investment investment = investmentRepository.findById(projectId)
+                        .orElseThrow(() -> new IllegalArgumentException("Investment not found"));
+                
+                if (investment.getStatus() != InvestmentStatus.PENDING_REVIEW) {
+                    throw new IllegalStateException("Investment is not in PENDING_REVIEW status. Current status: " + investment.getStatus());
+                }
+                
+                // Initialize version if null (for existing records before migration)
+                if (investment.getVersion() == null) {
+                    investment.setVersion(0L);
+                }
+                
+                investment.setStatus(InvestmentStatus.REJECTED);
+                com.lebvest.model.entities.investment.Investment savedInvestment = investmentRepository.save(investment);
+                
+                Company company = savedInvestment.getCompany();
+                String reason = request.getReason() != null && !request.getReason().trim().isEmpty() 
+                        ? request.getReason() 
+                        : "No reason provided";
+                String reviewNotes = request.getReviewNotes() != null && !request.getReviewNotes().trim().isEmpty() 
+                        ? request.getReviewNotes() 
+                        : null;
+                
+                // Build notification message
+                String notificationMessage = "Your project \"" + savedInvestment.getTitle() + "\" has been rejected.\n\nReason: " + reason;
+                if (reviewNotes != null) {
+                    notificationMessage += "\n\nAdmin Notes: " + reviewNotes;
+                }
+                
+                // Send SSE notification asynchronously (pass IDs to avoid detached entity issues)
+                companyNotificationSseController.notifyCompany(
+                        company.getId(),
+                        CompanyNotificationType.PROJECT_REJECTED,
+                        "Project Rejected",
+                        notificationMessage,
+                        savedInvestment.getId()
+                );
+                
+                // Send email notification
+                sendProjectRejectionEmail(company, savedInvestment, reason, reviewNotes);
+                
+                log.info("Project {} rejected by admin. Reason: {}. Notification sent to company {} (ID: {})", 
+                        projectId, reason, company.getName(), company.getId());
+                
+                return convertToAdminReviewDto(savedInvestment);
+                
+            } catch (ObjectOptimisticLockingFailureException e) {
+                attempt++;
+                if (attempt >= maxRetries) {
+                    log.error("Failed to reject project {} after {} retries due to concurrent modification", projectId, maxRetries);
+                    throw new IllegalStateException("Project status was modified by another process. Please refresh and try again.");
+                }
+                log.warn("Optimistic locking failure on project {} rejection, retrying (attempt {}/{})", projectId, attempt, maxRetries);
+                try {
+                    Thread.sleep(100 * attempt); // Exponential backoff
+                } catch (InterruptedException ie) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Thread interrupted during retry");
+                }
+            }
         }
         
-        investment.setStatus(InvestmentStatus.REJECTED);
-        investmentRepository.save(investment);
-        
-        // TODO: Send notification to company about rejection with reason
-        log.info("Project {} rejected by admin. Reason: {}", projectId, request.getReason());
-        
-        return convertToAdminReviewDto(investment);
+        throw new IllegalStateException("Failed to reject project after retries");
     }
 
     private AdminProjectReviewDto convertToAdminReviewDto(com.lebvest.model.entities.investment.Investment investment) {

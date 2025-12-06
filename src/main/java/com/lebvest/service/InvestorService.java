@@ -26,6 +26,7 @@ import com.lebvest.model.enums.InvestmentType;
 import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestmentRequestRepository;
 import com.lebvest.repository.InvestorNotificationRepository;
 import com.lebvest.repository.InvestorRepository;
 import org.springframework.security.core.Authentication;
@@ -44,23 +45,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import com.lebvest.model.dto.InvestmentRequestDto;
 
 @Service
 public class InvestorService {
 
     private final InvestorRepository investorRepository;
     private final InvestmentRepository investmentRepository;
+    private final InvestmentRequestRepository investmentRequestRepository;
     private final InvestorNotificationRepository investorNotificationRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
     private final PasswordEncoder passwordEncoder;
 
     public InvestorService(InvestorRepository investorRepository,
                            InvestmentRepository investmentRepository,
+                           InvestmentRequestRepository investmentRequestRepository,
                            InvestorNotificationRepository investorNotificationRepository,
                            InvestorInvestmentRepository investorInvestmentRepository,
                            PasswordEncoder passwordEncoder) {
         this.investorRepository = investorRepository;
         this.investmentRepository = investmentRepository;
+        this.investmentRequestRepository = investmentRequestRepository;
         this.investorNotificationRepository = investorNotificationRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
         this.passwordEncoder = passwordEncoder;
@@ -619,6 +624,55 @@ public class InvestorService {
         }
         
         return toInvestorInvestmentDto(investorInvestment);
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestmentRequestDto> getInvestmentRequests(String status) {
+        Investor investor = getCurrentInvestorWithRelations();
+        
+        com.lebvest.model.enums.InvestmentRequestStatus requestStatus = null;
+        if (status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            try {
+                requestStatus = com.lebvest.model.enums.InvestmentRequestStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Invalid status, return all
+                requestStatus = null;
+            }
+        }
+        
+        List<com.lebvest.model.entities.investment.InvestmentRequest> requests;
+        if (requestStatus != null) {
+            requests = investmentRequestRepository.findByInvestor_IdAndStatusOrderByCreatedAtDesc(
+                    investor.getId(), requestStatus);
+        } else {
+            requests = investmentRequestRepository.findByInvestor_IdOrderByCreatedAtDesc(investor.getId());
+        }
+        
+        return requests.stream()
+                .map(this::convertToInvestmentRequestDto)
+                .collect(Collectors.toList());
+    }
+
+    private InvestmentRequestDto convertToInvestmentRequestDto(com.lebvest.model.entities.investment.InvestmentRequest request) {
+        return InvestmentRequestDto.builder()
+                .id(request.getId())
+                .investorId(request.getInvestor().getId())
+                .investorName(request.getInvestor().getUser().getName())
+                .investorEmail(request.getInvestor().getUser().getEmail())
+                .investorProfileImageUrl(request.getInvestor().getImageUrl())
+                .investmentId(request.getInvestment().getId())
+                .investmentTitle(request.getInvestment().getTitle())
+                .amount(request.getAmount())
+                .status(request.getStatus())
+                .rejectionReason(request.getRejectionReason())
+                .message(request.getMessage())
+                .stripePaymentIntentId(request.getStripePaymentIntentId())
+                .paidAt(request.getPaidAt())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .acceptedAt(request.getAcceptedAt())
+                .rejectedAt(request.getRejectedAt())
+                .build();
     }
 }
 

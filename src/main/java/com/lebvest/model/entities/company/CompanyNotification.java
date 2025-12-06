@@ -38,7 +38,7 @@ public class CompanyNotification {
 
     @NonNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private CompanyNotificationType type;
 
     @NonNull

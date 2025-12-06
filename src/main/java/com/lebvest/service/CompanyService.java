@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.lebvest.repository.CompanyRepository;
 import com.lebvest.repository.CompanyVerificationDocumentsRepository;
 import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestmentRequestRepository;
 import com.lebvest.repository.InvestmentUpdateRepository;
 import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
@@ -53,6 +54,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.lebvest.model.dto.InvestmentRequestDto;
 
 @Service
 public class CompanyService {
@@ -62,6 +64,7 @@ public class CompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyVerificationDocumentsRepository verificationDocumentsRepository;
     private final InvestmentRepository investmentRepository;
+    private final InvestmentRequestRepository investmentRequestRepository;
     private final InvestmentUpdateRepository investmentUpdateRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
     private final InvestorRepository investorRepository;
@@ -76,6 +79,7 @@ public class CompanyService {
             CompanyRepository companyRepository,
             CompanyVerificationDocumentsRepository verificationDocumentsRepository,
             InvestmentRepository investmentRepository,
+            InvestmentRequestRepository investmentRequestRepository,
             InvestmentUpdateRepository investmentUpdateRepository,
             InvestorInvestmentRepository investorInvestmentRepository,
             InvestorRepository investorRepository,
@@ -88,6 +92,7 @@ public class CompanyService {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
+        this.investmentRequestRepository = investmentRequestRepository;
         this.investmentUpdateRepository = investmentUpdateRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
         this.investorRepository = investorRepository;
@@ -985,6 +990,59 @@ public class CompanyService {
             log.error("An unexpected error occurred during profile image upload: {}", e.getMessage(), e);
             throw new RuntimeException("An unexpected error occurred during profile image upload: " + e.getMessage(), e);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<InvestmentRequestDto> getInvestmentRequests(String status) {
+        Company company = getCurrentCompany();
+        
+        com.lebvest.model.enums.InvestmentRequestStatus requestStatus = null;
+        if (status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL")) {
+            try {
+                requestStatus = com.lebvest.model.enums.InvestmentRequestStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Invalid status, return all
+                requestStatus = null;
+            }
+        }
+        
+        List<com.lebvest.model.entities.investment.InvestmentRequest> requests;
+        if (requestStatus != null) {
+            requests = investmentRequestRepository.findByInvestment_Company_IdAndStatusOrderByCreatedAtDesc(
+                    company.getId(), requestStatus);
+        } else {
+            // Get all requests for this company
+            requests = investmentRequestRepository.findAll().stream()
+                    .filter(req -> req.getInvestment().getCompany().getId().equals(company.getId()))
+                    .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                    .collect(Collectors.toList());
+        }
+        
+        return requests.stream()
+                .map(this::convertToInvestmentRequestDto)
+                .collect(Collectors.toList());
+    }
+
+    private InvestmentRequestDto convertToInvestmentRequestDto(com.lebvest.model.entities.investment.InvestmentRequest request) {
+        return InvestmentRequestDto.builder()
+                .id(request.getId())
+                .investorId(request.getInvestor().getId())
+                .investorName(request.getInvestor().getUser().getName())
+                .investorEmail(request.getInvestor().getUser().getEmail())
+                .investorProfileImageUrl(request.getInvestor().getImageUrl())
+                .investmentId(request.getInvestment().getId())
+                .investmentTitle(request.getInvestment().getTitle())
+                .amount(request.getAmount())
+                .status(request.getStatus())
+                .rejectionReason(request.getRejectionReason())
+                .message(request.getMessage())
+                .stripePaymentIntentId(request.getStripePaymentIntentId())
+                .paidAt(request.getPaidAt())
+                .createdAt(request.getCreatedAt())
+                .updatedAt(request.getUpdatedAt())
+                .acceptedAt(request.getAcceptedAt())
+                .rejectedAt(request.getRejectedAt())
+                .build();
     }
 }
 

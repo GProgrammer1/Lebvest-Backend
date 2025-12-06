@@ -16,11 +16,8 @@ import java.util.stream.Collectors;
 @Component
 public class AdminNotificationMapper implements GenericMapper<AdminNotification, AdminNotificationDto>{
 
-    @Value("${server.port:8080}")
-    private String serverPort;
-
-    @Value("${server.address:localhost}")
-    private String serverAddress;
+    @Value("${frontend.url:http://localhost:3000}")
+    private String frontendUrl;
 
     public AdminNotification toEntity(AdminNotificationDto adminNotificationDto) {
         return AdminNotification.builder()
@@ -172,7 +169,14 @@ public class AdminNotificationMapper implements GenericMapper<AdminNotification,
         
         // Convert relative path to URL
         // Format: http://localhost:8080/api/files/{path}
-        String baseUrl = "http://" + serverAddress + ":" + serverPort;
+        // Use frontend URL and replace port with backend port (same approach as AdminService)
+        String baseUrl = frontendUrl.replace(":3000", ":8080");
+        // Ensure we use localhost instead of 0.0.0.0 or other binding addresses (0.0.0.0 is for server binding, not client URLs)
+        baseUrl = baseUrl.replace("0.0.0.0", "localhost");
+        // If frontend URL doesn't contain :8080, default to localhost:8080
+        if (!baseUrl.contains(":8080")) {
+            baseUrl = "http://localhost:8080";
+        }
         return baseUrl + "/api/files/" + filePath.replace("\\", "/");
     }
 }

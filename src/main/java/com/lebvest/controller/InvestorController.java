@@ -3,6 +3,7 @@ package com.lebvest.controller;
 import com.lebvest.model.dto.CreateGoalRequest;
 import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.model.dto.UpdateGoalRequest;
+import com.lebvest.model.dto.InvestmentRequestDto;
 import com.lebvest.model.dto.investor.InvestorDashboardDto;
 import com.lebvest.model.dto.investor.InvestorNotificationDto;
 import com.lebvest.model.dto.investor.InvestorPreferenceDto;
@@ -253,6 +254,32 @@ public class InvestorController {
                         .status(200)
                         .message("Investor investment details retrieved successfully")
                         .data(Map.of("investment", investment))
+                        .build()
+        );
+    }
+
+    // Investment Request Endpoints
+    @GetMapping("/investment-requests")
+    public ResponseEntity<ResponsePayload> getInvestmentRequests(
+            @RequestParam(required = false) String status) {
+        List<InvestmentRequestDto> requests = investorService.getInvestmentRequests(status);
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Investment requests retrieved successfully")
+                        .data(Map.of("requests", requests))
+                        .build()
+        );
+    }
+
+    @GetMapping("/investment-requests/accepted")
+    public ResponseEntity<ResponsePayload> getAcceptedInvestmentRequests() {
+        List<InvestmentRequestDto> requests = investorService.getInvestmentRequests("ACCEPTED");
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Accepted investment requests retrieved successfully")
+                        .data(Map.of("requests", requests))
                         .build()
         );
     }
