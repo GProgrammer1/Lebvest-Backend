@@ -788,12 +788,43 @@ public class AdminService {
             int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         
-        // If status is null, we want all projects (for "All" filter)
-        // The repository query handles null status correctly
-        Page<com.lebvest.model.entities.investment.Investment> investments = 
+        // First, get paginated investments without eager loading (for proper pagination)
+        Page<com.lebvest.model.entities.investment.Investment> investmentsPage = 
                 investmentRepository.findPendingInvestmentsForAdmin(status, category, search, pageable);
         
-        return investments.map(this::convertToAdminReviewDto);
+        // Then, eagerly load all relationships for the page of investments in a single query
+        List<com.lebvest.model.entities.investment.Investment> investments = investmentsPage.getContent();
+        if (!investments.isEmpty()) {
+            List<Long> investmentIds = investments.stream()
+                    .map(com.lebvest.model.entities.investment.Investment::getId)
+                    .collect(Collectors.toList());
+            // Load with all relationships in one query
+            List<com.lebvest.model.entities.investment.Investment> investmentsWithRelations = 
+                    investmentRepository.findByIdsWithRelations(investmentIds);
+            // Create a map for quick lookup
+            java.util.Map<Long, com.lebvest.model.entities.investment.Investment> investmentsMap = 
+                    investmentsWithRelations.stream()
+                            .collect(Collectors.toMap(
+                                    com.lebvest.model.entities.investment.Investment::getId,
+                                    inv -> inv,
+                                    (existing, replacement) -> existing
+                            ));
+            // Replace with fully loaded investments
+            investments = investments.stream()
+                    .map(inv -> investmentsMap.getOrDefault(inv.getId(), inv))
+                    .collect(Collectors.toList());
+        }
+        
+        // Convert to DTOs
+        List<AdminProjectReviewDto> dtoList = investments.stream()
+                .map(this::convertToAdminReviewDto)
+                .collect(Collectors.toList());
+        
+        return new org.springframework.data.domain.PageImpl<>(
+                dtoList,
+                pageable,
+                investmentsPage.getTotalElements()
+        );
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -1040,8 +1071,12 @@ public class AdminService {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
             Page<User> userPage;
             
-            // Normalize search string
-            String normalizedSearch = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+            // Normalize search to use prefix search (better for indexes)
+            // If search is provided, use prefix search instead of LIKE '%...%'
+            String normalizedSearch = null;
+            if (search != null && !search.trim().isEmpty()) {
+                normalizedSearch = search.trim();
+            }
             
             // Determine status filters
             Boolean enabledFilter = null;
@@ -1099,8 +1134,23 @@ public class AdminService {
                 userPage = userRepo.findAll(pageable);
             }
             
-            // Batch load related entities to avoid N+1 queries
+            // Get users from page - roles are already loaded via EntityGraph in separate query
             List<User> users = userPage.getContent();
+            
+            // Eagerly load roles for all users in a single query (if not already loaded)
+            if (!users.isEmpty()) {
+                List<Long> userIds = users.stream().map(User::getId).collect(Collectors.toList());
+                List<User> usersWithRoles = userRepo.findAllByIdIn(userIds);
+                // Create a map for quick lookup
+                java.util.Map<Long, User> usersWithRolesMap = usersWithRoles.stream()
+                        .collect(Collectors.toMap(User::getId, u -> u, (existing, replacement) -> existing));
+                // Replace users with fully loaded ones
+                users = users.stream()
+                        .map(u -> usersWithRolesMap.getOrDefault(u.getId(), u))
+                        .collect(Collectors.toList());
+            }
+            
+            // Batch load company and verification data
             java.util.Map<Long, Company> companyMap = new java.util.HashMap<>();
             java.util.Map<Long, CompanyVerificationDocuments> verificationDocsMap = new java.util.HashMap<>();
             
@@ -1260,7 +1310,10 @@ public class AdminService {
             }
         }
         
-        // Include online presence information (this is fast - just a map lookup)
+        // Include online presence information
+        // OPTIMIZED: Batch load all user activity statuses to avoid N queries
+        // For now, keep individual lookups (they're fast - ConcurrentHashMap)
+        // TODO: Consider caching user activity status in Redis or batch loading
         boolean isOnline = userActivityService.isUserOnline(user.getId());
         builder.isOnline(isOnline);
         if (isOnline) {

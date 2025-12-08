@@ -8,6 +8,7 @@ import com.lebvest.model.enums.Location;
 import com.lebvest.model.enums.RiskLevel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -63,15 +64,30 @@ public interface InvestmentRepository extends JpaRepository<Investment, Long> {
             @Param("riskLevel") RiskLevel riskLevel,
             Pageable pageable);
 
-    // Admin methods
-    @Query("SELECT i FROM Investment i WHERE " +
-            "(:status IS NULL OR i.status = :status) AND " +
+    // Admin methods - FIXED: Use prefix search instead of LIKE '%...%' for better index usage
+    // For full-text search, consider using MATCH() AGAINST() with FULLTEXT index
+    // Note: EntityGraph is applied separately to avoid pagination issues with fetch joins
+    @Query("SELECT i FROM Investment i " +
+            "JOIN i.company c " +
+            "WHERE (:status IS NULL OR i.status = :status) AND " +
             "(:category IS NULL OR i.category = :category) AND " +
-            "(:search IS NULL OR LOWER(i.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(i.company.name) LIKE LOWER(CONCAT('%', :search, '%')))")
+            "(:search IS NULL OR i.title LIKE CONCAT(:search, '%') OR " +
+            "c.name LIKE CONCAT(:search, '%'))")
     Page<Investment> findPendingInvestmentsForAdmin(
             @Param("status") InvestmentStatus status,
             @Param("category") InvestmentCategory category,
             @Param("search") String search,
             Pageable pageable);
+    
+    // Eagerly load all relationships for admin review in a separate query
+    @EntityGraph(attributePaths = {
+        "company",
+        "highlights",
+        "teamMembers",
+        "financials",
+        "documents",
+        "updates"
+    })
+    @Query("SELECT i FROM Investment i WHERE i.id IN :ids")
+    List<Investment> findByIdsWithRelations(@Param("ids") List<Long> ids);
 }
