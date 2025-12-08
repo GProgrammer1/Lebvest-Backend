@@ -48,6 +48,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String requestPath = request.getRequestURI();
             String method = request.getMethod();
+            
+            // Skip JWT validation for OPTIONS requests (CORS preflight)
+            if ("OPTIONS".equalsIgnoreCase(method)) {
+                log.debug("JWT Filter - Skipping OPTIONS request for CORS preflight");
+                filterChain.doFilter(request, response);
+                return;
+            }
+            
             log.info("JWT Filter - {} request to: {}", method, requestPath);
             
             // Log content type for multipart requests

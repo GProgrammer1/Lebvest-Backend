@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -82,6 +83,7 @@ public class Investment {
     private BigDecimal targetAmount;
 
     @Column(name = "raised_amount", precision = 15, scale = 2, nullable = false)
+    @Builder.Default
     private BigDecimal raisedAmount = BigDecimal.ZERO;
 
     @Enumerated(EnumType.STRING)
@@ -122,6 +124,7 @@ public class Investment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @Builder.Default
     private InvestmentStatus status = InvestmentStatus.PENDING_REVIEW;
 
     @OneToOne(mappedBy = "investment", fetch = FetchType.LAZY,
@@ -132,31 +135,37 @@ public class Investment {
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestmentHighlight> highlights = new ArrayList<>();
 
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestmentTeamMember> teamMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestmentFinancial> financials = new ArrayList<>();
 
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestmentDocument> documents = new ArrayList<>();
 
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestmentUpdate> updates = new ArrayList<>();
 
     @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestorInvestment> investorInvestments = new ArrayList<>();
 
     @PrePersist

@@ -1,6 +1,7 @@
 package com.lebvest.controller;
 import com.lebvest.model.dto.AdminProjectReviewDto;
 import com.lebvest.model.dto.AdminStatisticsDto;
+import com.lebvest.model.dto.AdminAnalyticsDto;
 import com.lebvest.model.dto.AcceptSignupPayload;
 import com.lebvest.model.dto.ApproveProjectRequest;
 import com.lebvest.model.dto.RejectProjectRequest;
@@ -69,7 +70,57 @@ public class AdminController {
                 ResponsePayload.builder()
                         .status(200)
                         .message("Statistics retrieved successfully")
-                        .data(Map.of("statistics", statistics))
+                        .data(java.util.Map.of("statistics", statistics))
+                        .build()
+        );
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<ResponsePayload> getEnhancedAnalytics() {
+        AdminAnalyticsDto analytics = adminService.getEnhancedAnalytics();
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Analytics retrieved successfully")
+                        .data(java.util.Map.of("analytics", analytics))
+                        .build()
+        );
+    }
+
+    @GetMapping("/queues/company-approvals")
+    public ResponseEntity<ResponsePayload> getPendingCompanyApprovals(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+        Page<com.lebvest.model.entities.company.CompanySignupRequest> requests = adminService.getPendingCompanyApprovals(page, size);
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("requests", requests.getContent());
+        data.put("totalElements", requests.getTotalElements());
+        data.put("totalPages", requests.getTotalPages());
+        data.put("currentPage", requests.getNumber());
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Pending company approvals retrieved successfully")
+                        .data(data)
+                        .build()
+        );
+    }
+
+    @GetMapping("/queues/investor-approvals")
+    public ResponseEntity<ResponsePayload> getPendingInvestorApprovals(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+        Page<UserDto> investors = adminService.getPendingInvestorApprovals(page, size);
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("investors", investors.getContent());
+        data.put("totalElements", investors.getTotalElements());
+        data.put("totalPages", investors.getTotalPages());
+        data.put("currentPage", investors.getNumber());
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Pending investor approvals retrieved successfully")
+                        .data(data)
                         .build()
         );
     }

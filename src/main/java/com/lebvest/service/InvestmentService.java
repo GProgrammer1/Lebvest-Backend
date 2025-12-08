@@ -40,16 +40,19 @@ public class InvestmentService {
     private final InvestorRepository investorRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
     private final UserRepository userRepository;
+    private final GeminiService geminiService;
 
     public InvestmentService(
             InvestmentRepository investmentRepository,
             InvestorRepository investorRepository,
             InvestorInvestmentRepository investorInvestmentRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            GeminiService geminiService) {
         this.investmentRepository = investmentRepository;
         this.investorRepository = investorRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
         this.userRepository = userRepository;
+        this.geminiService = geminiService;
     }
 
     public Page<InvestmentDto> getInvestments(
@@ -268,12 +271,21 @@ public class InvestmentService {
         return investorRepository.findByUser(user.get()).orElse(null);
     }
 
-    public Page<InvestmentDto> searchInvestments(String query, int page, int size) {
+    @org.springframework.cache.annotation.Cacheable(value = "investments", key = "'search_' + #query + '_' + #category + '_' + #riskLevel + '_' + #page + '_' + #size")
+    public Page<InvestmentDto> searchInvestments(String query, InvestmentCategory category, RiskLevel riskLevel, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Investment> investments = investmentRepository.searchInvestments(query, InvestmentStatus.APPROVED, pageable);
+        Page<Investment> investments = investmentRepository.searchInvestments(
+                query, InvestmentStatus.APPROVED, category, riskLevel, pageable);
         
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
         return investments.map(inv -> convertToDto(inv, watchlistIds));
+    }
+
+    public List<String> getSearchSuggestions(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return List.of();
+        }
+        return geminiService.getSearchSuggestions(query.trim());
     }
 
     @Transactional(readOnly = true)
@@ -439,12 +451,12 @@ public class InvestmentService {
         
         // Calculate maturity date if not set (based on durationMonths)
         if (investment.getMaturityDate() == null && investment.getDurationMonths() != null) {
-            java.time.LocalDate maturityDate = java.time.LocalDate.now()
+            java.time.LocalDate investmentMaturityDate = java.time.LocalDate.now()
                     .plusMonths(investment.getDurationMonths());
-            investment.setMaturityDate(maturityDate);
+            investment.setMaturityDate(investmentMaturityDate);
             
             // Calculate expected return date (same as maturity for now)
-            investment.setExpectedReturnDate(maturityDate);
+            investment.setExpectedReturnDate(investmentMaturityDate);
         }
         investmentRepository.save(investment);
 

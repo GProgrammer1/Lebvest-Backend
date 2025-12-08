@@ -5,6 +5,7 @@ import org.apache.tika.Tika;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.mime.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +81,7 @@ public class FileValidationService {
              TikaInputStream tikaInputStream = TikaInputStream.get(inputStream)) {
             
             Metadata metadata = new Metadata();
-            metadata.set(Metadata.RESOURCE_NAME_KEY, originalFilename);
+            metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, originalFilename);
             MediaType detectedType = tika.getDetector().detect(tikaInputStream, metadata);
             String detectedMimeType = detectedType.toString();
 

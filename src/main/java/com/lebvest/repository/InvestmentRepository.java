@@ -53,10 +53,14 @@ public interface InvestmentRepository extends JpaRepository<Investment, Long> {
     @Query("SELECT i FROM Investment i WHERE " +
             "(LOWER(i.title) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
             "LOWER(i.company.name) LIKE LOWER(CONCAT('%', :query, '%'))) AND " +
-            "(:status IS NULL OR i.status = :status)")
+            "(:status IS NULL OR i.status = :status) AND " +
+            "(:category IS NULL OR i.category = :category) AND " +
+            "(:riskLevel IS NULL OR i.riskLevel = :riskLevel)")
     Page<Investment> searchInvestments(
             @Param("query") String query,
             @Param("status") InvestmentStatus status,
+            @Param("category") InvestmentCategory category,
+            @Param("riskLevel") RiskLevel riskLevel,
             Pageable pageable);
 
     // Admin methods

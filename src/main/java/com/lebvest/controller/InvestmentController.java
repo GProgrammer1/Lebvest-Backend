@@ -138,10 +138,12 @@ public class InvestmentController {
     @GetMapping("/search")
     public ResponseEntity<ResponsePayload> searchInvestments(
             @RequestParam("q") String query,
+            @RequestParam(required = false) InvestmentCategory category,
+            @RequestParam(required = false) RiskLevel riskLevel,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
         
-        Page<InvestmentDto> investments = investmentService.searchInvestments(query, page, size);
+        Page<InvestmentDto> investments = investmentService.searchInvestments(query, category, riskLevel, page, size);
         
         Map<String, Object> data = new HashMap<>();
         data.put("investments", investments.getContent());
@@ -157,6 +159,21 @@ public class InvestmentController {
                         .status(200)
                         .message("Investments search completed successfully")
                         .data(data)
+                        .build()
+        );
+    }
+
+    @GetMapping("/search/suggestions")
+    public ResponseEntity<ResponsePayload> getSearchSuggestions(
+            @RequestParam("q") String query) {
+        
+        List<String> suggestions = investmentService.getSearchSuggestions(query);
+        
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Search suggestions retrieved successfully")
+                        .data(Map.of("suggestions", suggestions))
                         .build()
         );
     }

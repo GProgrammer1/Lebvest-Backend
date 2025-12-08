@@ -3,6 +3,7 @@ package com.lebvest.model.entities.investor;
 import com.lebvest.model.entities.investment.Investment;
 import com.lebvest.model.entities.investment.InvestorInvestment;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,12 +38,15 @@ public class Investor {
     private User user;
 
     @Column(nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal portfolio_value = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal total_invested = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 15, scale = 2)
+    @Builder.Default
     private BigDecimal total_returns = BigDecimal.ZERO;
 
     private String bio;
@@ -67,6 +71,7 @@ public class Investor {
     private String kycNotes;
 
     @Column(name = "profile_public", nullable = false)
+    @Builder.Default
     private Boolean profilePublic = false;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -76,21 +81,25 @@ public class Investor {
             inverseJoinColumns = @JoinColumn(name = "investment_id", referencedColumnName = "id")
     )
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private Set<Investment> watchlist = new HashSet<>();
 
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestorInvestment> investments = new ArrayList<>();
 
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestorNotification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "investor", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @OnDelete(action = OnDeleteAction.CASCADE)
+    @Builder.Default
     private List<InvestorGoal> goals = new ArrayList<>();
 
     @OneToOne(mappedBy = "investor",

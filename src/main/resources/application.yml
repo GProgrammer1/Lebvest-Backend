@@ -4,17 +4,20 @@ spring:
 
   # Database Configuration (MySQL/AWS RDS)
   datasource:
-    url: jdbc:mysql://lebvest.cc5w6c8uk08j.us-east-1.rds.amazonaws.com:${DB_PORT:3306}/${DB_NAME:lebvest}?createDatabaseIfNotExist=${CREATE_DB_IF_NOT_EXIST:false}&useSSL=${DB_USE_SSL:true}&requireSSL=${DB_REQUIRE_SSL:false}&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionTimeout=30000&socketTimeout=60000
+    url: jdbc:mysql://lebvest.cc5w6c8uk08j.us-east-1.rds.amazonaws.com:${DB_PORT:3306}/${DB_NAME:lebvest}?createDatabaseIfNotExist=${CREATE_DB_IF_NOT_EXIST:false}&useSSL=${DB_USE_SSL:true}&requireSSL=${DB_REQUIRE_SSL:false}&serverTimezone=UTC&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&connectionTimeout=60000&socketTimeout=120000&autoReconnect=true&failOverReadOnly=false&maxReconnects=3
     username: ${DB_USERNAME:admin}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: ${DB_POOL_SIZE:10}
       minimum-idle: ${DB_MIN_IDLE:5}
-      connection-timeout: 30000
+      connection-timeout: 60000  # Increased to 60 seconds for AWS RDS
       idle-timeout: 600000
       max-lifetime: 1800000
-      leak-detection-threshold: 60000
+      leak-detection-threshold: 300000  # 5 minutes - allows for schema migration during startup
+      connection-test-query: SELECT 1  # Test query to validate connections
+      validation-timeout: 5000  # Timeout for connection validation
+      initialization-fail-timeout: 1  # Fail fast if initial connections fail
   # JPA Configuration
   jpa:
     hibernate:
@@ -129,6 +132,12 @@ stripe:
   secret-key: ${STRIPE_SECRET_KEY:sk_test_...}
   publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_...}
   webhook-secret: ${STRIPE_WEBHOOK_SECRET:whsec_...}
+
+# Gemini AI Configuration
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}
+    url: ${GEMINI_API_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent}
 
 url:
   pending-prefix: ${PENDING_PREFIX:pending/}

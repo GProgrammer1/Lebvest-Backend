@@ -69,5 +69,10 @@ public class RedisConfig {
                 .transactionAware()
                 .build();
     }
+
+    @Bean
+    public org.springframework.web.client.RestTemplate restTemplate() {
+        return new org.springframework.web.client.RestTemplate();
+    }
 }
 

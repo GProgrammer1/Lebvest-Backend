@@ -443,6 +443,103 @@ public class AdminService {
                 .build();
     }
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public AdminAnalyticsDto getEnhancedAnalytics() {
+        // Basic stats
+        long totalInvestors = investorRepository.count();
+        long totalCompanies = companyRepo.count();
+        long totalInvestments = investmentRepository.count();
+        
+        // Today's investments
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.math.BigDecimal totalInvestedToday = investorInvestmentRepository.findAll().stream()
+                .filter(inv -> inv.getInvestedAt() != null && 
+                        inv.getInvestedAt().equals(today))
+                .map(inv -> inv.getAmount() != null ? inv.getAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        // This month's investments
+        java.time.LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+        java.math.BigDecimal totalInvestedThisMonth = investorInvestmentRepository.findAll().stream()
+                .filter(inv -> inv.getInvestedAt() != null && 
+                        inv.getInvestedAt().isAfter(firstDayOfMonth.minusDays(1)))
+                .map(inv -> inv.getAmount() != null ? inv.getAmount() : java.math.BigDecimal.ZERO)
+                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+        
+        // Top projects (by raised amount)
+        List<AdminAnalyticsDto.TopProjectDto> topProjects = investmentRepository.findAll().stream()
+                .filter(inv -> inv.getStatus() == InvestmentStatus.APPROVED)
+                .sorted((a, b) -> b.getRaisedAmount().compareTo(a.getRaisedAmount()))
+                .limit(10)
+                .map(inv -> AdminAnalyticsDto.TopProjectDto.builder()
+                        .id(inv.getId())
+                        .title(inv.getTitle())
+                        .companyName(inv.getCompany().getName())
+                        .raisedAmount(inv.getRaisedAmount())
+                        .targetAmount(inv.getTargetAmount())
+                        .investorCount((long) investorInvestmentRepository.findByInvestmentId(inv.getId()).size())
+                        .build())
+                .collect(Collectors.toList());
+        
+        // Daily investments (last 30 days)
+        Map<java.time.LocalDate, java.math.BigDecimal> dailyInvestments = new java.util.HashMap<>();
+        for (int i = 29; i >= 0; i--) {
+            java.time.LocalDate date = today.minusDays(i);
+            java.math.BigDecimal dailyTotal = investorInvestmentRepository.findAll().stream()
+                    .filter(inv -> inv.getInvestedAt() != null && 
+                            inv.getInvestedAt().equals(date))
+                    .map(inv -> inv.getAmount() != null ? inv.getAmount() : java.math.BigDecimal.ZERO)
+                    .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
+            dailyInvestments.put(date, dailyTotal);
+        }
+        
+        // Investments by category
+        Map<String, Long> investmentsByCategory = investmentRepository.findAll().stream()
+                .filter(inv -> inv.getStatus() == InvestmentStatus.APPROVED)
+                .collect(Collectors.groupingBy(
+                        inv -> inv.getCategory() != null ? inv.getCategory().toString() : "Unknown",
+                        Collectors.counting()
+                ));
+        
+        // Investments by risk level
+        Map<String, Long> investmentsByRiskLevel = investmentRepository.findAll().stream()
+                .filter(inv -> inv.getStatus() == InvestmentStatus.APPROVED)
+                .collect(Collectors.groupingBy(
+                        inv -> inv.getRiskLevel() != null ? inv.getRiskLevel().toString() : "Unknown",
+                        Collectors.counting()
+                ));
+        
+        // Queue counts
+        long pendingCompanyApprovals = companySignupRequestRepository.findAll().stream()
+                .filter(req -> req.getRequestStatus() == SignupRequestStatus.PENDING)
+                .count();
+        
+        long pendingInvestorApprovals = userRepo.findAll().stream()
+                .filter(u -> u.getRoles() != null && u.getRoles().contains(Role.INVESTOR) && 
+                        !u.isEnabled())
+                .count();
+        
+        // Pending payouts and returns (placeholder - implement based on your payout/return logic)
+        long pendingPayouts = 0L; // TODO: Implement based on payout request status
+        long pendingReturns = 0L; // TODO: Implement based on return request status
+        
+        return AdminAnalyticsDto.builder()
+                .totalInvestors(totalInvestors)
+                .totalCompanies(totalCompanies)
+                .totalInvestments(totalInvestments)
+                .totalInvestedToday(totalInvestedToday)
+                .totalInvestedThisMonth(totalInvestedThisMonth)
+                .topProjects(topProjects)
+                .dailyInvestments(dailyInvestments)
+                .investmentsByCategory(investmentsByCategory)
+                .investmentsByRiskLevel(investmentsByRiskLevel)
+                .pendingCompanyApprovals(pendingCompanyApprovals)
+                .pendingInvestorApprovals(pendingInvestorApprovals)
+                .pendingPayouts(pendingPayouts)
+                .pendingReturns(pendingReturns)
+                .build();
+    }
+
     @Transactional
     public ResponsePayload approveVerificationDocuments(Long companyId) {
         Company company = companyRepo.findById(companyId)
@@ -943,65 +1040,97 @@ public class AdminService {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
             Page<User> userPage;
             
-            // If no filters, use simple pagination
-            if (role == null && (status == null || status.equals("All")) && (search == null || search.isEmpty())) {
-                userPage = userRepo.findAll(pageable);
-            } else {
-                // For now, still load all (but with timeout protection)
-                // TODO: Optimize with proper JPA queries
-                List<User> allUsersList = userRepo.findAll();
-                log.info("Loaded {} users from database", allUsersList.size());
-                
-                // Apply filters
-                java.util.stream.Stream<User> filteredStream = allUsersList.stream();
-                
-                // Filter by role
-                if (role != null) {
-                    filteredStream = filteredStream.filter(user -> user.getRoles().contains(role));
+            // Normalize search string
+            String normalizedSearch = (search != null && !search.trim().isEmpty()) ? search.trim() : null;
+            
+            // Determine status filters
+            Boolean enabledFilter = null;
+            Boolean lockedFilter = null;
+            if (status != null && !status.equals("All")) {
+                if ("active".equals(status.toLowerCase())) {
+                    enabledFilter = true;
+                    lockedFilter = false;
+                } else if ("inactive".equals(status.toLowerCase())) {
+                    enabledFilter = false;
+                } else if ("locked".equals(status.toLowerCase())) {
+                    lockedFilter = true;
                 }
-                
-                // Filter by status
-                if (status != null && !status.equals("All")) {
-                    filteredStream = filteredStream.filter(user -> {
-                        String userStatus = determineUserStatus(user);
-                        return userStatus.equals(status);
-                    });
-                }
-                
-                // Filter by search
-                if (search != null && !search.isEmpty()) {
-                    String searchLower = search.toLowerCase();
-                    filteredStream = filteredStream.filter(user -> 
-                        (user.getName() != null && user.getName().toLowerCase().contains(searchLower)) ||
-                        (user.getEmail() != null && user.getEmail().toLowerCase().contains(searchLower))
-                    );
-                }
-                
-                // Convert to list
-                List<User> filteredList = filteredStream.collect(java.util.stream.Collectors.toList());
-                
-                // Manual pagination
-                int start = page * size;
-                int end = Math.min(start + size, filteredList.size());
-                List<User> pageContent = start < filteredList.size() 
-                        ? filteredList.subList(start, end) 
-                        : new java.util.ArrayList<>();
-                
-                // Convert to DTOs
-                List<UserDto> dtoList = pageContent.stream()
-                        .map(this::convertToUserDto)
-                        .collect(java.util.stream.Collectors.toList());
-                
-                return new org.springframework.data.domain.PageImpl<>(
-                        dtoList,
-                        pageable,
-                        filteredList.size()
-                );
             }
             
-            // Convert to DTOs
-            List<UserDto> dtoList = userPage.getContent().stream()
-                    .map(this::convertToUserDto)
+            // Use optimized database queries based on filters
+            if (role == null && enabledFilter == null && lockedFilter == null && normalizedSearch == null) {
+                // No filters - simple pagination
+                userPage = userRepo.findAll(pageable);
+            } else if (role != null && enabledFilter != null && normalizedSearch != null) {
+                // All filters: role, search, enabled
+                userPage = userRepo.findByRoleAndSearchAndEnabled(role, normalizedSearch, enabledFilter, pageable);
+            } else if (role != null && lockedFilter != null && normalizedSearch != null) {
+                // All filters: role, search, locked
+                userPage = userRepo.findByRoleAndSearchAndLocked(role, normalizedSearch, lockedFilter, pageable);
+            } else if (role != null && enabledFilter != null) {
+                // Role and enabled
+                userPage = userRepo.findByRoleAndEnabled(role, enabledFilter, pageable);
+            } else if (role != null && lockedFilter != null) {
+                // Role and locked
+                userPage = userRepo.findByRoleAndLocked(role, lockedFilter, pageable);
+            } else if (role != null && normalizedSearch != null) {
+                // Role and search
+                userPage = userRepo.findByRoleAndSearch(role, normalizedSearch, pageable);
+            } else if (role != null) {
+                // Only role
+                userPage = userRepo.findByRole(role, pageable);
+            } else if (normalizedSearch != null && enabledFilter != null) {
+                // Search and enabled
+                userPage = userRepo.findBySearchAndEnabled(normalizedSearch, enabledFilter, pageable);
+            } else if (normalizedSearch != null && lockedFilter != null) {
+                // Search and locked
+                userPage = userRepo.findBySearchAndLocked(normalizedSearch, lockedFilter, pageable);
+            } else if (normalizedSearch != null) {
+                // Only search
+                userPage = userRepo.findBySearch(normalizedSearch, pageable);
+            } else if (enabledFilter != null) {
+                // Only enabled
+                userPage = userRepo.findByEnabled(enabledFilter, pageable);
+            } else if (lockedFilter != null) {
+                // Only locked
+                userPage = userRepo.findByLocked(lockedFilter, pageable);
+            } else {
+                // Fallback to simple pagination
+                userPage = userRepo.findAll(pageable);
+            }
+            
+            // Batch load related entities to avoid N+1 queries
+            List<User> users = userPage.getContent();
+            java.util.Map<Long, Company> companyMap = new java.util.HashMap<>();
+            java.util.Map<Long, CompanyVerificationDocuments> verificationDocsMap = new java.util.HashMap<>();
+            
+            if (!users.isEmpty()) {
+                java.util.Map<Long, Company> batchCompanyMap = batchLoadCompanyData(users);
+                if (batchCompanyMap != null) {
+                    companyMap = batchCompanyMap;
+                }
+                // Also load verification documents map
+                if (!companyMap.isEmpty()) {
+                    List<Long> companyIds = companyMap.values().stream()
+                            .map(Company::getId)
+                            .collect(Collectors.toList());
+                    List<CompanyVerificationDocuments> docs = verificationDocumentsRepository.findByCompanyIds(companyIds);
+                    verificationDocsMap = docs.stream()
+                            .collect(Collectors.toMap(
+                                    doc -> doc.getCompany().getId(),
+                                    doc -> doc,
+                                    (existing, replacement) -> existing
+                            ));
+                }
+            }
+            
+            // Create final maps for use in conversion
+            final java.util.Map<Long, Company> finalCompanyMap = companyMap;
+            final java.util.Map<Long, CompanyVerificationDocuments> finalVerificationDocsMap = verificationDocsMap;
+            
+            // Convert to DTOs using pre-loaded data
+            List<UserDto> dtoList = users.stream()
+                    .map(user -> convertToUserDto(user, finalCompanyMap, finalVerificationDocsMap))
                     .collect(java.util.stream.Collectors.toList());
             
             log.info("Returning {} users (page {} of {})", dtoList.size(), page, userPage.getTotalPages());
@@ -1014,6 +1143,40 @@ public class AdminService {
             log.error("Error fetching users: {}", e.getMessage(), e);
             throw e;
         }
+    }
+    
+    /**
+     * Batch load company data for users to avoid N+1 queries
+     * Returns a map of userId -> Company for quick lookup
+     */
+    private java.util.Map<Long, Company> batchLoadCompanyData(List<User> users) {
+        // Get all company user IDs
+        List<Long> companyUserIds = users.stream()
+                .filter(u -> u.getRoles() != null && u.getRoles().contains(Role.COMPANY))
+                .map(User::getId)
+                .collect(Collectors.toList());
+        
+        if (companyUserIds.isEmpty()) {
+            return new java.util.HashMap<>();
+        }
+        
+        // Batch load companies for these users in a single query using IN clause
+        List<Company> companies = companyRepo.findByUserIds(companyUserIds);
+        
+        if (companies.isEmpty()) {
+            return new java.util.HashMap<>();
+        }
+        
+        // Create a map: userId -> Company for quick lookup
+        java.util.Map<Long, Company> companyMap = companies.stream()
+                .collect(Collectors.toMap(
+                        company -> company.getUser().getId(),
+                        company -> company,
+                        (existing, replacement) -> existing
+                ));
+        
+        log.debug("Batch loaded {} companies for {} users", companies.size(), companyUserIds.size());
+        return companyMap;
     }
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
@@ -1047,6 +1210,12 @@ public class AdminService {
     }
 
     private UserDto convertToUserDto(User user) {
+        return convertToUserDto(user, null, null);
+    }
+    
+    private UserDto convertToUserDto(User user, 
+                                     java.util.Map<Long, Company> companyMap,
+                                     java.util.Map<Long, CompanyVerificationDocuments> verificationDocsMap) {
         String status = determineUserStatus(user);
         UserDto.UserDtoBuilder builder = UserDto.builder()
                 .id(user.getId())
@@ -1060,14 +1229,29 @@ public class AdminService {
         
         // If user is a company, include company verification information
         if (user.getRoles() != null && user.getRoles().contains(Role.COMPANY)) {
-            Company company = companyRepo.findByUser(user).orElse(null);
+            Company company = null;
+            if (companyMap != null) {
+                // Use pre-loaded company from map
+                company = companyMap.get(user.getId());
+            } else {
+                // Fallback to query if map not provided (for single user lookups)
+                company = companyRepo.findByUser(user).orElse(null);
+            }
+            
             if (company != null) {
                 builder.companyId(company.getId())
                        .companyStatus(company.getStatus());
                 
                 // Check verification documents approval status
-                CompanyVerificationDocuments verificationDocs = 
-                        verificationDocumentsRepository.findByCompany(company).orElse(null);
+                CompanyVerificationDocuments verificationDocs = null;
+                if (verificationDocsMap != null && company.getId() != null) {
+                    // Use pre-loaded verification docs from map
+                    verificationDocs = verificationDocsMap.get(company.getId());
+                } else if (company.getId() != null) {
+                    // Fallback to query if map not provided
+                    verificationDocs = verificationDocumentsRepository.findByCompany(company).orElse(null);
+                }
+                
                 if (verificationDocs != null) {
                     builder.verificationDocumentsApproved(verificationDocs.getIsApproved());
                 } else {
@@ -1076,7 +1260,7 @@ public class AdminService {
             }
         }
         
-        // Include online presence information
+        // Include online presence information (this is fast - just a map lookup)
         boolean isOnline = userActivityService.isUserOnline(user.getId());
         builder.isOnline(isOnline);
         if (isOnline) {
@@ -1096,5 +1280,49 @@ public class AdminService {
         // Check if it's a company with pending signup
         // This is a simplified check - you might want to enhance this
         return "active";
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<com.lebvest.model.entities.company.CompanySignupRequest> getPendingCompanyApprovals(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return companySignupRequestRepository.findAll().stream()
+                .filter(req -> req.getRequestStatus() == SignupRequestStatus.PENDING)
+                .collect(Collectors.toList())
+                .stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .collect(Collectors.toList())
+                .stream()
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        list -> new org.springframework.data.domain.PageImpl<>(
+                                list,
+                                pageable,
+                                companySignupRequestRepository.findAll().stream()
+                                        .filter(req -> req.getRequestStatus() == SignupRequestStatus.PENDING)
+                                        .count()
+                        )
+                ));
+    }
+
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public Page<UserDto> getPendingInvestorApprovals(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<User> pendingInvestors = userRepo.findAll().stream()
+                .filter(u -> u.getRoles() != null && u.getRoles().contains(Role.INVESTOR) && 
+                        !u.isEnabled())
+                .collect(Collectors.toList());
+        
+        List<UserDto> dtoList = pendingInvestors.stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .map(this::convertToUserDto)
+                .collect(Collectors.toList());
+        
+        return new org.springframework.data.domain.PageImpl<>(
+                dtoList,
+                pageable,
+                pendingInvestors.size()
+        );
     }
 }

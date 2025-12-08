@@ -16,3 +16,5 @@ WHERE version IS NOT NULL;
 
 SELECT 'Version field initialized successfully!' as status;
 
+
+

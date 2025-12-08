@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -32,4 +33,8 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     
     @Query("SELECT c FROM Company c WHERE c.location = :location")
     Page<Company> findByLocation(@Param("location") Location location, Pageable pageable);
+    
+    // Batch load companies by user IDs
+    @Query("SELECT c FROM Company c WHERE c.user.id IN :userIds")
+    List<Company> findByUserIds(@Param("userIds") List<Long> userIds);
 }

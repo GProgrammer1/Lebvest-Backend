@@ -2,6 +2,7 @@ package com.lebvest.model.entities.investment;
 
 import com.lebvest.model.entities.investor.Investor;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
