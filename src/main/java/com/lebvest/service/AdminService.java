@@ -25,6 +25,11 @@ import com.lebvest.repository.CompanyVerificationDocumentsRepository;
 import com.lebvest.repository.CompanyNotificationRepository;
 import com.lebvest.repository.VerificationDocumentHistoryRepository;
 import com.lebvest.repository.InvestmentRepository;
+import com.lebvest.repository.InvestmentHighlightRepository;
+import com.lebvest.repository.InvestmentFinancialRepository;
+import com.lebvest.repository.InvestmentDocumentRepository;
+import com.lebvest.repository.InvestmentTeamMemberRepository;
+import com.lebvest.repository.InvestmentUpdateRepository;
 import com.lebvest.repository.InvestorInvestmentRepository;
 import com.lebvest.repository.InvestorRepository;
 import com.lebvest.repository.UserRepository;
@@ -65,6 +70,11 @@ public class AdminService {
     private final AdminNotificationRepository adminNotificationRepository;
     private final CompanySignupRequestRepository companySignupRequestRepository;
     private final InvestmentRepository investmentRepository;
+    private final InvestmentHighlightRepository investmentHighlightRepository;
+    private final InvestmentFinancialRepository investmentFinancialRepository;
+    private final InvestmentDocumentRepository investmentDocumentRepository;
+    private final InvestmentTeamMemberRepository investmentTeamMemberRepository;
+    private final InvestmentUpdateRepository investmentUpdateRepository;
     private final InvestorRepository investorRepository;
     private final InvestorInvestmentRepository investorInvestmentRepository;
     private final LocalFileStorageService localFileStorageService;
@@ -86,6 +96,11 @@ public class AdminService {
                         AdminNotificationRepository adminNotificationRepository,
                         CompanySignupRequestRepository companySignupRequestRepository,
                         InvestmentRepository investmentRepository,
+                        InvestmentHighlightRepository investmentHighlightRepository,
+                        InvestmentFinancialRepository investmentFinancialRepository,
+                        InvestmentDocumentRepository investmentDocumentRepository,
+                        InvestmentTeamMemberRepository investmentTeamMemberRepository,
+                        InvestmentUpdateRepository investmentUpdateRepository,
                         InvestorRepository investorRepository,
                         InvestorInvestmentRepository investorInvestmentRepository,
                         LocalFileStorageService localFileStorageService,
@@ -107,6 +122,11 @@ public class AdminService {
         this.adminNotificationRepository = adminNotificationRepository;
         this.companySignupRequestRepository = companySignupRequestRepository;
         this.investmentRepository = investmentRepository;
+        this.investmentHighlightRepository = investmentHighlightRepository;
+        this.investmentFinancialRepository = investmentFinancialRepository;
+        this.investmentDocumentRepository = investmentDocumentRepository;
+        this.investmentTeamMemberRepository = investmentTeamMemberRepository;
+        this.investmentUpdateRepository = investmentUpdateRepository;
         this.investorRepository = investorRepository;
         this.investorInvestmentRepository = investorInvestmentRepository;
         this.localFileStorageService = localFileStorageService;
@@ -792,23 +812,62 @@ public class AdminService {
         Page<com.lebvest.model.entities.investment.Investment> investmentsPage = 
                 investmentRepository.findPendingInvestmentsForAdmin(status, category, search, pageable);
         
-        // Then, eagerly load all relationships for the page of investments in a single query
+        // Then, load company and batch load all collections separately to avoid MultipleBagFetchException
         List<com.lebvest.model.entities.investment.Investment> investments = investmentsPage.getContent();
         if (!investments.isEmpty()) {
             List<Long> investmentIds = investments.stream()
                     .map(com.lebvest.model.entities.investment.Investment::getId)
                     .collect(Collectors.toList());
-            // Load with all relationships in one query
-            List<com.lebvest.model.entities.investment.Investment> investmentsWithRelations = 
-                    investmentRepository.findByIdsWithRelations(investmentIds);
-            // Create a map for quick lookup
+            
+            // Load investments with company only (to avoid MultipleBagFetchException)
+            List<com.lebvest.model.entities.investment.Investment> investmentsWithCompany = 
+                    investmentRepository.findByIdsWithCompany(investmentIds);
             java.util.Map<Long, com.lebvest.model.entities.investment.Investment> investmentsMap = 
-                    investmentsWithRelations.stream()
+                    investmentsWithCompany.stream()
                             .collect(Collectors.toMap(
                                     com.lebvest.model.entities.investment.Investment::getId,
                                     inv -> inv,
                                     (existing, replacement) -> existing
                             ));
+            
+            // Batch load all collections separately
+            List<com.lebvest.model.entities.investment.InvestmentHighlight> highlights = 
+                    investmentHighlightRepository.findByInvestmentIds(investmentIds);
+            List<com.lebvest.model.entities.investment.InvestmentFinancial> financials = 
+                    investmentFinancialRepository.findByInvestmentIds(investmentIds);
+            List<com.lebvest.model.entities.investment.InvestmentDocument> documents = 
+                    investmentDocumentRepository.findByInvestmentIds(investmentIds);
+            List<com.lebvest.model.entities.investment.InvestmentTeamMember> teamMembers = 
+                    investmentTeamMemberRepository.findByInvestmentIds(investmentIds);
+            List<com.lebvest.model.entities.investment.InvestmentUpdate> updates = 
+                    investmentUpdateRepository.findByInvestmentIds(investmentIds);
+            
+            // Group collections by investment ID
+            java.util.Map<Long, List<com.lebvest.model.entities.investment.InvestmentHighlight>> highlightsMap = 
+                    highlights.stream().collect(Collectors.groupingBy(h -> h.getInvestment().getId()));
+            java.util.Map<Long, List<com.lebvest.model.entities.investment.InvestmentFinancial>> financialsMap = 
+                    financials.stream().collect(Collectors.groupingBy(f -> f.getInvestment().getId()));
+            java.util.Map<Long, List<com.lebvest.model.entities.investment.InvestmentDocument>> documentsMap = 
+                    documents.stream().collect(Collectors.groupingBy(d -> d.getInvestment().getId()));
+            java.util.Map<Long, List<com.lebvest.model.entities.investment.InvestmentTeamMember>> teamMembersMap = 
+                    teamMembers.stream().collect(Collectors.groupingBy(tm -> tm.getInvestment().getId()));
+            java.util.Map<Long, List<com.lebvest.model.entities.investment.InvestmentUpdate>> updatesMap = 
+                    updates.stream().collect(Collectors.groupingBy(u -> u.getInvestment().getId()));
+            
+            // Attach collections to investments
+            investmentsWithCompany.forEach(inv -> {
+                inv.getHighlights().clear();
+                inv.getHighlights().addAll(highlightsMap.getOrDefault(inv.getId(), Collections.emptyList()));
+                inv.getFinancials().clear();
+                inv.getFinancials().addAll(financialsMap.getOrDefault(inv.getId(), Collections.emptyList()));
+                inv.getDocuments().clear();
+                inv.getDocuments().addAll(documentsMap.getOrDefault(inv.getId(), Collections.emptyList()));
+                inv.getTeamMembers().clear();
+                inv.getTeamMembers().addAll(teamMembersMap.getOrDefault(inv.getId(), Collections.emptyList()));
+                inv.getUpdates().clear();
+                inv.getUpdates().addAll(updatesMap.getOrDefault(inv.getId(), Collections.emptyList()));
+            });
+            
             // Replace with fully loaded investments
             investments = investments.stream()
                     .map(inv -> investmentsMap.getOrDefault(inv.getId(), inv))
@@ -1231,9 +1290,37 @@ public class AdminService {
 
     @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserDto getUserDetails(Long userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return convertToUserDto(user);
+        // OPTIMIZED: Eagerly load user with roles to avoid lazy loading
+        List<User> usersWithRoles = userRepo.findAllByIdIn(java.util.Collections.singletonList(userId));
+        if (usersWithRoles.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+        User user = usersWithRoles.get(0);
+        
+        // OPTIMIZED: Pre-load company and verification documents to avoid N+1 queries
+        java.util.Map<Long, Company> companyMap = new java.util.HashMap<>();
+        java.util.Map<Long, CompanyVerificationDocuments> verificationDocsMap = new java.util.HashMap<>();
+        
+        // If user is a company, batch load company data
+        if (user.getRoles() != null && user.getRoles().contains(Role.COMPANY)) {
+            List<Long> userIds = java.util.Collections.singletonList(userId);
+            List<Company> companies = companyRepo.findByUserIds(userIds);
+            if (!companies.isEmpty()) {
+                Company company = companies.get(0);
+                companyMap.put(userId, company);
+                
+                // Load verification documents for this company
+                if (company.getId() != null) {
+                    List<Long> companyIds = java.util.Collections.singletonList(company.getId());
+                    List<CompanyVerificationDocuments> docs = verificationDocumentsRepository.findByCompanyIds(companyIds);
+                    if (!docs.isEmpty()) {
+                        verificationDocsMap.put(company.getId(), docs.get(0));
+                    }
+                }
+            }
+        }
+        
+        return convertToUserDto(user, companyMap, verificationDocsMap);
     }
 
     @Transactional
