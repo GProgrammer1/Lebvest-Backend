@@ -42,26 +42,28 @@ public class AdminNotification {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-
-    private boolean isRead;
+    private boolean read;
     private Boolean isAccepted;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "request_id", referencedColumnName = "id", nullable = true)
     private CompanySignupRequest request;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "investment_id", referencedColumnName = "id", nullable = true)
     private com.lebvest.model.entities.investment.Investment investment;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "id", nullable = true)
     private com.lebvest.model.entities.company.Company company;
-    
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "investor_id", referencedColumnName = "id", nullable = true)
+    private com.lebvest.model.entities.investor.Investor investor;
+
     @PrePersist
     protected void onCreate() {
-        isRead = false;
+        read = false;
     }
-
 
 }

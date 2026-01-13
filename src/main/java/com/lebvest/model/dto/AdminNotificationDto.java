@@ -23,7 +23,7 @@ public class AdminNotificationDto {
     private String message;
     private AdminNotificationType type;
     private Boolean isAccepted;
-    private boolean isRead;
+    private boolean read;
     public LocalDateTime createdAt;
     private List<String> documentUrls; // URLs to documents for viewing
 }

@@ -19,6 +19,6 @@ public class InvestorProfileDto {
     private BigDecimal totalInvested;
     private BigDecimal totalReturns;
     private Boolean profilePublic;
+    private Boolean kycVerified;
+    private com.lebvest.model.enums.VerificationStatus kycStatus;
 }
-
-

@@ -71,8 +71,8 @@ public class InvestmentService {
 
         // Query with filters - only show APPROVED investments to public
         Page<Investment> investments = investmentRepository.findInvestmentsWithFilters(
-                category, riskLevel, minReturn, location, sector, investmentType, minAmount, maxAmount, InvestmentStatus.APPROVED, pageable
-        );
+                category, riskLevel, minReturn, location, sector, investmentType, minAmount, maxAmount,
+                InvestmentStatus.APPROVED, pageable);
 
         // Get current user's watchlist if authenticated
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
@@ -168,7 +168,8 @@ public class InvestmentService {
                 .targetAmount(investment.getTargetAmount())
                 .raisedAmount(investment.getRaisedAmount())
                 .location(investment.getLocation())
-                .sector(investment.getCompany().getSector() != null ? investment.getCompany().getSector().getValue() : null)
+                .sector(investment.getCompany().getSector() != null ? investment.getCompany().getSector().getValue()
+                        : null)
                 .investmentType(investment.getInvestmentType())
                 .duration(investment.getDurationMonths())
                 .imageUrl(investment.getImageUrl())
@@ -270,8 +271,9 @@ public class InvestmentService {
 
     public Page<InvestmentDto> searchInvestments(String query, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Investment> investments = investmentRepository.searchInvestments(query, InvestmentStatus.APPROVED, pageable);
-        
+        Page<Investment> investments = investmentRepository.searchInvestments(query, InvestmentStatus.APPROVED,
+                pageable);
+
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
         return investments.map(inv -> convertToDto(inv, watchlistIds));
     }
@@ -280,17 +282,18 @@ public class InvestmentService {
     public com.lebvest.model.dto.WatchlistStatusDto getWatchlistStatus(Long investmentId) {
         Investment investment = investmentRepository.findById(investmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
-        
+
         Investor investor = getCurrentInvestor();
         if (investor == null) {
             return com.lebvest.model.dto.WatchlistStatusDto.builder()
                     .isWatchlisted(false)
                     .build();
         }
-        
+
         boolean isWatchlisted = investor.getWatchlist().contains(investment);
-        
-        // If watchlisted, find when it was added (we'd need to track this, for now return null)
+
+        // If watchlisted, find when it was added (we'd need to track this, for now
+        // return null)
         return com.lebvest.model.dto.WatchlistStatusDto.builder()
                 .isWatchlisted(isWatchlisted)
                 .addedAt(null) // TODO: Track watchlist addition date if needed
@@ -302,8 +305,8 @@ public class InvestmentService {
         Investment investment = investmentRepository.findById(investmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
 
-        List<com.lebvest.model.entities.investment.InvestorInvestment> investorInvestments =
-                investorInvestmentRepository.findByInvestment(investment);
+        List<com.lebvest.model.entities.investment.InvestorInvestment> investorInvestments = investorInvestmentRepository
+                .findByInvestment(investment);
 
         Integer totalInvestors = investorInvestments.size();
         BigDecimal targetAmount = investment.getTargetAmount();
@@ -359,13 +362,13 @@ public class InvestmentService {
     public InvestmentDto getInvestmentById(Long investmentId) {
         Investment investment = investmentRepository.findById(investmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Investment not found"));
-        
+
         // Only return APPROVED investments for public access
         // Admin endpoints should use AdminService.getProjectForReview instead
         if (investment.getStatus() != InvestmentStatus.APPROVED) {
             throw new ResourceNotFoundException("Investment not found or not available");
         }
-        
+
         List<Long> watchlistIds = getCurrentUserWatchlistIds();
         return convertToDto(investment, watchlistIds);
     }
@@ -375,6 +378,10 @@ public class InvestmentService {
         Investor investor = getCurrentInvestor();
         if (investor == null) {
             throw new IllegalStateException("User must be an investor to make an investment");
+        }
+
+        if (!investor.getKycVerified()) {
+            throw new IllegalStateException("Your account must be verified to make investments.");
         }
 
         Investment investment = investmentRepository.findById(investmentId)
@@ -399,7 +406,8 @@ public class InvestmentService {
         BigDecimal newTotalRaised = investment.getRaisedAmount().add(amount);
         if (newTotalRaised.compareTo(investment.getTargetAmount()) > 0) {
             BigDecimal remaining = investment.getTargetAmount().subtract(investment.getRaisedAmount());
-            throw new IllegalArgumentException("Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
+            throw new IllegalArgumentException(
+                    "Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
         }
 
         // Calculate maturity date for this specific investment
@@ -407,10 +415,10 @@ public class InvestmentService {
         if (maturityDate == null && investment.getDurationMonths() != null) {
             maturityDate = java.time.LocalDate.now().plusMonths(investment.getDurationMonths());
         }
-        
+
         // Calculate expected return amount
         BigDecimal expectedReturnAmount = calculateExpectedReturn(amount, investment.getExpectedReturn());
-        
+
         // Create investor investment
         InvestorInvestment investorInvestment = InvestorInvestment.builder()
                 .investor(investor)
@@ -429,22 +437,22 @@ public class InvestmentService {
         // Update investment raised amount
         BigDecimal newRaisedAmount = investment.getRaisedAmount().add(amount);
         investment.setRaisedAmount(newRaisedAmount);
-        
+
         // Update funding status
         if (newRaisedAmount.compareTo(investment.getTargetAmount()) >= 0) {
             investment.setFundingStatus(com.lebvest.model.enums.FundingStatus.COMPLETED);
         } else if (investment.getFundingStatus() == com.lebvest.model.enums.FundingStatus.PENDING) {
             investment.setFundingStatus(com.lebvest.model.enums.FundingStatus.PAID);
         }
-        
+
         // Calculate maturity date if not set (based on durationMonths)
         if (investment.getMaturityDate() == null && investment.getDurationMonths() != null) {
-            java.time.LocalDate maturityDate = java.time.LocalDate.now()
+            java.time.LocalDate calculatedMaturityDate = java.time.LocalDate.now()
                     .plusMonths(investment.getDurationMonths());
-            investment.setMaturityDate(maturityDate);
-            
+            investment.setMaturityDate(calculatedMaturityDate);
+
             // Calculate expected return date (same as maturity for now)
-            investment.setExpectedReturnDate(maturityDate);
+            investment.setExpectedReturnDate(calculatedMaturityDate);
         }
         investmentRepository.save(investment);
 
@@ -455,7 +463,7 @@ public class InvestmentService {
 
         return investorInvestment;
     }
-    
+
     /**
      * Calculate expected return amount based on principal and return rate
      */
@@ -464,7 +472,7 @@ public class InvestmentService {
         BigDecimal rate = expectedReturnRate.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
         return principal.multiply(BigDecimal.ONE.add(rate));
     }
-    
+
     /**
      * Calculate percentage funded for an investment
      */
@@ -496,4 +504,3 @@ public class InvestmentService {
                 .collect(Collectors.toList());
     }
 }
-

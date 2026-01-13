@@ -58,11 +58,11 @@ public class InvestorService {
     private final PasswordEncoder passwordEncoder;
 
     public InvestorService(InvestorRepository investorRepository,
-                           InvestmentRepository investmentRepository,
-                           InvestmentRequestRepository investmentRequestRepository,
-                           InvestorNotificationRepository investorNotificationRepository,
-                           InvestorInvestmentRepository investorInvestmentRepository,
-                           PasswordEncoder passwordEncoder) {
+            InvestmentRepository investmentRepository,
+            InvestmentRequestRepository investmentRequestRepository,
+            InvestorNotificationRepository investorNotificationRepository,
+            InvestorInvestmentRepository investorInvestmentRepository,
+            PasswordEncoder passwordEncoder) {
         this.investorRepository = investorRepository;
         this.investmentRepository = investmentRepository;
         this.investmentRequestRepository = investmentRequestRepository;
@@ -146,11 +146,11 @@ public class InvestorService {
             throw new IllegalArgumentException("Unable to determine authenticated investor");
         }
         String email = authentication.getName();
-        
+
         // Use a simpler query that only loads user (no collections)
         Investor investor = investorRepository.findByUserEmailForProfile(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
-        
+
         return InvestorProfileDto.builder()
                 .id(investor.getId())
                 .name(investor.getUser().getName())
@@ -161,6 +161,8 @@ public class InvestorService {
                 .totalInvested(investor.getTotal_invested())
                 .totalReturns(investor.getTotal_returns())
                 .profilePublic(investor.getProfilePublic() != null ? investor.getProfilePublic() : false)
+                .kycVerified(investor.getKycVerified())
+                .kycStatus(investor.getKycStatus())
                 .build();
     }
 
@@ -168,9 +170,9 @@ public class InvestorService {
     public InvestorProfileDto getPublicInvestorProfile(Long id) {
         Investor investor = investorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found"));
-        
+
         Boolean isPublic = investor.getProfilePublic() != null ? investor.getProfilePublic() : false;
-        
+
         // Contact info (email), bio, and imageUrl are always public
         InvestorProfileDto.InvestorProfileDtoBuilder builder = InvestorProfileDto.builder()
                 .id(investor.getId())
@@ -179,26 +181,26 @@ public class InvestorService {
                 .bio(investor.getBio())
                 .imageUrl(investor.getImageUrl())
                 .profilePublic(isPublic);
-        
+
         // Only include portfolio/investment details if profile is public
         if (isPublic) {
             builder.portfolioValue(investor.getPortfolio_value())
-                   .totalInvested(investor.getTotal_invested())
-                   .totalReturns(investor.getTotal_returns());
+                    .totalInvested(investor.getTotal_invested())
+                    .totalReturns(investor.getTotal_returns());
         } else {
             // Set private portfolio values to zero
             builder.portfolioValue(BigDecimal.ZERO)
-                   .totalInvested(BigDecimal.ZERO)
-                   .totalReturns(BigDecimal.ZERO);
+                    .totalInvested(BigDecimal.ZERO)
+                    .totalReturns(BigDecimal.ZERO);
         }
-        
+
         return builder.build();
     }
 
     @Transactional
     public InvestorProfileDto updateCurrentInvestorProfile(UpdateInvestorProfileRequest request) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         if (request.getName() != null && !request.getName().isBlank()) {
             investor.getUser().setName(request.getName());
         }
@@ -214,9 +216,9 @@ public class InvestorService {
         if (request.getProfilePublic() != null) {
             investor.setProfilePublic(request.getProfilePublic());
         }
-        
+
         investorRepository.save(investor);
-        
+
         return InvestorProfileDto.builder()
                 .id(investor.getId())
                 .name(investor.getUser().getName())
@@ -227,6 +229,8 @@ public class InvestorService {
                 .totalInvested(investor.getTotal_invested())
                 .totalReturns(investor.getTotal_returns())
                 .profilePublic(investor.getProfilePublic() != null ? investor.getProfilePublic() : false)
+                .kycVerified(investor.getKycVerified())
+                .kycStatus(investor.getKycStatus())
                 .build();
     }
 
@@ -234,7 +238,7 @@ public class InvestorService {
     public InvestorPreferenceDto getCurrentInvestorPreferences() {
         Investor investor = getCurrentInvestorWithRelations();
         InvestorPreference preferences = investor.getPreferences();
-        
+
         if (preferences == null) {
             return InvestorPreferenceDto.builder()
                     .categories(Set.of())
@@ -242,7 +246,7 @@ public class InvestorService {
                     .locations(Set.of())
                     .build();
         }
-        
+
         return InvestorPreferenceDto.builder()
                 .categories(toSlugSet(preferences.getCategories()))
                 .riskLevels(toSlugSet(preferences.getRiskLevels()))
@@ -254,7 +258,7 @@ public class InvestorService {
     public InvestorPreferenceDto updateCurrentInvestorPreferences(UpdateInvestorPreferenceRequest request) {
         Investor investor = getCurrentInvestorWithRelations();
         InvestorPreference preferences = investor.getPreferences();
-        
+
         if (preferences == null) {
             preferences = InvestorPreference.builder()
                     .investor(investor)
@@ -268,9 +272,9 @@ public class InvestorService {
             preferences.setRiskLevels(new HashSet<>(request.getRiskLevels()));
             preferences.setLocations(new HashSet<>(request.getLocations()));
         }
-        
+
         investorRepository.save(investor);
-        
+
         return InvestorPreferenceDto.builder()
                 .categories(toSlugSet(preferences.getCategories()))
                 .riskLevels(toSlugSet(preferences.getRiskLevels()))
@@ -291,10 +295,10 @@ public class InvestorService {
             throw new IllegalArgumentException("Unable to determine authenticated investor");
         }
         String email = authentication.getName();
-        
+
         Investor investor = investorRepository.findByUserEmailForProfile(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
-        
+
         // Verify current password
         if (!passwordEncoder.matches(request.getCurrentPassword(), investor.getUser().getPassword())) {
             throw new BadRequestException("Current password is incorrect");
@@ -303,7 +307,7 @@ public class InvestorService {
         // Update password
         String encodedNewPassword = passwordEncoder.encode(request.getNewPassword());
         investor.getUser().setPassword(encodedNewPassword);
-        
+
         investorRepository.save(investor);
     }
 
@@ -325,24 +329,25 @@ public class InvestorService {
             throw new IllegalArgumentException("Unable to determine authenticated investor");
         }
         String email = authentication.getName();
-        
+
         Investor investor = investorRepository.findByUserEmailForProfile(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor profile not found for current user"));
 
         try {
             // Get project root directory
             String projectRoot = System.getProperty("user.dir");
-            Path uploadsBasePath = Paths.get(projectRoot, "uploads", "investors", String.valueOf(investor.getId()), "profile");
-            
+            Path uploadsBasePath = Paths.get(projectRoot, "uploads", "investors", String.valueOf(investor.getId()),
+                    "profile");
+
             // Create directory structure if it doesn't exist
             Files.createDirectories(uploadsBasePath);
-            
+
             // Generate unique filename to avoid conflicts
             String originalFileName = file.getOriginalFilename();
             if (originalFileName == null || originalFileName.isEmpty()) {
                 originalFileName = "image";
             }
-            
+
             // Extract file extension
             String fileExtension = "";
             String baseFileName = originalFileName;
@@ -351,22 +356,23 @@ public class InvestorService {
                 fileExtension = originalFileName.substring(lastDotIndex);
                 baseFileName = originalFileName.substring(0, lastDotIndex);
             }
-            
+
             // Sanitize base filename and create unique name
             String sanitizedBaseName = baseFileName.replaceAll("[^a-zA-Z0-9.-]", "_");
             String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedBaseName + fileExtension;
-            
+
             // Save file locally using absolute path
             Path targetFilePath = uploadsBasePath.resolve(uniqueFileName);
             Files.copy(file.getInputStream(), targetFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            
-            // Store relative path for database (e.g., "uploads/investors/1/profile/filename.jpg")
+
+            // Store relative path for database (e.g.,
+            // "uploads/investors/1/profile/filename.jpg")
             String relativePath = "uploads/investors/" + investor.getId() + "/profile/" + uniqueFileName;
-            
+
             // Update investor's image URL
             investor.setImageUrl(relativePath);
             investorRepository.save(investor);
-            
+
             return relativePath;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload profile image: " + e.getMessage(), e);
@@ -389,10 +395,10 @@ public class InvestorService {
                 .findByIdAndInvestor(notificationId, investor)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Notification not found or does not belong to current investor"));
-        
+
         notification.setRead(true);
         investorNotificationRepository.save(notification);
-        
+
         return toInvestorNotificationDto(notification);
     }
 
@@ -431,6 +437,8 @@ public class InvestorService {
                 .totalInvested(investor.getTotal_invested())
                 .totalReturns(investor.getTotal_returns())
                 .preferences(toPreferencesDto(investor.getPreferences()))
+                .kycVerified(investor.getKycVerified())
+                .kycStatus(investor.getKycStatus())
                 .build();
     }
 
@@ -518,17 +526,14 @@ public class InvestorService {
     private List<InvestorDashboardDto.InvestmentSummaryDto> buildRecommendations(
             Investor investor,
             List<InvestorDashboardDto.InvestmentSummaryDto> watchlist,
-            List<InvestorDashboardDto.InvestorInvestmentDto> investments
-    ) {
+            List<InvestorDashboardDto.InvestorInvestmentDto> investments) {
         Set<Long> excludedIds = new HashSet<>();
         excludedIds.addAll(
-                watchlist.stream().map(InvestorDashboardDto.InvestmentSummaryDto::getId).toList()
-        );
+                watchlist.stream().map(InvestorDashboardDto.InvestmentSummaryDto::getId).toList());
         excludedIds.addAll(
                 investments.stream()
                         .map(dto -> dto.getInvestment().getId())
-                        .toList()
-        );
+                        .toList());
 
         return investmentRepository.findTop5ByOrderByCreatedAtDesc()
                 .stream()
@@ -557,30 +562,29 @@ public class InvestorService {
     @Transactional
     public InvestorDashboardDto.InvestorGoalDto createGoal(CreateGoalRequest request) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         InvestorGoal goal = new InvestorGoal(
                 investor,
                 request.getTitle(),
                 request.getTargetAmount(),
                 BigDecimal.ZERO, // currentAmount starts at 0
-                request.getDeadline()
-        );
-        
+                request.getDeadline());
+
         investor.getGoals().add(goal);
         investorRepository.save(investor);
-        
+
         return toGoalDto(goal);
     }
 
     @Transactional
     public InvestorDashboardDto.InvestorGoalDto updateGoal(Long goalId, UpdateGoalRequest request) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         InvestorGoal goal = investor.getGoals().stream()
                 .filter(g -> g.getId().equals(goalId))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Goal not found"));
-        
+
         // Update fields if provided
         if (request.getTitle() != null) {
             goal.setTitle(request.getTitle());
@@ -592,21 +596,21 @@ public class InvestorService {
             goal.setDeadline(request.getDeadline());
         }
         // currentAmount is not updated via this endpoint
-        
+
         investorRepository.save(investor);
-        
+
         return toGoalDto(goal);
     }
 
     @Transactional
     public void deleteGoal(Long goalId) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         InvestorGoal goal = investor.getGoals().stream()
                 .filter(g -> g.getId().equals(goalId))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Goal not found"));
-        
+
         investor.getGoals().remove(goal);
         investorRepository.save(investor);
     }
@@ -614,22 +618,22 @@ public class InvestorService {
     @Transactional(readOnly = true)
     public InvestorDashboardDto.InvestorInvestmentDto getInvestorInvestmentDetails(Long investorInvestmentId) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         InvestorInvestment investorInvestment = investorInvestmentRepository.findById(investorInvestmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Investor investment not found"));
-        
+
         // Verify it belongs to the current investor
         if (!investorInvestment.getInvestor().getId().equals(investor.getId())) {
             throw new IllegalArgumentException("This investment does not belong to the current investor");
         }
-        
+
         return toInvestorInvestmentDto(investorInvestment);
     }
 
     @Transactional(readOnly = true)
     public List<InvestmentRequestDto> getInvestmentRequests(String status) {
         Investor investor = getCurrentInvestorWithRelations();
-        
+
         com.lebvest.model.enums.InvestmentRequestStatus requestStatus = null;
         if (status != null && !status.trim().isEmpty() && !status.equalsIgnoreCase("ALL")) {
             try {
@@ -639,7 +643,7 @@ public class InvestorService {
                 requestStatus = null;
             }
         }
-        
+
         List<com.lebvest.model.entities.investment.InvestmentRequest> requests;
         if (requestStatus != null) {
             requests = investmentRequestRepository.findByInvestor_IdAndStatusOrderByCreatedAtDesc(
@@ -647,13 +651,14 @@ public class InvestorService {
         } else {
             requests = investmentRequestRepository.findByInvestor_IdOrderByCreatedAtDesc(investor.getId());
         }
-        
+
         return requests.stream()
                 .map(this::convertToInvestmentRequestDto)
                 .collect(Collectors.toList());
     }
 
-    private InvestmentRequestDto convertToInvestmentRequestDto(com.lebvest.model.entities.investment.InvestmentRequest request) {
+    private InvestmentRequestDto convertToInvestmentRequestDto(
+            com.lebvest.model.entities.investment.InvestmentRequest request) {
         return InvestmentRequestDto.builder()
                 .id(request.getId())
                 .investorId(request.getInvestor().getId())
@@ -675,4 +680,3 @@ public class InvestorService {
                 .build();
     }
 }
-
