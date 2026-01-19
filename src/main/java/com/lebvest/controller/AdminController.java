@@ -105,7 +105,6 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    // ========== PROJECT REVIEW ENDPOINTS ==========
 
     @GetMapping("/projects/pending")
     public ResponseEntity<ResponsePayload> getPendingProjects(
@@ -121,7 +120,6 @@ public class AdminController {
         InvestmentStatus investmentStatus = null;
         if (status != null && !status.trim().isEmpty()) {
             if (status.equalsIgnoreCase("ALL")) {
-                // Explicitly "All" selected - return all statuses (null)
                 investmentStatus = null;
                 log.info("Filtering projects: ALL statuses");
             } else {
@@ -201,7 +199,6 @@ public class AdminController {
                         .build());
     }
 
-    // ========== USER MANAGEMENT ENDPOINTS ==========
 
     @GetMapping("/users")
     public ResponseEntity<ResponsePayload> getAllUsers(
@@ -273,8 +270,6 @@ public class AdminController {
                         .data(data)
                         .build());
     }
-
-    // ========== INVESTOR KYC ENDPOINTS ==========
 
     @PutMapping("/investors/{investorId}/kyc")
     public ResponseEntity<ResponsePayload> updateInvestorKyc(

@@ -42,13 +42,27 @@ public class DevMailService implements IMailService {
 
     @PostConstruct
     public void init() {
-        log.info("Initializing GreenMail for dev profile on {}:{}", mailHost, mailPort);
+        log.info("========================================");
+        log.info("Initializing GreenMail for dev profile");
+        log.info("========================================");
+        log.info("Host: {}, Port: {}", mailHost, mailPort);
+        
         ServerSetup serverSetup = new ServerSetup(mailPort, mailHost, ServerSetup.PROTOCOL_SMTP);
         greenMail = new GreenMail(serverSetup);
+        
+        // Configure GreenMail to accept emails with or without authentication
+        // Set up a user that matches common dev credentials (if JavaMailSender tries to auth)
         greenMail.setUser("dev@lebvest.local", "dev@lebvest.local", "devpassword");
+        // Also allow any email address (GreenMail accepts all by default)
+        
         greenMail.start();
-        log.info("GreenMail started successfully. Emails will be captured locally.");
-        log.info("Access GreenMail via: http://localhost:{}/api/dev/mail (if you add an endpoint)", mailPort);
+        
+        log.info("✓ GreenMail started successfully");
+        log.info("✓ GreenMail is listening on {}:{}", mailHost, mailPort);
+        log.info("✓ GreenMail configured to accept emails (with or without auth)");
+        log.info("✓ GreenMail will capture ALL emails sent via JavaMailSender");
+        log.info("✓ Access captured emails via: http://localhost:8080/api/dev/mail");
+        log.info("========================================");
     }
 
     @PreDestroy
@@ -62,8 +76,16 @@ public class DevMailService implements IMailService {
     @Override
     @Async("taskExecutor")
     public void sendSimpleMail(String to, String subject, String text) {
-        log.info(" [DEV] Sending simple email to: {}, subject: {}", to, subject);
-        log.info(" [DEV] Email content: {}", text);
+        log.info(" [DEV] ===== Sending simple email =====");
+        log.info(" [DEV] To: {}", to);
+        log.info(" [DEV] Subject: {}", subject);
+        log.info(" [DEV] Content: {}", text);
+        log.info(" [DEV] GreenMail status: {}", greenMail != null ? "Running" : "NOT INITIALIZED");
+        
+        if (greenMail == null) {
+            log.error(" [DEV] GreenMail is not initialized! Cannot send email.");
+            return;
+        }
         
         MimeMessage message = mailSender.createMimeMessage();
         try {
@@ -71,10 +93,26 @@ public class DevMailService implements IMailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text, false);
+            
+            log.info(" [DEV] Attempting to send email via JavaMailSender...");
             mailSender.send(message);
-            log.info(" [DEV] Email sent successfully to: {} (captured by GreenMail)", to);
+            
+            // Wait a bit for GreenMail to process the email
+            Thread.sleep(100);
+            
+            int receivedCount = greenMail.getReceivedMessages().length;
+            log.info(" [DEV] ✓ Email sent successfully! Total emails in GreenMail: {}", receivedCount);
+            log.info(" [DEV] ===== Email sending completed =====");
         } catch (MessagingException e) {
-            log.error(" [DEV] Failed to send email: {}", e.getMessage(), e);
+            log.error(" [DEV] ✗ Failed to send email: {}", e.getMessage(), e);
+            log.error(" [DEV] Exception details: ", e);
+            throw new RuntimeException("Failed to send email", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error(" [DEV] Thread interrupted while waiting for GreenMail", e);
+        } catch (Exception e) {
+            log.error(" [DEV] ✗ Unexpected error sending email: {}", e.getMessage(), e);
+            log.error(" [DEV] Exception details: ", e);
             throw new RuntimeException("Failed to send email", e);
         }
     }
@@ -82,9 +120,18 @@ public class DevMailService implements IMailService {
     @Override
     @Async("taskExecutor")
     public void sendHtmlMail(String to, String subject, String htmlContent, Attachment... attachments) {
-        log.info(" [DEV] Sending HTML email to: {}, subject: {}", to, subject);
-        log.info(" [DEV] Email HTML preview (first 200 chars): {}", 
+        log.info(" [DEV] ===== Sending HTML email =====");
+        log.info(" [DEV] To: {}", to);
+        log.info(" [DEV] Subject: {}", subject);
+        log.info(" [DEV] HTML preview (first 200 chars): {}", 
                 htmlContent.length() > 200 ? htmlContent.substring(0, 200) + "..." : htmlContent);
+        log.info(" [DEV] Attachments: {}", attachments != null ? attachments.length : 0);
+        log.info(" [DEV] GreenMail status: {}", greenMail != null ? "Running" : "NOT INITIALIZED");
+        
+        if (greenMail == null) {
+            log.error(" [DEV] GreenMail is not initialized! Cannot send email.");
+            return;
+        }
         
         MimeMessage message = mailSender.createMimeMessage();
         try {
@@ -102,13 +149,25 @@ public class DevMailService implements IMailService {
                 log.info("📎 [DEV] Attachment added: {}", a.filename());
             }
 
+            log.info(" [DEV] Attempting to send HTML email via JavaMailSender...");
             mailSender.send(message);
-            log.info(" [DEV] HTML email sent successfully to: {} (captured by GreenMail)", to);
+            
+            // Wait a bit for GreenMail to process the email
+            Thread.sleep(100);
+            
+            int receivedCount = greenMail.getReceivedMessages().length;
+            log.info(" [DEV] ✓ HTML email sent successfully! Total emails in GreenMail: {}", receivedCount);
+            log.info(" [DEV] ===== HTML email sending completed =====");
         } catch (MessagingException e) {
-            log.error(" [DEV] Failed to send HTML email: {}", e.getMessage(), e);
+            log.error(" [DEV] ✗ Failed to send HTML email: {}", e.getMessage(), e);
+            log.error(" [DEV] Exception details: ", e);
             throw new RuntimeException("Failed to send email with attachments", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error(" [DEV] Thread interrupted while waiting for GreenMail", e);
         } catch (Exception e) {
-            log.error(" [DEV] Unexpected error sending email: {}", e.getMessage(), e);
+            log.error(" [DEV] ✗ Unexpected error sending HTML email: {}", e.getMessage(), e);
+            log.error(" [DEV] Exception details: ", e);
             throw new RuntimeException("Failed to send email", e);
         }
     }

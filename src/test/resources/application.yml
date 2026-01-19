@@ -1,0 +1,76 @@
+spring:
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        globally_quoted_identifiers: true
+        physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+  flyway:
+    enabled: false
+  mail:
+    host: localhost
+    port: 3025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+            required: false
+
+aws:
+  credentials:
+    accessKey: test-access-key
+    secretKey: test-secret-key
+  s3:
+    bucket: test-bucket
+  region: us-east-1
+
+jwt:
+  access-secret: test-access-secret-key-minimum-256-bits-for-hmac-sha256-algorithm-test
+  refresh-secret: test-refresh-secret-key-minimum-256-bits-for-hmac-sha256-algorithm-test
+
+admin:
+  email: admin@test.com
+
+frontend:
+  url: http://localhost:3000
+
+url:
+  pending-prefix: pending/
+  accepted-prefix: accepted/
+
+queue:
+  company:
+    signup:
+      upload: company.signup.upload
+      email: company.signup.email
+      accepted:
+        move: company.signup.accepted.move
+
+file:
+  upload:
+    base-dir: /tmp/test-uploads
+
+stripe:
+  secret-key: sk_test_test_key_for_testing_only
+  publishable-key: pk_test_test_key_for_testing_only
+  webhook-secret: whsec_test_webhook_secret
+
+logging:
+  level:
+    root: WARN
+    com.lebvest: INFO

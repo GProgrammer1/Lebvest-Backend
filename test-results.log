@@ -1,0 +1,2075 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------------< com:lebvest >-----------------------------
+[INFO] Building lebvest 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.4.1:clean (default-clean) @ lebvest ---
+[INFO] Deleting /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/target
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ lebvest ---
+[INFO] Copying 2 resources from src/main/resources to target/classes
+[INFO] Copying 7 resources from src/main/resources to target/classes
+[INFO] 
+[INFO] --- compiler:3.13.0:compile (default-compile) @ lebvest ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 196 source files with javac [debug parameters release 17] to target/classes
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/InvestorPreference.java:[49,37] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/InvestorPreference.java:[63,28] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/InvestorPreference.java:[76,27] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investment/FundingHistory.java:[71,27] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyFinancial.java:[34,24] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyFinancial.java:[37,24] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyFinancial.java:[40,24] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/Company.java:[73,37] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/Company.java:[81,26] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/Company.java:[85,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/Company.java:[93,35] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/Company.java:[97,34] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanySignupRequest.java:[56,26] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[57,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[63,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[69,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[85,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[91,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyVerificationDocuments.java:[97,36] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyInvestor.java:[35,24] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/User.java:[45,23] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/User.java:[48,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/investor/User.java:[51,21] @SuperBuilder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyNotification.java:[57,5] @NonNull is meaningless on a primitive.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyNotification.java:[27,1] @NonNull is meaningless on a primitive.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyNotification.java:[24,1] @NonNull is meaningless on a primitive.
+[WARNING] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/model/entities/company/CompanyNotification.java:[26,1] @NonNull is meaningless on a primitive.
+[INFO] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/config/RateLimitConfig.java: Some input files use or override a deprecated API.
+[INFO] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/config/RateLimitConfig.java: Recompile with -Xlint:deprecation for details.
+[INFO] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/config/RateLimitConfig.java: /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/config/RateLimitConfig.java uses unchecked or unsafe operations.
+[INFO] /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/src/main/java/com/lebvest/config/RateLimitConfig.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ lebvest ---
+[INFO] Copying 1 resource from src/test/resources to target/test-classes
+[INFO] 
+[INFO] --- compiler:3.13.0:testCompile (default-testCompile) @ lebvest ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 6 source files with javac [debug parameters release 17] to target/test-classes
+[INFO] 
+[INFO] --- surefire:3.5.3:test (default-test) @ lebvest ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.lebvest.LebvestApplicationTests
+Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
+19:22:02.784 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.lebvest.LebvestApplicationTests]: LebvestApplicationTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+19:22:02.937 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.lebvest.LebvestApplication for test class com.lebvest.LebvestApplicationTests
+19:22:03.114 [main] INFO org.springframework.boot.devtools.restart.RestartApplicationListener -- Restart disabled due to context in which it is running
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.4.5)
+
+2026-01-19T19:22:03.547+02:00  INFO 158761 --- [           main] com.lebvest.LebvestApplicationTests      : Starting LebvestApplicationTests using Java 21.0.9 with PID 158761 (started by georgio in /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend)
+2026-01-19T19:22:03.549+02:00  INFO 158761 --- [           main] com.lebvest.LebvestApplicationTests      : The following 1 profile is active: "test"
+2026-01-19T19:22:07.151+02:00  WARN 158761 --- [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+Hibernate: 
+    create global temporary table "HTE_company_verification_documents"("isApproved" boolean, rn_ integer not null, "company_id" bigint, "createdAt" timestamp(6), "id" bigint, "articlesOfAssociation" varchar(512), "bankAccountConfirmation" varchar(512), "boardResolution" varchar(512), "certificateOfIncorporation" varchar(512), "pepSanctionsDeclaration" varchar(512), "proofOfRegisteredAddress" varchar(512), "shareholderStructure" varchar(512), "sourceOfFundsDeclaration" varchar(512), "taxRegistrationCertificate" varchar(512), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_users"("enabled" boolean, "locked" boolean, rn_ integer not null, "createdAt" timestamp(6), "id" bigint, "password" varchar(254), "email" varchar(255), "name" varchar(255), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_companies"("foundedYear" integer, "sector" tinyint, rn_ integer not null, "id" bigint, "user_id" bigint, "phoneNumber" varchar(50), "location" varchar(512), "logo" varchar(512), "website" varchar(512), "city" varchar(255), "customSector" varchar(255), "governorate" varchar(255), "name" varchar(255), "description" clob, "status" enum ('APPROVED', 'FULLY_VERIFIED', 'PENDING', 'PENDING_DOCS', 'REJECTED'), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_investments"("deadline" date, "duration_months" integer, "expected_return" numeric(5, 2), "expected_return_date" date, "maturity_date" date, "min_investment" numeric(15, 2), "raised_amount" numeric(15, 2), "target_amount" numeric(15, 2), rn_ integer not null, "company_id" bigint, "created_at" timestamp(6), "id" bigint, "version" bigint, "image_url" varchar(512), "funding_stage" varchar(255), "title" varchar(255), "category" enum ('AGRICULTURE', 'EDUCATION', 'ENERGY', 'GOVERNMENT_BONDS', 'HEALTHCARE', 'PERSONAL_PROJECT', 'REAL_ESTATE', 'RETAIL', 'SME', 'STARTUP', 'TECHNOLOGY', 'TOURISM'), "description" clob, "funding_status" enum ('APPROVED', 'COMPLETED', 'PAID', 'PENDING'), "investment_type" enum ('CROWDFUNDING', 'DEBT', 'EQUITY'), "location" enum ('AKKAR', 'BAALBEK_HERMEL', 'BEIRUT', 'BEKAA', 'MOUNT_LEBANON', 'NABATIEH', 'NORTH', 'SOUTH'), "risk_level" enum ('HIGH', 'LOW', 'MEDIUM'), "status" enum ('APPROVED', 'DRAFT', 'PENDING_REVIEW', 'REJECTED'), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_investors"("annual_income" numeric(15, 2), "kyc_verified" boolean, "portfolio_value" numeric(15, 2), "profile_public" boolean, "total_invested" numeric(15, 2), "total_returns" numeric(15, 2), rn_ integer not null, "created_at" timestamp(6) with time zone, "id" bigint, "user_id" bigint, "risk_profile_assessment" varchar(500), "kyc_notes" varchar(1000), "address_doc_url" varchar(255), "bio" varchar(255), "identity_doc_url" varchar(255), "imageUrl" varchar(255), "selfie_doc_url" varchar(255), "source_of_funds_doc_url" varchar(255), "classification" enum ('INSTITUTIONAL', 'QUALIFIED', 'RETAIL'), "kyc_status" enum ('APPROVED', 'PENDING', 'REJECTED', 'RESUBMIT_REQUIRED'), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_company_signup_requests"("foundedYear" integer, "requestStatus" tinyint, "sector" tinyint, rn_ integer not null, "createdAt" timestamp(6), "id" bigint, "requestId" uuid, "location" varchar(512), "city" varchar(255), "companyName" varchar(255), "customSector" varchar(255), "email" varchar(255), "governorate" varchar(255), "logo" varchar(255), "name" varchar(255), "password" varchar(255), "phoneNumber" varchar(255), "website" varchar(255), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_investor_goals"("current_amount" numeric(15, 2), "deadline" date, "target_amount" numeric(15, 2), rn_ integer not null, "id" bigint, "investor_id" bigint, "title" varchar(255), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_company_financials"("expenses" numeric(15, 2), "profit" numeric(15, 2), "revenue" numeric(15, 2), "year" integer, rn_ integer not null, "company_id" bigint, "id" bigint, primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_company_investors"("amount" numeric(15, 2), "invested_at" date, rn_ integer not null, "company_id" bigint, "id" bigint, "investor_id" bigint, primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_admin_notifications"("isAccepted" boolean, "is_read" boolean, rn_ integer not null, "admin_id" bigint, "company_id" bigint, "createdAt" timestamp(6), "id" bigint, "investment_id" bigint, "investor_id" bigint, "request_id" bigint, "message" varchar(255), "title" varchar(255), "type" "VARCHAR(50)", primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_forgot_pass_tokens"(rn_ integer not null, "createdAt" timestamp(6), "id" bigint, "user_id" bigint, "token" varchar(255), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    create global temporary table "HTE_investor_notifications"("investorNotificationType" tinyint, "is_read" boolean, rn_ integer not null, "id" bigint, "investor_id" bigint, "notified_at" timestamp(6), "related_investment_id" bigint, "message" varchar(255), "title" varchar(255), primary key (rn_)) TRANSACTIONAL
+Hibernate: 
+    drop table if exists "admin_notifications" cascade 
+Hibernate: 
+    drop table if exists "audit_logs" cascade 
+Hibernate: 
+    drop table if exists "companies" cascade 
+Hibernate: 
+    drop table if exists "company_bank_statements" cascade 
+Hibernate: 
+    drop table if exists "company_director_ids" cascade 
+Hibernate: 
+    drop table if exists "company_documents" cascade 
+Hibernate: 
+    drop table if exists "company_financial_statements" cascade 
+Hibernate: 
+    drop table if exists "company_financials" cascade 
+Hibernate: 
+    drop table if exists "company_investors" cascade 
+Hibernate: 
+    drop table if exists "company_management_accounts" cascade 
+Hibernate: 
+    drop table if exists "company_notifications" cascade 
+Hibernate: 
+    drop table if exists "company_signatory_ids" cascade 
+Hibernate: 
+    drop table if exists "company_signup_requests" cascade 
+Hibernate: 
+    drop table if exists "company_social_media" cascade 
+Hibernate: 
+    drop table if exists "company_team_members" cascade 
+Hibernate: 
+    drop table if exists "company_ubo_ids" cascade 
+Hibernate: 
+    drop table if exists "company_verification_documents" cascade 
+Hibernate: 
+    drop table if exists "forgot_pass_tokens" cascade 
+Hibernate: 
+    drop table if exists "funding_history" cascade 
+Hibernate: 
+    drop table if exists "funding_history_investors" cascade 
+Hibernate: 
+    drop table if exists "investment_ai_predictions" cascade 
+Hibernate: 
+    drop table if exists "investment_documents" cascade 
+Hibernate: 
+    drop table if exists "investment_financials" cascade 
+Hibernate: 
+    drop table if exists "investment_highlights" cascade 
+Hibernate: 
+    drop table if exists "investment_requests" cascade 
+Hibernate: 
+    drop table if exists "investment_team_members" cascade 
+Hibernate: 
+    drop table if exists "investment_updates" cascade 
+Hibernate: 
+    drop table if exists "investments" cascade 
+Hibernate: 
+    drop table if exists "investor_goals" cascade 
+Hibernate: 
+    drop table if exists "investor_investments" cascade 
+Hibernate: 
+    drop table if exists "investor_notifications" cascade 
+Hibernate: 
+    drop table if exists "investor_pref_categories" cascade 
+Hibernate: 
+    drop table if exists "investor_pref_locations" cascade 
+Hibernate: 
+    drop table if exists "investor_pref_risk_levels" cascade 
+Hibernate: 
+    drop table if exists "investor_preferences" cascade 
+Hibernate: 
+    drop table if exists "investor_watchlist" cascade 
+Hibernate: 
+    drop table if exists "investors" cascade 
+Hibernate: 
+    drop table if exists "payout_history" cascade 
+Hibernate: 
+    drop table if exists "payout_requests" cascade 
+Hibernate: 
+    drop table if exists "requesting_company_documents" cascade 
+Hibernate: 
+    drop table if exists "user_roles" cascade 
+Hibernate: 
+    drop table if exists "users" cascade 
+Hibernate: 
+    drop table if exists "verification_document_history" cascade 
+Hibernate: 
+    drop sequence if exists "admin_notifications_SEQ"
+Hibernate: 
+    drop sequence if exists "companies_SEQ"
+Hibernate: 
+    drop sequence if exists "company_financials_SEQ"
+Hibernate: 
+    drop sequence if exists "company_investors_SEQ"
+Hibernate: 
+    drop sequence if exists "company_signup_requests_SEQ"
+Hibernate: 
+    drop sequence if exists "company_verification_documents_SEQ"
+Hibernate: 
+    drop sequence if exists "forgot_pass_tokens_SEQ"
+Hibernate: 
+    drop sequence if exists "investments_SEQ"
+Hibernate: 
+    drop sequence if exists "investor_goals_SEQ"
+Hibernate: 
+    drop sequence if exists "investor_notifications_SEQ"
+Hibernate: 
+    drop sequence if exists "investors_SEQ"
+Hibernate: 
+    drop sequence if exists "users_SEQ"
+Hibernate: 
+    create sequence "admin_notifications_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "companies_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "company_financials_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "company_investors_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "company_signup_requests_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "company_verification_documents_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "forgot_pass_tokens_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "investments_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "investor_goals_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "investor_notifications_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "investors_SEQ" start with 1 increment by 50
+Hibernate: 
+    create sequence "users_SEQ" start with 1 increment by 50
+Hibernate: 
+    create table "admin_notifications" (
+        "isAccepted" boolean,
+        "is_read" boolean not null,
+        "admin_id" bigint not null,
+        "company_id" bigint,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "investment_id" bigint,
+        "investor_id" bigint,
+        "request_id" bigint unique,
+        "message" varchar(255) not null,
+        "title" varchar(255) not null,
+        "type" "VARCHAR(50)",
+        primary key ("id")
+    )
+2026-01-19T19:22:09.045+02:00  WARN 158761 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    create table "admin_notifications" (
+        "isAccepted" boolean,
+        "is_read" boolean not null,
+        "admin_id" bigint not null,
+        "company_id" bigint,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "investment_id" bigint,
+        "investor_id" bigint,
+        "request_id" bigint unique,
+        "message" varchar(255) not null,
+        "title" varchar(255) not null,
+        "type" "VARCHAR(50)",
+        primary key ("id")
+    )" via JDBC [Domain "VARCHAR(50)" not found;]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    create table "admin_notifications" (
+        "isAccepted" boolean,
+        "is_read" boolean not null,
+        "admin_id" bigint not null,
+        "company_id" bigint,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "investment_id" bigint,
+        "investor_id" bigint,
+        "request_id" bigint unique,
+        "message" varchar(255) not null,
+        "title" varchar(255) not null,
+        "type" "VARCHAR(50)",
+        primary key ("id")
+    )" via JDBC [Domain "VARCHAR(50)" not found;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createTables(SchemaCreatorImpl.java:430) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createSequencesTablesConstraints(SchemaCreatorImpl.java:346) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createFromMetadata(SchemaCreatorImpl.java:241) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.performCreation(SchemaCreatorImpl.java:174) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:120) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:250) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1865) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1814) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1462) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:194) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:150) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:124) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.3.jar:3.5.3]
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Domain "VARCHAR(50)" not found; SQL statement:
+
+    create table "admin_notifications" (
+        "isAccepted" boolean,
+        "is_read" boolean not null,
+        "admin_id" bigint not null,
+        "company_id" bigint,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "investment_id" bigint,
+        "investor_id" bigint,
+        "request_id" bigint unique,
+        "message" varchar(255) not null,
+        "title" varchar(255) not null,
+        "type" "VARCHAR(50)",
+        primary key ("id")
+    ) [90120-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:223) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:199) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.schema.Schema.getDomain(Schema.java:611) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseColumnWithType(Parser.java:5683) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseColumnForTable(Parser.java:5559) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseTableColumnDefinition(Parser.java:8876) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseCreateTable(Parser.java:8819) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseCreate(Parser.java:6398) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parsePrepared(Parser.java:645) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parse(Parser.java:581) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parse(Parser.java:556) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.prepareCommand(Parser.java:484) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:645) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:561) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1164) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:245) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231) ~[h2-2.3.232.jar:2.3.232]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	... 119 common frames omitted
+
+Hibernate: 
+    create table "audit_logs" (
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "resource_id" bigint,
+        "user_id" bigint,
+        "ip_address" varchar(45),
+        "status" varchar(50),
+        "action_type" varchar(100) not null,
+        "resource_type" varchar(100),
+        "error_message" varchar(512),
+        "user_agent" varchar(512),
+        "user_email" varchar(255),
+        "details" "TEXT",
+        primary key ("id")
+    )
+2026-01-19T19:22:09.054+02:00  WARN 158761 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    create table "audit_logs" (
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "resource_id" bigint,
+        "user_id" bigint,
+        "ip_address" varchar(45),
+        "status" varchar(50),
+        "action_type" varchar(100) not null,
+        "resource_type" varchar(100),
+        "error_message" varchar(512),
+        "user_agent" varchar(512),
+        "user_email" varchar(255),
+        "details" "TEXT",
+        primary key ("id")
+    )" via JDBC [Domain "TEXT" not found;]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    create table "audit_logs" (
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "resource_id" bigint,
+        "user_id" bigint,
+        "ip_address" varchar(45),
+        "status" varchar(50),
+        "action_type" varchar(100) not null,
+        "resource_type" varchar(100),
+        "error_message" varchar(512),
+        "user_agent" varchar(512),
+        "user_email" varchar(255),
+        "details" "TEXT",
+        primary key ("id")
+    )" via JDBC [Domain "TEXT" not found;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createTables(SchemaCreatorImpl.java:430) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createSequencesTablesConstraints(SchemaCreatorImpl.java:346) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createFromMetadata(SchemaCreatorImpl.java:241) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.performCreation(SchemaCreatorImpl.java:174) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:120) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:250) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1865) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1814) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1462) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:194) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:150) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:124) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.3.jar:3.5.3]
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Domain "TEXT" not found; SQL statement:
+
+    create table "audit_logs" (
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "resource_id" bigint,
+        "user_id" bigint,
+        "ip_address" varchar(45),
+        "status" varchar(50),
+        "action_type" varchar(100) not null,
+        "resource_type" varchar(100),
+        "error_message" varchar(512),
+        "user_agent" varchar(512),
+        "user_email" varchar(255),
+        "details" "TEXT",
+        primary key ("id")
+    ) [90120-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:644) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:223) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:199) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.schema.Schema.getDomain(Schema.java:611) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseColumnWithType(Parser.java:5683) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseColumnForTable(Parser.java:5559) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseTableColumnDefinition(Parser.java:8876) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseCreateTable(Parser.java:8819) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parseCreate(Parser.java:6398) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parsePrepared(Parser.java:645) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parse(Parser.java:581) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.parse(Parser.java:556) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Parser.prepareCommand(Parser.java:484) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:645) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:561) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1164) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:245) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231) ~[h2-2.3.232.jar:2.3.232]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	... 119 common frames omitted
+
+Hibernate: 
+    create table "companies" (
+        "foundedYear" integer not null,
+        "sector" tinyint not null check ("sector" between 0 and 12),
+        "id" bigint not null,
+        "user_id" bigint not null unique,
+        "phoneNumber" varchar(50),
+        "location" varchar(512),
+        "logo" varchar(512),
+        "website" varchar(512),
+        "city" varchar(255),
+        "customSector" varchar(255),
+        "governorate" varchar(255),
+        "name" varchar(255) not null unique,
+        "description" clob,
+        "status" enum ('APPROVED','FULLY_VERIFIED','PENDING','PENDING_DOCS','REJECTED') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_bank_statements" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_director_ids" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_documents" (
+        "company_id" bigint not null,
+        "document" varchar(255)
+    )
+Hibernate: 
+    create table "company_financial_statements" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_financials" (
+        "expenses" numeric(15,2) not null,
+        "profit" numeric(15,2) not null,
+        "revenue" numeric(15,2) not null,
+        "year" integer not null,
+        "company_id" bigint not null,
+        "id" bigint not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_investors" (
+        "amount" numeric(15,2) not null,
+        "invested_at" date not null,
+        "company_id" bigint not null,
+        "id" bigint not null,
+        "investor_id" bigint not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_management_accounts" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_notifications" (
+        "is_read" boolean not null,
+        "company_id" bigint not null,
+        "notified_at" timestamp(6),
+        "related_investment_id" bigint,
+        "id" varchar(36) not null,
+        "title" varchar(255) not null,
+        "message" clob not null,
+        "type" enum ('ADMIN_MESSAGE','FUNDING_MILESTONE','INVESTOR_INQUIRY','INVESTOR_REQUEST','PROJECT_APPROVED','PROJECT_REJECTED') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_signatory_ids" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_signup_requests" (
+        "foundedYear" integer not null,
+        "requestStatus" tinyint not null check ("requestStatus" between 0 and 2),
+        "sector" tinyint check ("sector" between 0 and 12),
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "requestId" uuid not null unique,
+        "location" varchar(512),
+        "city" varchar(255) not null,
+        "companyName" varchar(255) not null,
+        "customSector" varchar(255),
+        "email" varchar(255) not null,
+        "governorate" varchar(255) not null,
+        "logo" varchar(255),
+        "name" varchar(255) not null,
+        "password" varchar(255) not null,
+        "phoneNumber" varchar(255) not null,
+        "website" varchar(255) not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_social_media" (
+        "company_id" bigint not null,
+        "facebook" varchar(255),
+        "instagram" varchar(255),
+        "linkedin" varchar(255),
+        "twitter" varchar(255),
+        "website" varchar(255),
+        primary key ("company_id")
+    )
+Hibernate: 
+    create table "company_team_members" (
+        "company_id" bigint not null,
+        "id" bigint generated by default as identity,
+        "image_url" varchar(512),
+        "name" varchar(255) not null,
+        "role" varchar(255) not null,
+        "bio" clob not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "company_ubo_ids" (
+        "verification_docs_id" bigint not null,
+        "document_path" varchar(255)
+    )
+Hibernate: 
+    create table "company_verification_documents" (
+        "isApproved" boolean not null,
+        "company_id" bigint not null unique,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "articlesOfAssociation" varchar(512),
+        "bankAccountConfirmation" varchar(512),
+        "boardResolution" varchar(512),
+        "certificateOfIncorporation" varchar(512),
+        "pepSanctionsDeclaration" varchar(512),
+        "proofOfRegisteredAddress" varchar(512),
+        "shareholderStructure" varchar(512),
+        "sourceOfFundsDeclaration" varchar(512),
+        "taxRegistrationCertificate" varchar(512),
+        primary key ("id")
+    )
+Hibernate: 
+    create table "forgot_pass_tokens" (
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "user_id" bigint,
+        "token" varchar(255) not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "funding_history" (
+        "amount" numeric(15,2) not null,
+        "date" date not null,
+        "company_id" bigint not null,
+        "id" bigint generated by default as identity,
+        "round" varchar(100) not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "funding_history_investors" (
+        "funding_history_id" bigint not null,
+        "investor_id" bigint not null,
+        primary key ("funding_history_id", "investor_id")
+    )
+Hibernate: 
+    create table "investment_ai_predictions" (
+        "confidence_score" numeric(5,2) not null,
+        "profit_prediction" numeric(5,2) not null,
+        "investment_id" bigint not null,
+        "risk_assessment" varchar(255) not null,
+        primary key ("investment_id")
+    )
+Hibernate: 
+    create table "investment_documents" (
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "type" varchar(100) not null,
+        "url" varchar(512) not null,
+        "title" varchar(255) not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investment_financials" (
+        "expenses" numeric(15,2) not null,
+        "profit" numeric(15,2) not null,
+        "revenue" numeric(15,2) not null,
+        "year" integer not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investment_highlights" (
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "highlight" clob not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investment_requests" (
+        "amount" numeric(15,2) not null,
+        "accepted_at" timestamp(6),
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "investor_id" bigint not null,
+        "paid_at" timestamp(6),
+        "rejected_at" timestamp(6),
+        "updated_at" timestamp(6) not null,
+        "message" varchar(1000),
+        "rejectionReason" varchar(1000),
+        "stripe_payment_intent_id" varchar(255),
+        "status" enum ('ACCEPTED','CANCELLED','PAID','PENDING','REJECTED') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investment_team_members" (
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "image_url" varchar(512),
+        "name" varchar(255) not null,
+        "role" varchar(255) not null,
+        "bio" clob not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investment_updates" (
+        "update_date" date not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "title" varchar(255) not null,
+        "content" clob not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investments" (
+        "deadline" date not null,
+        "duration_months" integer not null,
+        "expected_return" numeric(5,2) not null,
+        "expected_return_date" date,
+        "maturity_date" date,
+        "min_investment" numeric(15,2) not null,
+        "raised_amount" numeric(15,2) not null,
+        "target_amount" numeric(15,2) not null,
+        "company_id" bigint not null,
+        "created_at" timestamp(6),
+        "id" bigint not null,
+        "version" bigint,
+        "image_url" varchar(512),
+        "funding_stage" varchar(255),
+        "title" varchar(255) not null,
+        "category" enum ('AGRICULTURE','EDUCATION','ENERGY','GOVERNMENT_BONDS','HEALTHCARE','PERSONAL_PROJECT','REAL_ESTATE','RETAIL','SME','STARTUP','TECHNOLOGY','TOURISM') not null,
+        "description" clob,
+        "funding_status" enum ('APPROVED','COMPLETED','PAID','PENDING') not null,
+        "investment_type" enum ('CROWDFUNDING','DEBT','EQUITY') not null,
+        "location" enum ('AKKAR','BAALBEK_HERMEL','BEIRUT','BEKAA','MOUNT_LEBANON','NABATIEH','NORTH','SOUTH') not null,
+        "risk_level" enum ('HIGH','LOW','MEDIUM') not null,
+        "status" enum ('APPROVED','DRAFT','PENDING_REVIEW','REJECTED') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investor_goals" (
+        "current_amount" numeric(15,2),
+        "deadline" date,
+        "target_amount" numeric(15,2),
+        "id" bigint not null,
+        "investor_id" bigint not null,
+        "title" varchar(255),
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investor_investments" (
+        "amount" numeric(15,2) not null,
+        "current_value" numeric(15,2) not null,
+        "expected_return_amount" numeric(15,2),
+        "invested_at" date not null,
+        "is_matured" boolean not null,
+        "maturity_date" date,
+        "payout_requested" boolean not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "investor_id" bigint not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investor_notifications" (
+        "investorNotificationType" tinyint not null check ("investorNotificationType" between 0 and 4),
+        "is_read" boolean not null,
+        "id" bigint not null,
+        "investor_id" bigint not null unique,
+        "notified_at" timestamp(6),
+        "related_investment_id" bigint not null unique,
+        "message" varchar(255) not null,
+        "title" varchar(255) not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "investor_pref_categories" (
+        "investor_id" bigint not null,
+        "category" enum ('AGRICULTURE','EDUCATION','ENERGY','GOVERNMENT_BONDS','HEALTHCARE','PERSONAL_PROJECT','REAL_ESTATE','RETAIL','SME','STARTUP','TECHNOLOGY','TOURISM') not null,
+        primary key ("investor_id", "category")
+    )
+Hibernate: 
+    create table "investor_pref_locations" (
+        "investor_id" bigint not null,
+        "location" enum ('AKKAR','BAALBEK_HERMEL','BEIRUT','BEKAA','MOUNT_LEBANON','NABATIEH','NORTH','SOUTH') not null,
+        primary key ("investor_id", "location")
+    )
+Hibernate: 
+    create table "investor_pref_risk_levels" (
+        "investor_id" bigint not null,
+        "risk_level" enum ('HIGH','LOW','MEDIUM') not null,
+        primary key ("investor_id", "risk_level")
+    )
+Hibernate: 
+    create table "investor_preferences" (
+        "investor_id" bigint not null,
+        primary key ("investor_id")
+    )
+Hibernate: 
+    create table "investor_watchlist" (
+        "investment_id" bigint not null,
+        "investor_id" bigint not null,
+        primary key ("investment_id", "investor_id")
+    )
+Hibernate: 
+    create table "investors" (
+        "annual_income" numeric(15,2),
+        "kyc_verified" boolean not null,
+        "portfolio_value" numeric(15,2) not null,
+        "profile_public" boolean not null,
+        "total_invested" numeric(15,2) not null,
+        "total_returns" numeric(15,2) not null,
+        "created_at" timestamp(6) with time zone not null,
+        "id" bigint not null,
+        "user_id" bigint not null unique,
+        "risk_profile_assessment" varchar(500),
+        "kyc_notes" varchar(1000),
+        "address_doc_url" varchar(255),
+        "bio" varchar(255),
+        "identity_doc_url" varchar(255),
+        "imageUrl" varchar(255),
+        "selfie_doc_url" varchar(255),
+        "source_of_funds_doc_url" varchar(255),
+        "classification" enum ('INSTITUTIONAL','QUALIFIED','RETAIL'),
+        "kyc_status" enum ('APPROVED','PENDING','REJECTED','RESUBMIT_REQUIRED'),
+        primary key ("id")
+    )
+Hibernate: 
+    create table "payout_history" (
+        "principalAmount" numeric(15,2) not null,
+        "returnAmount" numeric(15,2) not null,
+        "totalPayout" numeric(15,2) not null,
+        "completed_at" timestamp(6) not null,
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "investor_id" bigint not null,
+        "payout_request_id" bigint not null,
+        "payout_method" varchar(50),
+        "transaction_id" varchar(255),
+        primary key ("id")
+    )
+Hibernate: 
+    create table "payout_requests" (
+        "amount" numeric(15,2) not null,
+        "expectedReturn" numeric(15,2) not null,
+        "approved_at" timestamp(6),
+        "company_id" bigint not null,
+        "completed_at" timestamp(6),
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "investment_id" bigint not null,
+        "investor_id" bigint not null,
+        "investor_investment_id" bigint not null,
+        "submitted_at" timestamp(6),
+        "updated_at" timestamp(6) not null,
+        "payout_evidence_url" varchar(512),
+        "admin_notes" varchar(1000),
+        "rejection_reason" varchar(1000),
+        "stripe_payout_id" varchar(255),
+        "status" enum ('APPROVED','COMPLETED','PENDING','REJECTED','SUBMITTED','VERIFYING') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create table "requesting_company_documents" (
+        "signup_request" bigint not null,
+        "documents" varchar(255)
+    )
+Hibernate: 
+    create table "user_roles" (
+        "user_id" bigint not null,
+        "role" enum ('ADMIN','COMPANY','INVESTOR') not null,
+        primary key ("user_id", "role")
+    )
+Hibernate: 
+    create table "users" (
+        "enabled" boolean not null,
+        "locked" boolean not null,
+        "createdAt" timestamp(6),
+        "id" bigint not null,
+        "password" varchar(254) not null,
+        "email" varchar(255) not null unique,
+        "name" varchar(255),
+        primary key ("id")
+    )
+Hibernate: 
+    create table "verification_document_history" (
+        "version" integer not null,
+        "company_id" bigint not null,
+        "created_at" timestamp(6) not null,
+        "id" bigint generated by default as identity,
+        "document_type" varchar(50),
+        "document_url" varchar(512) not null,
+        "admin_notes" varchar(1000),
+        "rejection_reason" varchar(1000),
+        "status" enum ('APPROVED','PENDING','REJECTED','RESUBMIT_REQUIRED') not null,
+        primary key ("id")
+    )
+Hibernate: 
+    create index "idx_audit_user" 
+       on "audit_logs" ("user_id")
+2026-01-19T19:22:09.123+02:00  WARN 158761 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    create index "idx_audit_user" 
+       on "audit_logs" ("user_id")" via JDBC [Table "audit_logs" not found;]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    create index "idx_audit_user" 
+       on "audit_logs" ("user_id")" via JDBC [Table "audit_logs" not found;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createTableConstraints(SchemaCreatorImpl.java:392) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createSequencesTablesConstraints(SchemaCreatorImpl.java:358) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createFromMetadata(SchemaCreatorImpl.java:241) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.performCreation(SchemaCreatorImpl.java:174) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:120) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:250) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1865) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1814) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1462) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:194) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:150) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:124) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.3.jar:3.5.3]
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "audit_logs" not found; SQL statement:
+
+    create index "idx_audit_user" 
+       on "audit_logs" ("user [42102-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:223) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:199) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.ddl.CreateIndex.update(CreateIndex.java:70) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.CommandContainer.update(CommandContainer.java:139) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:304) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:248) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:262) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231) ~[h2-2.3.232.jar:2.3.232]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	... 119 common frames omitted
+
+Hibernate: 
+    create index "idx_audit_action" 
+       on "audit_logs" ("action_type")
+2026-01-19T19:22:09.126+02:00  WARN 158761 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    create index "idx_audit_action" 
+       on "audit_logs" ("action_type")" via JDBC [Table "audit_logs" not found;]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    create index "idx_audit_action" 
+       on "audit_logs" ("action_type")" via JDBC [Table "audit_logs" not found;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createTableConstraints(SchemaCreatorImpl.java:392) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createSequencesTablesConstraints(SchemaCreatorImpl.java:358) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createFromMetadata(SchemaCreatorImpl.java:241) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.performCreation(SchemaCreatorImpl.java:174) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:120) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:250) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1865) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1814) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1462) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:194) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:150) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:124) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.3.jar:3.5.3]
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "audit_logs" not found; SQL statement:
+
+    create index "idx_audit_action" 
+       on "audit_logs" ("action_t [42102-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:223) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:199) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.ddl.CreateIndex.update(CreateIndex.java:70) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.CommandContainer.update(CommandContainer.java:139) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:304) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:248) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:262) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231) ~[h2-2.3.232.jar:2.3.232]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	... 119 common frames omitted
+
+Hibernate: 
+    create index "idx_audit_timestamp" 
+       on "audit_logs" ("created_at")
+2026-01-19T19:22:09.127+02:00  WARN 158761 --- [           main] o.h.t.s.i.ExceptionHandlerLoggedImpl     : GenerationTarget encountered exception accepting command : Error executing DDL "
+    create index "idx_audit_timestamp" 
+       on "audit_logs" ("created_at")" via JDBC [Table "audit_logs" not found;]
+
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL "
+    create index "idx_audit_timestamp" 
+       on "audit_logs" ("created_at")" via JDBC [Table "audit_logs" not found;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:94) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:233) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.Helper.applySqlStrings(Helper.java:217) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createTableConstraints(SchemaCreatorImpl.java:392) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createSequencesTablesConstraints(SchemaCreatorImpl.java:358) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.createFromMetadata(SchemaCreatorImpl.java:241) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.performCreation(SchemaCreatorImpl.java:174) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.internal.SchemaCreatorImpl.doCreation(SchemaCreatorImpl.java:120) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:250) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$5(SchemaManagementToolCoordinator.java:144) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at java.base/java.util.HashMap.forEach(HashMap.java:1429) ~[na:na]
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:141) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:37) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:35) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.internal.SessionFactoryImpl.<init>(SessionFactoryImpl.java:324) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:463) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1517) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366) ~[spring-orm-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1865) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1814) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207) ~[spring-beans-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:970) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627) ~[spring-context-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:753) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46) ~[spring-core-6.2.6.jar:6.2.6]
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1462) ~[spring-boot-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:563) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:144) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110) ~[spring-boot-test-3.4.5.jar:3.4.5]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159) ~[spring-test-6.2.6.jar:6.2.6]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:383) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$12(ClassBasedTestDescriptor.java:378) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:184) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197) ~[na:na]
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1708) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:151) ~[na:na]
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:174) ~[na:na]
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234) ~[na:na]
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:377) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$7(ClassBasedTestDescriptor.java:290) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:289) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:279) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at java.base/java.util.Optional.orElseGet(Optional.java:364) ~[na:na]
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$6(ClassBasedTestDescriptor.java:278) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:31) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$1(TestMethodTestDescriptor.java:105) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:104) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:68) ~[junit-jupiter-engine-5.11.4.jar:5.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596) ~[na:na]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54) ~[junit-platform-engine-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:198) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:169) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:93) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:58) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:141) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:57) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47) ~[junit-platform-launcher-1.11.4.jar:1.11.4]
+	at org.apache.maven.surefire.junitplatform.LazyLauncher.execute(LazyLauncher.java:56) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.execute(JUnitPlatformProvider.java:194) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invokeAllTests(JUnitPlatformProvider.java:150) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.junitplatform.JUnitPlatformProvider.invoke(JUnitPlatformProvider.java:124) ~[surefire-junit-platform-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.runSuitesInProcess(ForkedBooter.java:385) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.execute(ForkedBooter.java:162) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.run(ForkedBooter.java:507) ~[surefire-booter-3.5.3.jar:3.5.3]
+	at org.apache.maven.surefire.booter.ForkedBooter.main(ForkedBooter.java:495) ~[surefire-booter-3.5.3.jar:3.5.3]
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "audit_logs" not found; SQL statement:
+
+    create index "idx_audit_timestamp" 
+       on "audit_logs" ("created [42102-232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:223) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.message.DbException.get(DbException.java:199) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.ddl.CreateIndex.update(CreateIndex.java:70) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.CommandContainer.update(CommandContainer.java:139) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:304) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.command.Command.executeUpdate(Command.java:248) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:262) ~[h2-2.3.232.jar:2.3.232]
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231) ~[h2-2.3.232.jar:2.3.232]
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:94) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java) ~[HikariCP-5.1.0.jar:na]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:80) ~[hibernate-core-6.6.13.Final.jar:6.6.13.Final]
+	... 119 common frames omitted
+
+Hibernate: 
+    create index "idx_company_user" 
+       on "companies" ("user_id")
+Hibernate: 
+    create index "idx_company_name" 
+       on "companies" ("name")
+Hibernate: 
+    create index "idx_company_status" 
+       on "companies" ("status")
+Hibernate: 
+    create index "idx_cf_company" 
+       on "company_financials" ("company_id")
+Hibernate: 
+    create index "idx_ci_company" 
+       on "company_investors" ("company_id")
+Hibernate: 
+    create index "idx_company_notifs" 
+       on "company_notifications" ("company_id")
+Hibernate: 
+    create index "idx_ctm_company" 
+       on "company_team_members" ("company_id")
+Hibernate: 
+    create index "idx_fh_company" 
+       on "funding_history" ("company_id")
+Hibernate: 
+    create index "idx_idoc_investment" 
+       on "investment_documents" ("investment_id")
+Hibernate: 
+    create index "idx_ifin_investment" 
+       on "investment_financials" ("investment_id")
+Hibernate: 
+    create index "idx_ih_investment" 
+       on "investment_highlights" ("investment_id")
+Hibernate: 
+    create index "idx_ir_investor" 
+       on "investment_requests" ("investor_id")
+Hibernate: 
+    create index "idx_ir_investment" 
+       on "investment_requests" ("investment_id")
+Hibernate: 
+    create index "idx_ir_status" 
+       on "investment_requests" ("status")
+Hibernate: 
+    create index "idx_itm_investment" 
+       on "investment_team_members" ("investment_id")
+Hibernate: 
+    create index "idx_iup_investment" 
+       on "investment_updates" ("investment_id")
+Hibernate: 
+    create index "idx_inv_company" 
+       on "investments" ("company_id")
+Hibernate: 
+    create index "idx_inv_category" 
+       on "investments" ("category")
+Hibernate: 
+    create index "idx_inv_status" 
+       on "investments" ("status")
+Hibernate: 
+    create index "idx_inv_deadline" 
+       on "investments" ("deadline")
+Hibernate: 
+    create index "idx_goals_investor" 
+       on "investor_goals" ("investor_id")
+Hibernate: 
+    create index "idx_ii_investor" 
+       on "investor_investments" ("investor_id")
+Hibernate: 
+    create index "idx_ii_investment" 
+       on "investor_investments" ("investment_id")
+Hibernate: 
+    create index "idx_ph_investor" 
+       on "payout_history" ("investor_id")
+Hibernate: 
+    create index "idx_ph_investment" 
+       on "payout_history" ("investment_id")
+Hibernate: 
+    create index "idx_ph_payout_request" 
+       on "payout_history" ("payout_request_id")
+Hibernate: 
+    create index "idx_pr_investor" 
+       on "payout_requests" ("investor_id")
+Hibernate: 
+    create index "idx_pr_investment" 
+       on "payout_requests" ("investment_id")
+Hibernate: 
+    create index "idx_pr_company" 
+       on "payout_requests" ("company_id")
+Hibernate: 
+    create index "idx_pr_status" 
+       on "payout_requests" ("status")
+Hibernate: 
+    create index "idx_vdh_company" 
+       on "verification_document_history" ("company_id")
+Hibernate: 
+    create index "idx_vdh_status" 
+       on "verification_document_history" ("status")
+Hibernate: 
+    alter table if exists "admin_notifications" 
+       add constraint "FKew43v9lm8l8f9jju7xxxks1kn" 
+       foreign key ("admin_id") 
+       references "users"
+Hibernate: 
+    alter table if exists "admin_notifications" 
+       add constraint "FK9p5lnht0i1bjt4h4u89ifddng" 
+       foreign key ("company_id") 
+       references "companies"
+Hibernate: 
+    alter table if exists "admin_notifications" 
+       add constraint "FKbj8vft6lebga4nalpfku7vu5d" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "admin_notifications" 
+       add constraint "FK36rw4q6x0bbsfu83cun1ijf53" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "admin_notifications" 
+       add constraint "FKf6ba0t1369sbsfk8vfh19efm2" 
+       foreign key ("request_id") 
+       references "company_signup_requests"
+Hibernate: 
+    alter table if exists "companies" 
+       add constraint "FKdf1wtxwu9f3qxmg1y5647uooe" 
+       foreign key ("user_id") 
+       references "users" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_bank_statements" 
+       add constraint "FKhni3lottt335368f145ukkh5y" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_director_ids" 
+       add constraint "FKsr2eegk1wu1600p0k1ylh1264" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_documents" 
+       add constraint "FKoe84nsx3pd1wo4u45o0ppftmp" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_financial_statements" 
+       add constraint "FK7a23rbm6194d3udc0e8q5eaxp" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_financials" 
+       add constraint "FKns7912q8nbk3vjuwp4fx8chsh" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_investors" 
+       add constraint "FKr7m0dcj5ju89cl467n290ic3y" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_investors" 
+       add constraint "FKanme0umpsjvl1bvoda4niacih" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "company_management_accounts" 
+       add constraint "FKn5cfu8g7c7197v8oa752yghh7" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_notifications" 
+       add constraint "FKjdrgm5n3obwqjasv7p30dmd8r" 
+       foreign key ("company_id") 
+       references "companies"
+Hibernate: 
+    alter table if exists "company_notifications" 
+       add constraint "FK6ijofy6hxgd080wo6a00sm3md" 
+       foreign key ("related_investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "company_signatory_ids" 
+       add constraint "FKfg31jv31e0p97w1tlry41d5sy" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_social_media" 
+       add constraint "FK5sdf9dxfylj2n9iyjlcj9qavm" 
+       foreign key ("company_id") 
+       references "companies"
+Hibernate: 
+    alter table if exists "company_team_members" 
+       add constraint "FK3vj7c2147iat7rftil4w8khqs" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_ubo_ids" 
+       add constraint "FKhc3b2r6sshw7gef48yvlm8isu" 
+       foreign key ("verification_docs_id") 
+       references "company_verification_documents" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "company_verification_documents" 
+       add constraint "FKdhq1rc9001bj55aq9x376jslo" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "forgot_pass_tokens" 
+       add constraint "FKmvd6v84duithfgtnxue7mb2ld" 
+       foreign key ("user_id") 
+       references "users"
+Hibernate: 
+    alter table if exists "funding_history" 
+       add constraint "FK1uvkabqmfrafodwhud32uvdwb" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "funding_history_investors" 
+       add constraint "FKlhmfp9ixtxi1m3foniyv2qk7b" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "funding_history_investors" 
+       add constraint "FK9ckttr61ps7a86y7vw2h9h4cj" 
+       foreign key ("funding_history_id") 
+       references "funding_history"
+Hibernate: 
+    alter table if exists "investment_ai_predictions" 
+       add constraint "FKsu32qq5x508ge05d5n0u6cyis" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "investment_documents" 
+       add constraint "FK99y2ry4essrblrdwh7m14gfo" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investment_financials" 
+       add constraint "FK3p3b55n4dfck0pfkjek5ynhe4" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investment_highlights" 
+       add constraint "FKmc6snnfuihpv0astkjx7k43pn" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investment_requests" 
+       add constraint "FK2dqb1e97459do9xka64dxg7gd" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "investment_requests" 
+       add constraint "FKnduxb981xx5rnecjc8prfiamt" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "investment_team_members" 
+       add constraint "FK1wlrrjavq9wsqwh3ohvqyqgug" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investment_updates" 
+       add constraint "FKpw9n2wg9t69u0l3qliedsig61" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investments" 
+       add constraint "FKjtmsvuhpy2qgirrtf69olukfw" 
+       foreign key ("company_id") 
+       references "companies" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investor_goals" 
+       add constraint "FKr2le6fgqcvlcyyglbfk4mih13" 
+       foreign key ("investor_id") 
+       references "investors" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investor_investments" 
+       add constraint "FKsqnejhaxrl5k44fgkwh98j8kf" 
+       foreign key ("investment_id") 
+       references "investments" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investor_investments" 
+       add constraint "FK2l6yq92pc41vfjcu4df7wnaty" 
+       foreign key ("investor_id") 
+       references "investors" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investor_notifications" 
+       add constraint "FKh6w5b8imw6kbeltm82fsm89ev" 
+       foreign key ("investor_id") 
+       references "investors" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investor_notifications" 
+       add constraint "FKbe7v2qfuurifi96vo97j31gg1" 
+       foreign key ("related_investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "investor_pref_categories" 
+       add constraint "FK2q3qe1l5airbpq6w2otvtnam7" 
+       foreign key ("investor_id") 
+       references "investor_preferences"
+Hibernate: 
+    alter table if exists "investor_pref_locations" 
+       add constraint "FKdn5d54u1fuyw99pwhlj1y5fvc" 
+       foreign key ("investor_id") 
+       references "investor_preferences"
+Hibernate: 
+    alter table if exists "investor_pref_risk_levels" 
+       add constraint "FKcfls1tn5nkddsycuwp8b0t099" 
+       foreign key ("investor_id") 
+       references "investor_preferences"
+Hibernate: 
+    alter table if exists "investor_preferences" 
+       add constraint "FK71ayvsrwmsiv6260u5xfgyik" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "investor_watchlist" 
+       add constraint "FK315g967l2vuqsygtl5k1477e1" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "investor_watchlist" 
+       add constraint "FKnm6q5limcwe7066q1ypdw4r0a" 
+       foreign key ("investor_id") 
+       references "investors" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "investors" 
+       add constraint "FKga2jgv8fdv0ubs9bgaka6xeh5" 
+       foreign key ("user_id") 
+       references "users" 
+       on delete cascade
+Hibernate: 
+    alter table if exists "payout_history" 
+       add constraint "FKofanlrr168es531amfv4vkv9d" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "payout_history" 
+       add constraint "FKa4if5cctrijygcl3pa51o9un9" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "payout_history" 
+       add constraint "FKqq9jbwed60p92orp11f0x9e3p" 
+       foreign key ("payout_request_id") 
+       references "payout_requests"
+Hibernate: 
+    alter table if exists "payout_requests" 
+       add constraint "FK2rq62p5bek79ncm1bycgi9fy8" 
+       foreign key ("company_id") 
+       references "companies"
+Hibernate: 
+    alter table if exists "payout_requests" 
+       add constraint "FKg09xr3bvkf5c3a7v35dl4w5ce" 
+       foreign key ("investment_id") 
+       references "investments"
+Hibernate: 
+    alter table if exists "payout_requests" 
+       add constraint "FKgpcjgkjsxvi59kk1yl037qg3n" 
+       foreign key ("investor_id") 
+       references "investors"
+Hibernate: 
+    alter table if exists "payout_requests" 
+       add constraint "FKcex4s11sisqptvjkdqajavwfs" 
+       foreign key ("investor_investment_id") 
+       references "investor_investments"
+Hibernate: 
+    alter table if exists "requesting_company_documents" 
+       add constraint "FK8om9v78q1cldtmlkx16j0ufjg" 
+       foreign key ("signup_request") 
+       references "company_signup_requests"
+Hibernate: 
+    alter table if exists "user_roles" 
+       add constraint "FK7ov27fyo7ebsvada1ej7qkphl" 
+       foreign key ("user_id") 
+       references "users"
+Hibernate: 
+    alter table if exists "verification_document_history" 
+       add constraint "FK3dm1y1prvhe4h84acywwk2duo" 
+       foreign key ("company_id") 
+       references "companies"
+2026-01-19T19:22:13.350+02:00  WARN 158761 --- [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with an AuthenticationProvider bean. UserDetailsService beans will not be used by Spring Security for automatically configuring username/password login. Consider removing the AuthenticationProvider bean. Alternatively, consider using the UserDetailsService in a manually instantiated DaoAuthenticationProvider. If the current configuration is intentional, to turn off this warning, increase the logging level of 'org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer' to ERROR
+2026-01-19T19:22:14.116+02:00  INFO 158761 --- [           main] com.lebvest.service.StripeService        : Environment variable STRIPE_SECRET_KEY: NOT SET
+2026-01-19T19:22:14.117+02:00  INFO 158761 --- [           main] com.lebvest.service.StripeService        : Stripe secret key from @Value: sk_test_te... (length: 33)
+2026-01-19T19:22:14.400+02:00  WARN 158761 --- [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-19T19:22:16.886+02:00  INFO 158761 --- [           main] com.lebvest.LebvestApplicationTests      : Started LebvestApplicationTests in 13.789 seconds (process running for 14.948)
+Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build what is described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org/mockito/Mockito.html#0.3
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+WARNING: A Java agent has been loaded dynamically (/home/georgio/.m2/repository/net/bytebuddy/byte-buddy-agent/1.15.11/byte-buddy-agent-1.15.11.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 14.86 s -- in com.lebvest.LebvestApplicationTests
+[INFO] Running com.lebvest.service.AdminServiceTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.722 s -- in com.lebvest.service.AdminServiceTest
+[INFO] Running com.lebvest.service.CompanyRegistrationServiceTest
+2026-01-19T19:22:19.586+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Starting company registration for: TestCorp
+2026-01-19T19:22:19.587+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Email: test@example.com, Name: Test User
+2026-01-19T19:22:19.587+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Password present: true, Password length: 11
+2026-01-19T19:22:19.598+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Starting company registration for: null
+2026-01-19T19:22:19.599+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Email: null, Name: null
+2026-01-19T19:22:19.599+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Password present: false, Password length: 0
+2026-01-19T19:22:19.736+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Starting company registration for: TestCorp
+2026-01-19T19:22:19.736+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Email: test@example.com, Name: Test User
+2026-01-19T19:22:19.737+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Password present: true, Password length: 11
+2026-01-19T19:22:19.866+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Starting company registration for: TestCorp
+2026-01-19T19:22:19.866+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Email: test@example.com, Name: Test User
+2026-01-19T19:22:19.866+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Password present: true, Password length: 11
+2026-01-19T19:22:19.996+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Starting company registration for: TestCorp
+2026-01-19T19:22:19.997+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Email: test@example.com, Name: John Doe
+2026-01-19T19:22:19.997+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : CompanyRegistrationService - Password present: true, Password length: 11
+2026-01-19T19:22:19.998+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Company signup request created with ID: null (requestId: 4ccd77ee-ddef-41c9-afa2-b7d7a4931aee)
+2026-01-19T19:22:19.999+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Starting file upload for signup request ID: null (requestId: 4ccd77ee-ddef-41c9-afa2-b7d7a4931aee). Number of files: 1
+2026-01-19T19:22:19.999+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Using requestId for file upload: 4ccd77ee-ddef-41c9-afa2-b7d7a4931aee
+2026-01-19T19:22:19.999+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : File upload completed. Saved 1 document paths for request ID: null
+2026-01-19T19:22:19.999+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Document path saved to database: uploads/pending/file1.pdf
+2026-01-19T19:22:20.000+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Updated signup request with 1 document paths
+2026-01-19T19:22:20.001+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Company confirmation email sent to: test@example.com
+2026-01-19T19:22:20.003+02:00  INFO 158761 --- [           main] c.l.service.CompanyRegistrationService   : Admin notification email sent to: admin@example.com
+[ERROR] Tests run: 5, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 1.832 s <<< FAILURE! -- in com.lebvest.service.CompanyRegistrationServiceTest
+[ERROR] com.lebvest.service.CompanyRegistrationServiceTest.registerCompany_shouldCreateSignupRequest_sendEmailAndNotification -- Time elapsed: 0.173 s <<< FAILURE!
+Argument(s) are different! Wanted:
+mailService.sendHtmlMail(
+    <any string>,
+    <any string>,
+    <any string>
+);
+-> at com.lebvest.service.MailService.sendHtmlMail(MailService.java:46)
+Actual invocations have different arguments at position [2]:
+mailService.loadAndFormatEmailTemplate(
+    {"companyName" = "TestCorp", "name" = "John Doe", "sector" = "Technology", "email" = "test@example.com"},
+    "CompanyRegistrationEmail"
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendCompanyConfirmationEmail(CompanyRegistrationService.java:164)
+mailService.sendHtmlMail(
+    "test@example.com",
+    "Registration Request Received - LebVest",
+    null
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendCompanyConfirmationEmail(CompanyRegistrationService.java:165)
+mailService.loadAndFormatEmailTemplate(
+    {"website" = "https://www.testcorp.com", "phoneNumber" = "+961 1 234 567", "city" = "Beirut", "governorate" = "Beirut", "companyName" = "TestCorp", "adminDashboardUrl" = "http://localhost:3000/signin?redirect=/admin-dashboard", "representativeName" = "John Doe", "sector" = "Technology", "foundedYear" = "2023", "email" = "test@example.com"},
+    "CompanySignupAdminNotification"
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendAdminNotificationEmail(CompanyRegistrationService.java:198)
+mailService.sendHtmlMail(
+    "admin@example.com",
+    "New Company Signup Request: TestCorp",
+    null
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendAdminNotificationEmail(CompanyRegistrationService.java:199)
+
+	at com.lebvest.service.MailService.sendHtmlMail(MailService.java:46)
+	at com.lebvest.service.CompanyRegistrationServiceTest.registerCompany_shouldCreateSignupRequest_sendEmailAndNotification(CompanyRegistrationServiceTest.java:166)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running com.lebvest.service.InvestmentRequestServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.500 s -- in com.lebvest.service.InvestmentRequestServiceTest
+[INFO] Running com.lebvest.service.InvestmentServiceTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.010 s -- in com.lebvest.service.InvestmentServiceTest
+[INFO] Running com.lebvest.service.InvestorRegistrationServiceTest
+2026-01-19T19:22:20.808+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : >>> Sending admin notification emails (after commit) for investor ID: 100 <<<
+2026-01-19T19:22:20.809+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : ✓ Admin notification emails sent successfully for investor: John Investor
+2026-01-19T19:22:20.817+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : >>> Sending admin notification emails (after commit) for investor ID: 100 <<<
+2026-01-19T19:22:20.818+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : ✓ Admin notification emails sent successfully for investor: John Investor
+2026-01-19T19:22:20.833+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : >>> Sending admin notification emails (after commit) for investor ID: 100 <<<
+2026-01-19T19:22:20.833+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : ✓ Admin notification emails sent successfully for investor: John Investor
+2026-01-19T19:22:20.851+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : >>> Sending admin notification emails (after commit) for investor ID: 100 <<<
+2026-01-19T19:22:20.852+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : ✓ Admin notification emails sent successfully for investor: John Investor
+2026-01-19T19:22:20.870+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : >>> Sending admin notification emails (after commit) for investor ID: 100 <<<
+2026-01-19T19:22:20.871+02:00  INFO 158761 --- [           main] c.l.service.InvestorRegistrationService  : ✓ Admin notification emails sent successfully for investor: Existing
+[INFO] Tests run: 14, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.296 s -- in com.lebvest.service.InvestorRegistrationServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   CompanyRegistrationServiceTest.registerCompany_shouldCreateSignupRequest_sendEmailAndNotification:166 
+Argument(s) are different! Wanted:
+mailService.sendHtmlMail(
+    <any string>,
+    <any string>,
+    <any string>
+);
+-> at com.lebvest.service.MailService.sendHtmlMail(MailService.java:46)
+Actual invocations have different arguments at position [2]:
+mailService.loadAndFormatEmailTemplate(
+    {"companyName" = "TestCorp", "name" = "John Doe", "sector" = "Technology", "email" = "test@example.com"},
+    "CompanyRegistrationEmail"
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendCompanyConfirmationEmail(CompanyRegistrationService.java:164)
+mailService.sendHtmlMail(
+    "test@example.com",
+    "Registration Request Received - LebVest",
+    null
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendCompanyConfirmationEmail(CompanyRegistrationService.java:165)
+mailService.loadAndFormatEmailTemplate(
+    {"website" = "https://www.testcorp.com", "phoneNumber" = "+961 1 234 567", "city" = "Beirut", "governorate" = "Beirut", "companyName" = "TestCorp", "adminDashboardUrl" = "http://localhost:3000/signin?redirect=/admin-dashboard", "representativeName" = "John Doe", "sector" = "Technology", "foundedYear" = "2023", "email" = "test@example.com"},
+    "CompanySignupAdminNotification"
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendAdminNotificationEmail(CompanyRegistrationService.java:198)
+mailService.sendHtmlMail(
+    "admin@example.com",
+    "New Company Signup Request: TestCorp",
+    null
+);
+-> at com.lebvest.service.CompanyRegistrationService.sendAdminNotificationEmail(CompanyRegistrationService.java:199)
+
+[INFO] 
+[ERROR] Tests run: 25, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  31.752 s
+[INFO] Finished at: 2026-01-19T19:22:23+02:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.3:test (default-test) on project lebvest: There are test failures.
+[ERROR] 
+[ERROR] See /home/georgio/Documents/Projects/LebVest-Backend/Lebvest-backend/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

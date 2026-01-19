@@ -35,8 +35,8 @@ public class S3Config {
     public S3Client s3Client() {
         return S3Client.builder()
                 .httpClientBuilder(ApacheHttpClient.builder())
-
-                .region(Region.US_EAST_1) // or your region
+                //TODO: externalize region to config
+                .region(Region.US_EAST_1) 
                 .credentialsProvider(
                        staticCredentialsProvider()
                 )

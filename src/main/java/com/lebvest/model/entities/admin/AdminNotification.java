@@ -42,6 +42,7 @@ public class AdminNotification {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "is_read", nullable = false)
     private boolean read;
     private Boolean isAccepted;
 

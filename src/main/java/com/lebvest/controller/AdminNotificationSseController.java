@@ -51,7 +51,6 @@ public class AdminNotificationSseController {
 
     /**
      * Validates the token and user for SSE connection.
-     * This method is transactional and read-only to ensure database connections are released quickly.
      */
     @Transactional(readOnly = true, timeout = 5)
     User validateAndGetUser(String token, Long adminId) {
@@ -108,13 +107,13 @@ public class AdminNotificationSseController {
             @RequestParam Long adminId,
             @RequestParam(required = false) String token) {
         
-        // Validate token if provided (EventSource can't send headers, so token comes as query param)
+        // Validate token if provided 
         if (token == null || token.isEmpty()) {
             log.warn("SSE connection attempt without token");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         
-        // Validate user and token - this completes quickly and releases DB connection
+        // Validate user and token
         try {
             validateAndGetUser(token, adminId);
         } catch (Exception e) {
@@ -196,7 +195,6 @@ public class AdminNotificationSseController {
     @Async("taskExecutor")
     public void notifyAllAdminsVerification(com.lebvest.model.entities.company.Company company) {
         try {
-            log.info("=== STARTING SSE NOTIFICATION FOR COMPANY VERIFICATION ===");
             log.info("Company: {} (ID: {})", company.getName(), company.getId());
             log.info("Company Status: {}", company.getStatus());
             
@@ -216,9 +214,9 @@ public class AdminNotificationSseController {
             admins.forEach(admin -> {
                 SseEmitter existingEmitter = emitters.get(admin.getId());
                 if (existingEmitter != null) {
-                    log.info("  ✓ Admin {} (ID: {}) has active SSE connection", admin.getEmail(), admin.getId());
+                    log.info(" Admin {} (ID: {}) has active SSE connection", admin.getEmail(), admin.getId());
                 } else {
-                    log.warn("  ✗ Admin {} (ID: {}) does NOT have active SSE connection", admin.getEmail(), admin.getId());
+                    log.warn(" Admin {} (ID: {}) does NOT have active SSE connection", admin.getEmail(), admin.getId());
                 }
             });
 
@@ -226,7 +224,6 @@ public class AdminNotificationSseController {
                     admins.stream().map(
                             (admin) -> CompletableFuture.supplyAsync(() -> {
                                 try {
-                                    log.info("--- Creating SSE notification for admin: {} (ID: {}) ---", admin.getEmail(), admin.getId());
                                     
                                     AdminNotification notification = AdminNotification.builder()
                                             .admin(admin)

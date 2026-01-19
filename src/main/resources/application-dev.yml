@@ -24,18 +24,22 @@ spring:
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:3025}
+    # Set credentials that match GreenMail user (even though auth is false, JavaMailSender may still try)
     username: ${MAIL_USERNAME:dev@lebvest.local}
     password: ${MAIL_PASSWORD:devpassword}
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
             enable: false
             required: false
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
+          localhost: localhost
+          # Explicitly disable authentication
+          auth.mechanisms: ""
 
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
