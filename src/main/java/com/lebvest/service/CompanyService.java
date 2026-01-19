@@ -71,11 +71,11 @@ public class CompanyService {
     private final UserRepository userRepository;
     private final InvestmentService investmentService;
     private final com.lebvest.controller.AdminNotificationSseController adminNotificationSseController;
-    private final MailService mailService;
+    private final IMailService mailService;
     private final VarsConfig varsConfig;
     private final PasswordEncoder passwordEncoder;
     private final FileValidationService fileValidationService;
-    private final S3Service s3Service;
+    private final IFileStorageService fileStorageService;
 
     public CompanyService(
             CompanyRepository companyRepository,
@@ -88,11 +88,11 @@ public class CompanyService {
             UserRepository userRepository,
             InvestmentService investmentService,
             com.lebvest.controller.AdminNotificationSseController adminNotificationSseController,
-            MailService mailService,
+            IMailService mailService,
             VarsConfig varsConfig,
             PasswordEncoder passwordEncoder,
             FileValidationService fileValidationService,
-            S3Service s3Service) {
+            IFileStorageService fileStorageService) {
         this.companyRepository = companyRepository;
         this.verificationDocumentsRepository = verificationDocumentsRepository;
         this.investmentRepository = investmentRepository;
@@ -107,7 +107,7 @@ public class CompanyService {
         this.varsConfig = varsConfig;
         this.passwordEncoder = passwordEncoder;
         this.fileValidationService = fileValidationService;
-        this.s3Service = s3Service;
+        this.fileStorageService = fileStorageService;
     }
 
     @Transactional
@@ -389,9 +389,8 @@ public class CompanyService {
             String sanitizedFileName = fileValidationService.sanitizeFilename(originalFileName);
             String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
             
-            // Upload to S3
             String prefix = "companies/" + company.getId() + "/documents";
-            String s3Key = s3Service.uploadFile(
+            String fileKey = fileStorageService.uploadFile(
                     prefix,
                     uniqueFileName,
                     file.getInputStream(),
@@ -399,10 +398,10 @@ public class CompanyService {
                     file.getContentType()
             );
             
-            log.info("File uploaded to S3 successfully: {}", s3Key);
+            log.info("File uploaded successfully: {}", fileKey);
             
-            // Return S3 key for database storage
-            return s3Key;
+            // Return file key for database storage
+            return fileKey;
         } catch (IOException e) {
             log.error("Failed to upload file to S3: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);

@@ -1,4 +1,5 @@
 package com.lebvest.controller;
+
 import com.lebvest.model.dto.AdminProjectReviewDto;
 import com.lebvest.model.dto.AdminStatisticsDto;
 import com.lebvest.model.dto.AcceptSignupPayload;
@@ -8,6 +9,7 @@ import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.model.dto.SignupRejectPayload;
 import com.lebvest.model.dto.UpdateUserStatusRequest;
 import com.lebvest.model.dto.UserDto;
+import com.lebvest.model.entities.investor.Investor;
 import com.lebvest.model.enums.InvestmentCategory;
 import com.lebvest.model.enums.InvestmentStatus;
 import com.lebvest.model.enums.Role;
@@ -25,7 +27,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/admin")
-//@PreAuthorize("hasRole('ADMIN')")
+// @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
@@ -35,13 +37,13 @@ public class AdminController {
         this.adminService = adminService;
         this.investorKycService = investorKycService;
     }
+
     @PostMapping("/accept-request")
     public ResponseEntity<ResponsePayload> acceptRequest(@RequestBody AcceptSignupPayload payload) {
 
         ResponsePayload responsePayload = adminService.acceptSignupRequest(payload);
         return ResponseEntity.ok(
-               responsePayload
-        );
+                responsePayload);
     }
 
     @GetMapping("/notifications")
@@ -70,8 +72,7 @@ public class AdminController {
                         .status(200)
                         .message("Statistics retrieved successfully")
                         .data(Map.of("statistics", statistics))
-                        .build()
-        );
+                        .build());
     }
 
     @PostMapping("/approve-verification/{companyId}")
@@ -89,7 +90,21 @@ public class AdminController {
         return ResponseEntity.ok(response);
     }
 
-    // ========== PROJECT REVIEW ENDPOINTS ==========
+    @PostMapping("/approve-investor-verification/{investorId}")
+    public ResponseEntity<ResponsePayload> approveInvestorVerification(@PathVariable Long investorId) {
+        ResponsePayload response = adminService.approveInvestorVerification(investorId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reject-investor-verification/{investorId}")
+    public ResponseEntity<ResponsePayload> rejectInvestorVerification(
+            @PathVariable Long investorId,
+            @RequestBody(required = false) Map<String, String> requestBody) {
+        String reason = requestBody != null ? requestBody.get("reason") : null;
+        ResponsePayload response = adminService.rejectInvestorVerification(investorId, reason);
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/projects/pending")
     public ResponseEntity<ResponsePayload> getPendingProjects(
@@ -98,14 +113,13 @@ public class AdminController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
-        
-        log.debug("Getting projects with status={}, category={}, search={}, page={}, size={}", 
+
+        log.debug("Getting projects with status={}, category={}, search={}, page={}, size={}",
                 status, category, search, page, size);
-        
+
         InvestmentStatus investmentStatus = null;
         if (status != null && !status.trim().isEmpty()) {
             if (status.equalsIgnoreCase("ALL")) {
-                // Explicitly "All" selected - return all statuses (null)
                 investmentStatus = null;
                 log.info("Filtering projects: ALL statuses");
             } else {
@@ -123,13 +137,14 @@ public class AdminController {
             investmentStatus = InvestmentStatus.PENDING_REVIEW;
             log.info("No status provided, defaulting to PENDING_REVIEW");
         }
-        
-        Page<AdminProjectReviewDto> projects = adminService.getPendingProjects(investmentStatus, category, search, page, size);
-        
-        log.info("Retrieved {} projects with status {} (total: {}, page: {})", 
-                projects.getContent().size(), investmentStatus != null ? investmentStatus : "ALL", 
+
+        Page<AdminProjectReviewDto> projects = adminService.getPendingProjects(investmentStatus, category, search, page,
+                size);
+
+        log.info("Retrieved {} projects with status {} (total: {}, page: {})",
+                projects.getContent().size(), investmentStatus != null ? investmentStatus : "ALL",
                 projects.getTotalElements(), projects.getNumber());
-        
+
         java.util.Map<String, Object> data = new java.util.HashMap<>();
         data.put("projects", projects.getContent());
         data.put("totalElements", projects.getTotalElements());
@@ -138,14 +153,13 @@ public class AdminController {
         data.put("pageSize", projects.getSize());
         data.put("hasNext", projects.hasNext());
         data.put("hasPrevious", projects.hasPrevious());
-        
+
         return ResponseEntity.ok(
                 ResponsePayload.builder()
                         .status(200)
                         .message("Pending projects retrieved successfully")
                         .data(data)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/projects/{id}")
@@ -156,8 +170,7 @@ public class AdminController {
                         .status(200)
                         .message("Project details retrieved successfully")
                         .data(java.util.Map.of("project", project))
-                        .build()
-        );
+                        .build());
     }
 
     @PostMapping("/projects/{id}/approve")
@@ -170,8 +183,7 @@ public class AdminController {
                         .status(200)
                         .message("Project approved successfully")
                         .data(java.util.Map.of("project", project))
-                        .build()
-        );
+                        .build());
     }
 
     @PostMapping("/projects/{id}/reject")
@@ -184,11 +196,9 @@ public class AdminController {
                         .status(200)
                         .message("Project rejected successfully")
                         .data(java.util.Map.of("project", project))
-                        .build()
-        );
+                        .build());
     }
 
-    // ========== USER MANAGEMENT ENDPOINTS ==========
 
     @GetMapping("/users")
     public ResponseEntity<ResponsePayload> getAllUsers(
@@ -197,9 +207,9 @@ public class AdminController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
-        
+
         Page<UserDto> users = adminService.getAllUsers(role, status, search, page, size);
-        
+
         java.util.Map<String, Object> data = new java.util.HashMap<>();
         data.put("users", users.getContent());
         data.put("totalElements", users.getTotalElements());
@@ -208,14 +218,13 @@ public class AdminController {
         data.put("pageSize", users.getSize());
         data.put("hasNext", users.hasNext());
         data.put("hasPrevious", users.hasPrevious());
-        
+
         return ResponseEntity.ok(
                 ResponsePayload.builder()
                         .status(200)
                         .message("Users retrieved successfully")
                         .data(data)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/users/{id}")
@@ -226,8 +235,7 @@ public class AdminController {
                         .status(200)
                         .message("User details retrieved successfully")
                         .data(java.util.Map.of("user", user))
-                        .build()
-        );
+                        .build());
     }
 
     @PutMapping("/users/{id}/status")
@@ -240,11 +248,28 @@ public class AdminController {
                         .status(200)
                         .message("User status updated successfully")
                         .data(java.util.Map.of("user", user))
-                        .build()
-        );
+                        .build());
     }
 
-    // ========== INVESTOR KYC ENDPOINTS ==========
+    @GetMapping("/investors/pending-verifications")
+    public ResponseEntity<ResponsePayload> getPendingInvestorVerifications(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+        Page<Investor> investors = adminService.getPendingInvestorVerifications(page, size);
+
+        java.util.Map<String, Object> data = new java.util.HashMap<>();
+        data.put("investors", investors.getContent());
+        data.put("totalElements", investors.getTotalElements());
+        data.put("totalPages", investors.getTotalPages());
+        data.put("currentPage", investors.getNumber());
+
+        return ResponseEntity.ok(
+                ResponsePayload.builder()
+                        .status(200)
+                        .message("Pending investor verifications retrieved successfully")
+                        .data(data)
+                        .build());
+    }
 
     @PutMapping("/investors/{investorId}/kyc")
     public ResponseEntity<ResponsePayload> updateInvestorKyc(
@@ -253,21 +278,20 @@ public class AdminController {
         InvestorClassification classification = InvestorClassification.valueOf(
                 request.get("classification").toString().toUpperCase());
         String kycNotes = request.get("kycNotes") != null ? request.get("kycNotes").toString() : null;
-        
+
         var investor = investorKycService.updateKycClassification(investorId, classification, kycNotes);
-        
+
         java.util.Map<String, Object> investorData = new java.util.HashMap<>();
         investorData.put("id", investor.getId());
         investorData.put("classification", investor.getClassification());
         investorData.put("kycVerified", investor.getKycVerified());
         investorData.put("kycNotes", investor.getKycNotes());
-        
+
         return ResponseEntity.ok(
                 ResponsePayload.builder()
                         .status(200)
                         .message("Investor KYC updated successfully")
                         .data(java.util.Map.of("investor", investorData))
-                        .build()
-        );
+                        .build());
     }
 }

@@ -34,23 +34,17 @@ public class VarsConfig {
     @Value("${queue.company.signup.accepted.move}")
     private String signupCompanyAcceptedMoveQueueName;
 
-    /**
-     * Builds the full pending path prefix for a specific signup request.
-     */
+   
     public String getPendingPrefix(UUID uuid) {
         return pendingDocsPrefix + uuid;
     }
 
-    /**
-     * Builds the full accepted path prefix for a specific signup request.
-     */
+    
     public String getAcceptedPrefix(UUID uuid) {
         return acceptedDocsPrefix + uuid;
     }
 
-    /**
-     * Returns the full reset-password link for emails.
-     */
+    
     public String getResetLink(String token) {
         return frontendUrl + "/reset-password/" + token;
     }

@@ -3,7 +3,7 @@ package com.lebvest.messaging;
 import com.lebvest.model.dto.DocumentProcessingJob;
 import com.lebvest.model.dto.EmailJob;
 import com.lebvest.model.dto.PayoutCalculationJob;
-import com.lebvest.service.MailService;
+import com.lebvest.service.IMailService;
 import com.lebvest.service.StripeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class BackgroundJobHandler {
 
-    private final MailService mailService;
+    private final IMailService mailService;
     private final StripeService stripeService;
 
-    public BackgroundJobHandler(MailService mailService, StripeService stripeService) {
+    public BackgroundJobHandler(IMailService mailService, StripeService stripeService) {
         this.mailService = mailService;
         this.stripeService = stripeService;
     }

@@ -34,7 +34,7 @@ public class InvestmentFinancial {
      * The fiscal year for this record.
      */
     @NonNull
-    @Column(nullable = false)
+    @Column(name = "`year`", nullable = false)
     private Integer year;
 
     /**

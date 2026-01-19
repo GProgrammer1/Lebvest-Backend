@@ -21,7 +21,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Enable a simple in-memory message broker to carry messages back to the client
         config.enableSimpleBroker("/topic", "/queue");
-        // Prefix for messages bound to methods annotated with @MessageMapping
         config.setApplicationDestinationPrefixes("/app");
     }
 
@@ -29,7 +28,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // Register the /ws endpoint, enabling SockJS fallback options
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*") // Allow all origins (configure properly for production)
+                .setAllowedOriginPatterns("*") 
                 .withSockJS();
     }
 

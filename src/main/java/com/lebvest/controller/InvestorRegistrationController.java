@@ -5,6 +5,7 @@ import com.lebvest.model.dto.ResponsePayload;
 import com.lebvest.service.InvestorRegistrationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,9 @@ public class InvestorRegistrationController {
         this.investorRegistrationService = investorRegistrationService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<ResponsePayload> register(@RequestBody @Valid InvestorRegistrationRequest investorRegistrationRequest) {
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponsePayload> register(
+            @ModelAttribute @Valid InvestorRegistrationRequest investorRegistrationRequest) {
 
         String token = investorRegistrationService.registerInvestor(investorRegistrationRequest);
         return ResponseEntity.ok(
@@ -30,7 +32,6 @@ public class InvestorRegistrationController {
                         .message("Investor registered successfully!")
                         .status(201)
                         .data(Map.of("token", token))
-                        .build()
-        );
+                        .build());
     }
 }

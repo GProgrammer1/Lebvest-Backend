@@ -2,9 +2,24 @@ name: CI - LebVest Backend
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - test/**
+      - test/auth
+      - test/investor-registration
+      - test/company-registration
+      - test/investment
+      - test/admin
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
+      - test/**
+      - test/auth
+      - test/investor-registration
+      - test/company-registration
+      - test/investment
+      - test/admin
+
 
 jobs:
   build-and-test:

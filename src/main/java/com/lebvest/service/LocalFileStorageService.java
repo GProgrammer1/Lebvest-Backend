@@ -2,10 +2,12 @@ package com.lebvest.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +17,8 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class LocalFileStorageService {
+@org.springframework.context.annotation.Profile("dev")
+public class LocalFileStorageService implements IFileStorageService {
 
     private static final String UPLOADS_BASE_DIR = "uploads";
     private static final String PENDING_DIR = "pending";
@@ -63,12 +66,7 @@ public class LocalFileStorageService {
         return defaultUploads;
     }
 
-    /**
-     * Save files to local storage in pending folder structure
-     * @param requestId The UUID of the signup request
-     * @param files Array of files to save
-     * @return List of relative file paths (e.g., "uploads/pending/{requestId}/filename.pdf")
-     */
+    @Override
     public List<String> savePendingFiles(UUID requestId, MultipartFile[] files) {
         log.info("=== LocalFileStorageService.savePendingFiles START ===");
         log.info("RequestId: {}", requestId);
@@ -157,12 +155,7 @@ public class LocalFileStorageService {
         return savedPaths;
     }
 
-    /**
-     * Move files from pending to accepted folder
-     * @param requestId The UUID of the signup request
-     * @param pendingPaths List of pending file paths
-     * @return List of accepted file paths
-     */
+    @Override
     public List<String> moveToAccepted(UUID requestId, List<String> pendingPaths) {
         log.info("=== LocalFileStorageService.moveToAccepted START ===");
         log.info("RequestId: {}", requestId);
@@ -236,10 +229,7 @@ public class LocalFileStorageService {
         return acceptedPaths;
     }
 
-    /**
-     * Delete pending files
-     * @param requestId The UUID of the signup request
-     */
+    @Override
     public void deletePendingFiles(UUID requestId) {
         try {
             // Get consistent uploads base directory
@@ -263,12 +253,7 @@ public class LocalFileStorageService {
         }
     }
 
-    /**
-     * Save payout evidence file
-     * @param payoutRequestId The ID of the payout request
-     * @param evidenceFile The evidence file to save
-     * @return Relative path to the saved file
-     */
+    @Override
     public String savePayoutEvidence(Long payoutRequestId, MultipartFile evidenceFile) {
         if (evidenceFile == null || evidenceFile.isEmpty()) {
             throw new RuntimeException("Evidence file is required");
@@ -302,6 +287,112 @@ public class LocalFileStorageService {
     private String sanitizeFileName(String fileName) {
         // Remove or replace invalid characters
         return fileName.replaceAll("[^a-zA-Z0-9.\\-_]", "_");
+    }
+
+    // Implementation of IFileStorageService interface methods
+
+    @Override
+    public String uploadFile(String prefix, String fileName, InputStream inputStream, long contentLength, String contentType) {
+        try {
+            Path uploadsBase = getUploadsBaseDirectory();
+            Path targetDir = uploadsBase.resolve(prefix);
+            Files.createDirectories(targetDir);
+            
+            String sanitizedFileName = sanitizeFileName(fileName);
+            String uniqueFileName = System.currentTimeMillis() + "_" + sanitizedFileName;
+            Path targetPath = targetDir.resolve(uniqueFileName);
+            
+            Files.copy(inputStream, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            
+            String relativePath = UPLOADS_BASE_DIR + "/" + prefix + "/" + uniqueFileName;
+            log.info("File uploaded locally: {}", relativePath);
+            return relativePath;
+        } catch (IOException e) {
+            log.error("Failed to upload file locally: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to upload file: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public List<String> listFilesByPrefix(String prefix) {
+        try {
+            Path uploadsBase = getUploadsBaseDirectory();
+            Path prefixDir = uploadsBase.resolve(prefix);
+            
+            if (!Files.exists(prefixDir)) {
+                return new ArrayList<>();
+            }
+            
+            List<String> files = new ArrayList<>();
+            Files.walk(prefixDir)
+                    .filter(Files::isRegularFile)
+                    .forEach(path -> {
+                        String relativePath = UPLOADS_BASE_DIR + "/" + prefix + "/" + path.getFileName().toString();
+                        files.add(relativePath);
+                    });
+            
+            return files;
+        } catch (IOException e) {
+            log.error("Failed to list files by prefix: {}", e.getMessage(), e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public void deleteFolderByPrefix(String prefix) {
+        try {
+            Path uploadsBase = getUploadsBaseDirectory();
+            Path prefixDir = uploadsBase.resolve(prefix);
+            
+            if (Files.exists(prefixDir)) {
+                Files.walk(prefixDir)
+                        .sorted(java.util.Comparator.reverseOrder())
+                        .forEach(path -> {
+                            try {
+                                Files.delete(path);
+                            } catch (IOException e) {
+                                log.error("Failed to delete file: {}", path, e);
+                            }
+                        });
+                log.info("Deleted folder by prefix: {}", prefix);
+            }
+        } catch (IOException e) {
+            log.error("Failed to delete folder by prefix: {}", e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Async("taskExecutor")
+    public void moveFilesAndDelete(List<String> keys, String acceptedPrefix) {
+        try {
+            Path uploadsBase = getUploadsBaseDirectory();
+            Path acceptedDir = uploadsBase.resolve(acceptedPrefix);
+            Files.createDirectories(acceptedDir);
+            
+            for (String key : keys) {
+                // Remove "uploads/" prefix if present
+                String relativeKey = key.startsWith(UPLOADS_BASE_DIR + "/") 
+                    ? key.substring((UPLOADS_BASE_DIR + "/").length())
+                    : key;
+                
+                Path sourcePath = uploadsBase.resolve(relativeKey);
+                if (Files.exists(sourcePath)) {
+                    String fileName = sourcePath.getFileName().toString();
+                    Path targetPath = acceptedDir.resolve(fileName);
+                    Files.move(sourcePath, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    log.info("Moved file: {} -> {}", sourcePath, targetPath);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to move files: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to move files: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Async("taskExecutor")
+    public void uploadPendingDocs(UUID requestId, MultipartFile[] files) {
+        savePendingFiles(requestId, files);
     }
 }
 

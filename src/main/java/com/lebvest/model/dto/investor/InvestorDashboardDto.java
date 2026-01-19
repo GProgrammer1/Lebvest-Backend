@@ -30,6 +30,8 @@ public class InvestorDashboardDto {
         private BigDecimal totalInvested;
         private BigDecimal totalReturns;
         private InvestmentPreferencesDto preferences;
+        private Boolean kycVerified;
+        private com.lebvest.model.enums.VerificationStatus kycStatus;
     }
 
     @Getter
@@ -93,4 +95,3 @@ public class InvestorDashboardDto {
         private LocalDate deadline;
     }
 }
-

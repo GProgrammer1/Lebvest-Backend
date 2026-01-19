@@ -47,7 +47,7 @@ public class AuditLog {
     private String userAgent;
 
     @Lob
-    @Column(name = "details", columnDefinition = "TEXT")
+    @Column(name = "details")
     private String details; // JSON string with additional details
 
     @Column(name = "status", length = 50)

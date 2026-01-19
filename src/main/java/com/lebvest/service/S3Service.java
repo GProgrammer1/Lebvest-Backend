@@ -29,7 +29,8 @@ import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
-public class S3Service {
+@org.springframework.context.annotation.Profile("!dev")
+public class S3Service implements IFileStorageService {
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -214,40 +215,87 @@ public class S3Service {
         return (idx >= 0 ? key.substring(idx + 1) : key);
     }
 
+    @Override
     @Async("taskExecutor")
-    public void uploadPendingDocs(
-            UUID requestId,
-            MultipartFile[] files
-            ) {
-        ExecutorService executor = Executors.newFixedThreadPool(8); // limit to 3 threads
-
+    public void uploadPendingDocs(UUID requestId, MultipartFile[] files) {
+        ExecutorService executor = Executors.newFixedThreadPool(8);
         String prefix = varsConfig.getPendingPrefix(requestId);
-        List<CompletableFuture<String>> uploadFutures =
-                Arrays.stream(files)
-                        .map(file -> CompletableFuture.supplyAsync(() -> {
-                            try (InputStream inputStream = file.getInputStream()) {
-
-                                return
-                                        this.uploadFile(
-                                        prefix,
-                                        file.getOriginalFilename(),
-                                        inputStream,
-                                        file.getSize(),
-                                        file.getContentType()
-                                );
-                            } catch (IOException e) {
-                                throw new CompletionException(
-                                        new RuntimeException("Failed to upload document: " + file.getOriginalFilename(), e)
-                                );
-                            }
-                        },executor).exceptionally((ex) -> {
-                            log.error("Error uploading document: {}", ex.getMessage());
-                            return null;
-                        }))
-                        .toList();
-
-
+        Arrays.stream(files)
+                .map(file -> CompletableFuture.supplyAsync(() -> {
+                    try (InputStream inputStream = file.getInputStream()) {
+                        return this.uploadFile(
+                                prefix,
+                                file.getOriginalFilename(),
+                                inputStream,
+                                file.getSize(),
+                                file.getContentType()
+                        );
+                    } catch (IOException e) {
+                        throw new CompletionException(
+                                new RuntimeException("Failed to upload document: " + file.getOriginalFilename(), e)
+                        );
+                    }
+                }, executor).exceptionally((ex) -> {
+                    log.error("Error uploading document: {}", ex.getMessage());
+                    return null;
+                }))
+                .toList();
     }
 
+    @Override
+    public List<String> savePendingFiles(UUID requestId, MultipartFile[] files) {
+        String prefix = varsConfig.getPendingPrefix(requestId);
+        List<String> savedKeys = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try (InputStream inputStream = file.getInputStream()) {
+                String key = this.uploadFile(
+                        prefix,
+                        file.getOriginalFilename(),
+                        inputStream,
+                        file.getSize(),
+                        file.getContentType()
+                );
+                savedKeys.add(key);
+            } catch (IOException e) {
+                log.error("Error saving pending file: {}", file.getOriginalFilename(), e);
+                throw new RuntimeException("Failed to save pending file: " + file.getOriginalFilename(), e);
+            }
+        }
+        return savedKeys;
+    }
 
+    @Override
+    public List<String> moveToAccepted(UUID requestId, List<String> pendingPaths) {
+        String acceptedPrefix = varsConfig.getAcceptedPrefix(requestId);
+        moveFilesAndDelete(pendingPaths, acceptedPrefix);
+        List<String> acceptedPaths = new ArrayList<>();
+        for (String pendingPath : pendingPaths) {
+            String fileName = extractFileName(pendingPath);
+            acceptedPaths.add(acceptedPrefix + "/" + fileName);
+        }
+        return acceptedPaths;
+    }
+
+    @Override
+    public void deletePendingFiles(UUID requestId) {
+        String prefix = varsConfig.getPendingPrefix(requestId);
+        deleteFolderByPrefix(prefix);
+    }
+
+    @Override
+    public String savePayoutEvidence(Long payoutRequestId, MultipartFile evidenceFile) {
+        try (InputStream inputStream = evidenceFile.getInputStream()) {
+            String prefix = "payouts/" + payoutRequestId;
+            return this.uploadFile(
+                    prefix,
+                    evidenceFile.getOriginalFilename(),
+                    inputStream,
+                    evidenceFile.getSize(),
+                    evidenceFile.getContentType()
+            );
+        } catch (IOException e) {
+            log.error("Failed to save payout evidence: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to save payout evidence: " + e.getMessage(), e);
+        }
+    }
 }

@@ -50,7 +50,7 @@ public class InvestmentMaturityScheduler {
                     
                     // Calculate expected return amount
                     if (investorInvestment.getExpectedReturnAmount() == null) {
-                        BigDecimal expectedReturn = calculateExpectedReturn(
+                        java.math.BigDecimal expectedReturn = calculateExpectedReturn(
                                 investorInvestment.getAmount(),
                                 investment.getExpectedReturn()
                         );

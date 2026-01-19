@@ -33,7 +33,7 @@ public class InvestmentRequestService {
     private final InvestorRepository investorRepository;
     private final InvestorNotificationRepository investorNotificationRepository;
     private final UserRepository userRepository;
-    private final MailService mailService;
+    private final IMailService mailService;
     private final CompanyNotificationSseController companyNotificationSseController;
 
     public InvestmentRequestService(
@@ -42,7 +42,7 @@ public class InvestmentRequestService {
             InvestorRepository investorRepository,
             InvestorNotificationRepository investorNotificationRepository,
             UserRepository userRepository,
-            MailService mailService,
+            IMailService mailService,
             CompanyNotificationSseController companyNotificationSseController) {
         this.investmentRequestRepository = investmentRequestRepository;
         this.investmentRepository = investmentRepository;
@@ -58,6 +58,10 @@ public class InvestmentRequestService {
         Investor investor = getCurrentInvestor();
         if (investor == null) {
             throw new IllegalStateException("User must be an investor to create an investment request");
+        }
+
+        if (!investor.getKycVerified()) {
+            throw new IllegalStateException("Your account must be verified to request investments.");
         }
 
         Investment investment = investmentRepository.findById(investmentId)
@@ -82,7 +86,8 @@ public class InvestmentRequestService {
         BigDecimal newTotalRaised = investment.getRaisedAmount().add(request.getAmount());
         if (newTotalRaised.compareTo(investment.getTargetAmount()) > 0) {
             BigDecimal remaining = investment.getTargetAmount().subtract(investment.getRaisedAmount());
-            throw new IllegalArgumentException("Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
+            throw new IllegalArgumentException(
+                    "Investment amount exceeds remaining target. Maximum investment allowed: " + remaining);
         }
 
         // Check if there's already a pending request for this investor and investment
@@ -111,15 +116,13 @@ public class InvestmentRequestService {
                 "Investor %s has requested to invest $%s in your project \"%s\"",
                 investor.getUser().getName(),
                 request.getAmount(),
-                investment.getTitle()
-        );
+                investment.getTitle());
         companyNotificationSseController.notifyCompany(
                 investment.getCompany().getId(),
                 CompanyNotificationType.INVESTOR_REQUEST,
                 "New Investment Request",
                 notificationMessage,
-                investment.getId()
-        );
+                investment.getId());
 
         log.info("Investment request created: ID={}, Investor={}, Investment={}, Amount={}",
                 investmentRequest.getId(), investor.getId(), investmentId, request.getAmount());
@@ -151,8 +154,7 @@ public class InvestmentRequestService {
         notification.setMessage(String.format(
                 "Your investment request of $%s for \"%s\" has been accepted. You can now proceed with payment.",
                 investmentRequest.getAmount(),
-                investmentRequest.getInvestment().getTitle()
-        ));
+                investmentRequest.getInvestment().getTitle()));
         notification.setRelatedInvestment(investmentRequest.getInvestment());
         notification.setRead(false);
         investorNotificationRepository.save(notification);
@@ -199,7 +201,8 @@ public class InvestmentRequestService {
         return investorRepository.findByUser(user).orElse(null);
     }
 
-    private void sendInvestmentRequestEmailToCompany(Investment investment, Investor investor, InvestmentRequest request) {
+    private void sendInvestmentRequestEmailToCompany(Investment investment, Investor investor,
+            InvestmentRequest request) {
         try {
             String companyEmail = investment.getCompany().getUser().getEmail();
             String investorName = investor.getUser().getName();
@@ -210,10 +213,10 @@ public class InvestmentRequestService {
             String subject = "New Investment Request - " + projectTitle;
             String htmlContent = String.format(
                     "<h2>New Investment Request</h2>" +
-                            "<p>Investor <strong>%s</strong> has requested to invest <strong>$%s</strong> in your project <strong>%s</strong>.</p>" +
+                            "<p>Investor <strong>%s</strong> has requested to invest <strong>$%s</strong> in your project <strong>%s</strong>.</p>"
+                            +
                             "<p>Please review the request in your dashboard and accept or reject it.</p>",
-                    investorName, amount, projectTitle
-            );
+                    investorName, amount, projectTitle);
 
             mailService.sendHtmlMail(companyEmail, subject, htmlContent);
         } catch (Exception e) {
@@ -232,10 +235,10 @@ public class InvestmentRequestService {
             String htmlContent = String.format(
                     "<h2>Investment Request Accepted</h2>" +
                             "<p>Dear %s,</p>" +
-                            "<p>Great news! Your investment request of <strong>$%s</strong> for the project <strong>%s</strong> has been accepted.</p>" +
+                            "<p>Great news! Your investment request of <strong>$%s</strong> for the project <strong>%s</strong> has been accepted.</p>"
+                            +
                             "<p>You can now proceed with payment through the secure payment link in your dashboard.</p>",
-                    investorName, amount, projectTitle
-            );
+                    investorName, amount, projectTitle);
 
             mailService.sendHtmlMail(investorEmail, subject, htmlContent);
         } catch (Exception e) {
@@ -254,11 +257,11 @@ public class InvestmentRequestService {
             String htmlContent = String.format(
                     "<h2>Investment Request Update</h2>" +
                             "<p>Dear %s,</p>" +
-                            "<p>We regret to inform you that your investment request of <strong>$%s</strong> for the project <strong>%s</strong> has been declined.</p>" +
+                            "<p>We regret to inform you that your investment request of <strong>$%s</strong> for the project <strong>%s</strong> has been declined.</p>"
+                            +
                             "<p><strong>Reason:</strong> %s</p>" +
                             "<p>You can explore other investment opportunities on our platform.</p>",
-                    investorName, amount, projectTitle, reason
-            );
+                    investorName, amount, projectTitle, reason);
 
             mailService.sendHtmlMail(investorEmail, subject, htmlContent);
         } catch (Exception e) {

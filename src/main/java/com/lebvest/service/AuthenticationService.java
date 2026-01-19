@@ -34,7 +34,7 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
     private final TokenRepository tokenRepository;
-    private final MailService mailService;
+    private final IMailService mailService;
     private final VarsConfig varsConfig;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,7 +44,7 @@ public class AuthenticationService {
             UserRepository userRepository,
             TokenRepository tokenRepository,
             PasswordEncoder passwordEncoder,
-            MailService mailService, VarsConfig varsConfig) {
+            IMailService mailService, VarsConfig varsConfig) {
         this.authenticationManager = authenticationManager;
         this.jwtService = jwtService;
         this.userRepository = userRepository;

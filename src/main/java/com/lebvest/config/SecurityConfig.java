@@ -52,6 +52,7 @@ public class SecurityConfig {
                         authorizeRequests
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers("/auth/**").permitAll()
+                                .requestMatchers("/api/dev/mail/**").permitAll() // Dev mail endpoint for viewing GreenMail messages
                                 .requestMatchers("/investments/featured").permitAll()
                                 .requestMatchers("/investments").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/investments/*").permitAll() // Public investment details and updates

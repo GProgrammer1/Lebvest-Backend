@@ -5,8 +5,8 @@ import com.lebvest.config.VarsConfig;
 import com.lebvest.model.dto.Attachment;
 import com.lebvest.model.dto.CompanySignupEmailEvent;
 import com.lebvest.model.dto.CompanySignupUploadEvent;
-import com.lebvest.service.MailService;
-import com.lebvest.service.S3Service;
+import com.lebvest.service.IMailService;
+import com.lebvest.service.IFileStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -15,19 +15,19 @@ import org.springframework.stereotype.Component;
 //@Component  // Disabled - RabbitMQ not needed
 public class CompanySignupWorker {
 
-    private S3Service s3Service;
-    private MailService mailService;
+    private IFileStorageService fileStorageService;
+    private IMailService mailService;
     private VarsConfig varsConfig;
 
-    public CompanySignupWorker(S3Service s3Service, MailService mailService, VarsConfig varsConfig) {
-        this.s3Service = s3Service;
+    public CompanySignupWorker(IFileStorageService fileStorageService, IMailService mailService, VarsConfig varsConfig) {
+        this.fileStorageService = fileStorageService;
         this.mailService = mailService;
         this.varsConfig = varsConfig;
     }
 
     @RabbitListener(queues = "company.signup.upload")
     public void handleUpload(CompanySignupUploadEvent event) {
-        s3Service.uploadPendingDocs(event.requestId(), event.files());
+        fileStorageService.uploadPendingDocs(event.requestId(), event.files());
     }
 
     @RabbitListener(queues = "company.signup.email")
