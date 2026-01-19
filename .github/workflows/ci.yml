@@ -5,11 +5,20 @@ on:
     branches: 
       - main
       - test/**
-
+      - test/auth
+      - test/investor-registration
+      - test/company-registration
+      - test/investment
+      - test/admin
   pull_request:
     branches: 
       - main
       - test/**
+      - test/auth
+      - test/investor-registration
+      - test/company-registration
+      - test/investment
+      - test/admin
 
 
 jobs:
