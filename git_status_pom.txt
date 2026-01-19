@@ -1,0 +1,40 @@
+On branch test/kyc-implementation
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   .gitignore
+	modified:   src/main/java/com/lebvest/config/S3Config.java
+	modified:   src/main/java/com/lebvest/messaging/BackgroundJobHandler.java
+	modified:   src/main/java/com/lebvest/messaging/CompanySignupListeners.java
+	modified:   src/main/java/com/lebvest/model/entities/investment/Investment.java
+	modified:   src/main/java/com/lebvest/model/entities/investment/InvestorInvestment.java
+	modified:   src/main/java/com/lebvest/model/events/CompanySignupWorker.java
+	modified:   src/main/java/com/lebvest/repository/UserRepository.java
+	modified:   src/main/java/com/lebvest/service/AuthenticationService.java
+	modified:   src/main/java/com/lebvest/service/CleanupService.java
+	modified:   src/main/java/com/lebvest/service/CompanyRegistrationService.java
+	modified:   src/main/java/com/lebvest/service/CompanyService.java
+	modified:   src/main/java/com/lebvest/service/FileValidationService.java
+	modified:   src/main/java/com/lebvest/service/InvestmentMaturityScheduler.java
+	modified:   src/main/java/com/lebvest/service/LocalFileStorageService.java
+	modified:   src/main/java/com/lebvest/service/MailService.java
+	modified:   src/main/java/com/lebvest/service/PayoutService.java
+	modified:   src/main/java/com/lebvest/service/S3Service.java
+	modified:   src/main/resources/application.yml
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	.envrc
+	.mvn/wrapper/maven-wrapper.jar
+	final_test_results.log
+	git_status.txt
+	git_status_pom.txt
+	git_status_staged.txt
+	scripts/
+	set-java.sh
+	src/main/java/com/lebvest/service/DevMailService.java
+	src/main/java/com/lebvest/util/CreateAdminUser.java
+	src/main/resources/application-dev.yml
+	test_output.log
+
+no changes added to commit (use "git add" and/or "git commit -a")

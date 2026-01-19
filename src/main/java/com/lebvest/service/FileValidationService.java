@@ -1,8 +1,8 @@
 package com.lebvest.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tika.Tika;
 import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
@@ -34,10 +34,10 @@ public class FileValidationService {
             ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".jpg", ".jpeg", ".png", ".gif", ".webp"
     ));
 
-    private final Tika tika;
+    private final Detector detector;
 
     public FileValidationService() {
-        this.tika = new Tika(new DefaultDetector());
+        this.detector = new DefaultDetector();
     }
 
     /**
@@ -80,8 +80,8 @@ public class FileValidationService {
              TikaInputStream tikaInputStream = TikaInputStream.get(inputStream)) {
             
             Metadata metadata = new Metadata();
-            metadata.set(Metadata.RESOURCE_NAME_KEY, originalFilename);
-            MediaType detectedType = tika.getDetector().detect(tikaInputStream, metadata);
+            metadata.set(Metadata.TIKA_MIME_FILE, originalFilename);
+            MediaType detectedType = detector.detect(tikaInputStream, metadata);
             String detectedMimeType = detectedType.toString();
 
             log.info("File validation - Original: {}, Detected: {}, Expected Image: {}", 

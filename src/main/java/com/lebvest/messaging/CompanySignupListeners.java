@@ -5,8 +5,8 @@ import com.lebvest.model.events.Attachment;
 import com.lebvest.model.events.CompanySignupAcceptedMoveEvent;
 import com.lebvest.model.events.CompanySignupEmailEvent;
 import com.lebvest.model.events.CompanySignupUploadEvent;
-import com.lebvest.service.MailService;
-import com.lebvest.service.S3Service;
+import com.lebvest.service.IMailService;
+import com.lebvest.service.IFileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -21,12 +21,12 @@ public class CompanySignupListeners {
     private static final Logger log = LoggerFactory.getLogger(CompanySignupListeners.class);
 
     private final VarsConfig varsConfig;
-    private final S3Service s3Service;
-    private final MailService mailService;
+    private final IFileStorageService fileStorageService;
+    private final IMailService mailService;
 
-    public CompanySignupListeners(VarsConfig varsConfig, S3Service s3Service, MailService mailService) {
+    public CompanySignupListeners(VarsConfig varsConfig, IFileStorageService fileStorageService, IMailService mailService) {
         this.varsConfig = varsConfig;
-        this.s3Service = s3Service;
+        this.fileStorageService = fileStorageService;
         this.mailService = mailService;
     }
 
@@ -43,7 +43,7 @@ public class CompanySignupListeners {
 
         for (Attachment a : event.getFiles()) {
             try (var in = new ByteArrayInputStream(a.getContent())) {
-                s3Service.uploadFile(
+                fileStorageService.uploadFile(
                         prefix,
                         a.getFilename(),
                         in,
@@ -86,7 +86,7 @@ public class CompanySignupListeners {
 
         List<String> keys = event.getKeys();
         if (keys == null || keys.isEmpty()) {
-            keys = s3Service.listFilesByPrefix(pendingPrefix);
+            keys = fileStorageService.listFilesByPrefix(pendingPrefix);
         }
 
         if (keys == null || keys.isEmpty()) {
@@ -95,7 +95,7 @@ public class CompanySignupListeners {
         }
 
         try {
-            s3Service.moveFilesAndDelete(keys, acceptedPrefix);
+            fileStorageService.moveFilesAndDelete(keys, acceptedPrefix);
             log.info("Moved {} document(s) from {} to {} for requestId={}",
                     keys.size(), pendingPrefix, acceptedPrefix, requestId);
         } catch (Exception ex) {

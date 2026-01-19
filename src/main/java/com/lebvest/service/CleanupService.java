@@ -8,18 +8,17 @@ import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
-
 public class CleanupService {
 
-    private final S3Service s3Service;
+    private final IFileStorageService fileStorageService;
 
-    public CleanupService(S3Service s3Service) {
-        this.s3Service = s3Service;
+    public CleanupService(IFileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
     }
     @Async("s3CleanupExecutor")
     public CompletableFuture<Void> deleteByFolder(String prefix) {
         try {
-            s3Service.deleteFolderByPrefix(prefix);
+            fileStorageService.deleteFolderByPrefix(prefix);
         } catch (Exception ex) {
             log.error("Failed to cleanup {}", prefix, ex);
         }

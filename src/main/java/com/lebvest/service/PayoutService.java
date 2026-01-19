@@ -36,7 +36,7 @@ public class PayoutService {
     private final InvestorRepository investorRepository;
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
-    private final LocalFileStorageService fileStorageService;
+    private final IFileStorageService fileStorageService;
 
     @Transactional
     public PayoutRequest createPayoutRequest(Long investorInvestmentId) {

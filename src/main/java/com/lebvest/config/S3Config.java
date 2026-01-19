@@ -16,6 +16,7 @@ import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import java.time.Duration;
 
 @Configuration
+@org.springframework.context.annotation.Profile("!dev")
 public class S3Config {
 
     @Value("${aws.credentials.accessKey}")

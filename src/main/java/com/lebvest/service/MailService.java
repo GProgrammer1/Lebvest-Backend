@@ -15,8 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Service
+@org.springframework.context.annotation.Profile("!dev")
 @RequiredArgsConstructor
-public class MailService {
+public class MailService implements IMailService {
 
     private final JavaMailSender mailSender;
 

@@ -27,7 +27,7 @@ public class CompanyFinancial {
     )
     private Company company;
 
-    @Column(nullable = false)
+    @Column(name = "`year`", nullable = false)
     private int year;
 
     @Column(name = "revenue", nullable = false, precision = 15, scale = 2)

@@ -29,8 +29,8 @@ public class CompanyRegistrationService {
     private final CompanySignupRequestRepository companySignupRequestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final LocalFileStorageService localFileStorageService;
-    private final MailService mailService;
+    private final IFileStorageService fileStorageService;
+    private final IMailService mailService;
     private final VarsConfig varsConfig;
     private final AdminNotificationSseController adminNotificationSseController;
 
@@ -39,8 +39,8 @@ public class CompanyRegistrationService {
                                       CompanySignupRequestRepository companySignupRequestRepository,
                                       PasswordEncoder passwordEncoder,
                                       JwtService jwtService,
-                                      LocalFileStorageService localFileStorageService,
-                                      MailService mailService,
+                                      IFileStorageService fileStorageService,
+                                      IMailService mailService,
                                       VarsConfig varsConfig,
                                       AdminNotificationSseController adminNotificationSseController) {
         this.userRepository = userRepository;
@@ -48,7 +48,7 @@ public class CompanyRegistrationService {
         this.companySignupRequestRepository = companySignupRequestRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
-        this.localFileStorageService = localFileStorageService;
+        this.fileStorageService = fileStorageService;
         this.mailService = mailService;
         this.varsConfig = varsConfig;
         this.adminNotificationSseController = adminNotificationSseController;
@@ -120,7 +120,7 @@ public class CompanyRegistrationService {
             UUID requestId = signupRequest.getRequestId(); // Use the request's UUID, not a random one
             log.info("Using requestId for file upload: {}", requestId);
             
-            documentPaths = localFileStorageService.savePendingFiles(requestId, req.getDocuments());
+            documentPaths = fileStorageService.savePendingFiles(requestId, req.getDocuments());
             log.info("File upload completed. Saved {} document paths for request ID: {}", 
                     documentPaths.size(), signupRequest.getId());
             
